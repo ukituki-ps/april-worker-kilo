@@ -1,8 +1,8 @@
 openapi: 3.1.0
 info:
-  title: Microservice Template API
+  title: aprilWorker API
   description: |
-    Источник истины для REST API микросервиса на базе шаблона april_template.
+    Источник истины для REST API микросервиса aprilWorker.
     Спецификация ведётся в репозитории (`openapi/openapi.yaml`); при форке замените `info.title` и `servers`.
   version: 0.1.0
   license:
