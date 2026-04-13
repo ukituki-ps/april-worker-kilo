@@ -2,6 +2,8 @@
 
 Микросервис экосистемы **April** (документация Docusaurus, OpenAPI, Structurizr, Docker Compose, CI, сценарий деплоя). Репозиторий создан из шаблона [april_template](https://github.com/ukituki-ps/april_template).
 
+Один репозиторий соответствует **одному сервису** в экосистеме; backend по умолчанию описывается как **модульный монолит** (см. [`docs/AGENT_ARCHITECTURE_CONTEXT.md`](docs/AGENT_ARCHITECTURE_CONTEXT.md)); прикладной backend/frontend добавляются по мере разработки.
+
 ## Быстрый старт
 
 1. `cp .env.example .env` при необходимости.
@@ -20,8 +22,9 @@
 | [`docs/guides/FORK_AND_CUSTOMIZE.md`](docs/guides/FORK_AND_CUSTOMIZE.md) | Чеклист при копировании шаблона (для форков) |
 | [`docs/AGENT_ARCHITECTURE_CONTEXT.md`](docs/AGENT_ARCHITECTURE_CONTEXT.md) | Стек и границы |
 | [`docs/DEPLOYMENT_STRATEGY.md`](docs/DEPLOYMENT_STRATEGY.md) | Деплой на dev |
+| [`docs/guides/DESIGN_SYSTEM.md`](docs/guides/DESIGN_SYSTEM.md) | Дизайн-система April (`@april/tokens`, `@april/ui`) |
 | [`openapi/openapi.yaml`](openapi/openapi.yaml) | OpenAPI 3.1 |
 
 ## Лицензия
 
-_(по решению владельца репозитория)_
+См. [`LICENSE`](LICENSE): шаблон **MIT** с плейсхолдерами — замените год и правообладателя под свой проект или выберите другую лицензию.
