@@ -21,7 +21,7 @@ docs-serve:
 	cd docs-site && npm run serve
 
 openapi-lint:
-	npx --yes @redocly/cli@1.25.0 lint openapi/openapi.yaml openapi/mail-gateway-openapi.yaml --config redocly.yaml
+	npx --yes @redocly/cli@1.25.0 lint openapi/openapi.yaml openapi/mail-gateway-openapi.yaml openapi/aprilhub-bff.yaml --config redocly.yaml
 
 compose-config:
 	docker compose config
