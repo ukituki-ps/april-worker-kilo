@@ -55,3 +55,33 @@ make openapi-lint
 ```bash
 make compose-config
 ```
+
+## AprilHub runtime profile (Hub Shell + Hub BFF + Keycloak)
+
+1. Подготовьте env:
+
+```bash
+cp .env.example .env
+```
+
+2. Поднимите runtime-профиль:
+
+```bash
+docker compose --profile aprilhub up -d
+```
+
+3. Проверьте базовые endpoint-ы:
+
+```bash
+curl http://localhost:8081/healthz
+curl http://localhost:8081/readyz
+```
+
+4. Проверка smoke login path:
+- Keycloak Admin Console: `http://localhost:8082/admin/`
+- Realm: `april`
+- Dev user: `april-dev`
+- Password: `april-dev-pass`
+
+5. OpenAPI Hub BFF:
+- `http://localhost:8080/openapi/aprilhub-bff.yaml`

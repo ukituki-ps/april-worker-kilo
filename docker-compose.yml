@@ -33,3 +33,75 @@ services:
       # Lite создаёт/обновляет workspace.json при работе — том не только для чтения
       - ./structurizr:/usr/local/structurizr
     restart: unless-stopped
+
+  hub-bff:
+    image: golang:1.22-alpine
+    profiles: ["aprilhub"]
+    working_dir: /workspace/hub-bff
+    command: sh -c "go mod download && go run ./cmd/hub-bff"
+    environment:
+      HUB_BFF_PORT: ${HUB_BFF_PORT:-8081}
+      KEYCLOAK_URL: ${KEYCLOAK_URL:-http://keycloak:8080}
+      KEYCLOAK_REALM: ${KEYCLOAK_REALM:-april}
+      KEYCLOAK_ISSUER: ${KEYCLOAK_ISSUER:-http://localhost:8082/realms/april}
+      KEYCLOAK_AUDIENCE: ${KEYCLOAK_AUDIENCE:-aprilhub-shell}
+      KEYCLOAK_JWKS_URL: ${KEYCLOAK_JWKS_URL:-http://keycloak:8080/realms/april/protocol/openid-connect/certs}
+    volumes:
+      - ./:/workspace
+    ports:
+      - "${HUB_BFF_PORT:-8081}:8081"
+    depends_on:
+      - keycloak
+    restart: unless-stopped
+
+  hub-shell:
+    image: node:20-alpine
+    profiles: ["aprilhub"]
+    working_dir: /workspace/hub-shell
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0 --port ${HUB_SHELL_PORT:-4173}"
+    environment:
+      VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8081}
+      VITE_KEYCLOAK_URL: ${VITE_KEYCLOAK_URL:-http://localhost:8082}
+      VITE_KEYCLOAK_REALM: ${VITE_KEYCLOAK_REALM:-april}
+      VITE_KEYCLOAK_CLIENT_ID: ${VITE_KEYCLOAK_CLIENT_ID:-aprilhub-shell}
+    volumes:
+      - ./:/workspace
+    ports:
+      - "${HUB_SHELL_PORT:-4173}:4173"
+    depends_on:
+      - hub-bff
+    restart: unless-stopped
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.1
+    profiles: ["aprilhub"]
+    command: start-dev --import-realm
+    environment:
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN:-admin}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin}
+      KC_DB: postgres
+      KC_DB_URL_HOST: keycloak-db
+      KC_DB_URL_DATABASE: ${KEYCLOAK_DB_NAME:-keycloak}
+      KC_DB_USERNAME: ${KEYCLOAK_DB_USER:-keycloak}
+      KC_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD:-keycloak}
+    volumes:
+      - ./infra/keycloak/realm:/opt/keycloak/data/import:ro
+    ports:
+      - "${KEYCLOAK_HTTP_PORT:-8082}:8080"
+    depends_on:
+      - keycloak-db
+    restart: unless-stopped
+
+  keycloak-db:
+    image: postgres:17-alpine
+    profiles: ["aprilhub"]
+    environment:
+      POSTGRES_DB: ${KEYCLOAK_DB_NAME:-keycloak}
+      POSTGRES_USER: ${KEYCLOAK_DB_USER:-keycloak}
+      POSTGRES_PASSWORD: ${KEYCLOAK_DB_PASSWORD:-keycloak}
+    volumes:
+      - keycloak_pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  keycloak_pgdata:
