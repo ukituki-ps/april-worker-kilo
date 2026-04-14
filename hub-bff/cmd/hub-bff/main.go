@@ -23,7 +23,18 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/healthz", httpapi.Healthz)
 	mux.HandleFunc("/readyz", httpapi.Readyz)
-	mux.Handle("/api/v1/overview", authMiddleware.Validate(http.HandlerFunc(httpapi.Overview)))
+	mux.Handle(
+		"/api/v1/overview",
+		authMiddleware.Validate(auth.RequireAnyRole("user", "admin")(http.HandlerFunc(httpapi.Overview))),
+	)
+	mux.Handle(
+		"/api/v1/me",
+		authMiddleware.Validate(auth.RequireAnyRole("user", "admin")(http.HandlerFunc(httpapi.Me))),
+	)
+	mux.Handle(
+		"/api/v1/admin/ping",
+		authMiddleware.Validate(auth.RequireAnyRole("admin")(http.HandlerFunc(httpapi.AdminPing))),
+	)
 
 	addr := ":" + cfg.Port
 	log.Printf("hub-bff listening on %s", addr)
