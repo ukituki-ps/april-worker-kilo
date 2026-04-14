@@ -19,3 +19,17 @@
 Граница: **один репозиторий = один сервис**; внутри репозитория допустим **модульный монолит** (не путать с «микросервисом на каждый модуль»).
 
 Версии инструментов и образов — в [`guides/VERSIONS.md`](./guides/VERSIONS.md). Форк репозитория под новый сервис — [`guides/FORK_AND_CUSTOMIZE.md`](./guides/FORK_AND_CUSTOMIZE.md).
+
+## Архитектурные документы (для агента)
+
+Канонический набор архитектурных материалов расположен в `docs/architecture/`:
+
+- [`architecture/README.md`](./architecture/README.md)
+- [`architecture/структура сервиса.md`](./architecture/структура%20сервиса.md)
+- [`architecture/INTERSERVICE_LINKS.md`](./architecture/INTERSERVICE_LINKS.md)
+- [`architecture/INTEGRATION_CONTRACTS.md`](./architecture/INTEGRATION_CONTRACTS.md)
+- [`architecture/APRILHUB_C3_C4.md`](./architecture/APRILHUB_C3_C4.md)
+- [`architecture/APRILWORKER_C3_C4.md`](./architecture/APRILWORKER_C3_C4.md)
+- [`architecture/C4_RUNTIME_SEQUENCES.md`](./architecture/C4_RUNTIME_SEQUENCES.md)
+
+Модель C4 в Structurizr: `structurizr/workspace.dsl`.

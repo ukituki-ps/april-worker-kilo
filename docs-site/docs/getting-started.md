@@ -77,11 +77,29 @@ curl http://localhost:8081/healthz
 curl http://localhost:8081/readyz
 ```
 
-4. Проверка smoke login path:
+4. Проверка smoke auth path:
 - Keycloak Admin Console: `http://localhost:8082/admin/`
 - Realm: `april`
 - Dev user: `april-dev`
 - Password: `april-dev-pass`
 
-5. OpenAPI Hub BFF:
+5. Получите access token и проверьте auth/RBAC контракт:
+
+```bash
+TOKEN=$(curl -s -X POST "http://localhost:8082/realms/april/protocol/openid-connect/token" \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "grant_type=password&client_id=aprilhub-shell&username=april-dev&password=april-dev-pass" \
+  | python3 -c 'import sys,json; print(json.load(sys.stdin)["access_token"])')
+
+# 200: профиль текущего пользователя
+curl -i -H "Authorization: Bearer $TOKEN" http://localhost:8081/api/v1/me
+
+# 401: отсутствует Bearer token
+curl -i http://localhost:8081/api/v1/overview
+
+# 403: недостаточная роль (dev-user имеет только роль user)
+curl -i -H "Authorization: Bearer $TOKEN" http://localhost:8081/api/v1/admin/ping
+```
+
+6. OpenAPI Hub BFF:
 - `http://localhost:8080/openapi/aprilhub-bff.yaml`

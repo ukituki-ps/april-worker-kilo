@@ -12,6 +12,13 @@
 | Ветка деплоя на dev | `develop` |
 | Когда деплоим | Только после merge PR в `develop` |
 
+### Рабочая ветка для AprilHub (до завершения roadmap)
+
+- Для реализации полного roadmap `AprilHub` (`task_list.md`, эпики `001-010`) используется выделенная долгоживущая ветка: `feature/aprilhub-implementation`.
+- Все изменения, относящиеся к `Hub Shell`, `Hub BFF`, интеграционным контрактам и сопровождающей документации AprilHub, вносятся в эту ветку до закрытия roadmap.
+- Текущий поток слияний: feature/task branches (при необходимости) -> `feature/aprilhub-implementation` -> `develop`.
+- Dev-деплой остаётся неизменным: публикация в dev по-прежнему выполняется после merge в `develop`.
+
 **Практика для GitHub Actions:** workflow запускается на **`push` в `develop`** (merge PR даёт такой push). Чтобы исключить прямой push в `develop`, на GitHub включается **branch protection** для `develop` (запрет прямых push, обязательный PR). Тогда событие `push` в `develop` по смыслу соответствует «приняли PR».
 
 **Реализация в репозитории:** workflow **Deploy to dev** (файл `.github/workflows/dev-deploy.yml`) на **self-hosted** runner с labels **`dev`** и **`RUNNER_LABEL_EXTRA`** (для april-worker: `worker`) выполняет в каталоге клона (**`DEPLOY_ROOT`**, для april-worker: `/opt/april-worker`) `git fetch`, переход на коммит **`github.sha`**, затем **`SKIP_GIT_PULL=1 ./deploy.sh`**. Путь к клону можно переопределить **repository variable** `APRIL_DEPLOY_ROOT`. Ручной перезапуск того же сценария — **Actions → Deploy to dev → Run workflow** (`workflow_dispatch`).

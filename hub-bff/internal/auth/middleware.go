@@ -2,6 +2,7 @@ package auth
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"slices"
@@ -11,9 +12,18 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-type Claims struct {
+type realmAccess struct {
 	Roles []string `json:"roles"`
-	AZP   string   `json:"azp"`
+}
+
+type Claims struct {
+	AZP               string      `json:"azp"`
+	PreferredUsername string      `json:"preferred_username"`
+	Email             string      `json:"email"`
+	GivenName         string      `json:"given_name"`
+	FamilyName        string      `json:"family_name"`
+	Name              string      `json:"name"`
+	RealmAccess       realmAccess `json:"realm_access"`
 	jwt.RegisteredClaims
 }
 
@@ -36,11 +46,39 @@ func NewMiddleware(issuer, audience, jwksURL string) (*Middleware, error) {
 	}, nil
 }
 
+type contextKey string
+
+const claimsContextKey contextKey = "auth_claims"
+
+type errorResponse struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+func writeError(w http.ResponseWriter, code int, appCode, message string) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(code)
+	_ = json.NewEncoder(w).Encode(errorResponse{
+		Code:    appCode,
+		Message: message,
+	})
+}
+
+func ClaimsFromContext(ctx context.Context) (*Claims, bool) {
+	claims, ok := ctx.Value(claimsContextKey).(*Claims)
+	return claims, ok
+}
+
 func (m *Middleware) Validate(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		tokenValue := strings.TrimPrefix(r.Header.Get("Authorization"), "Bearer ")
-		if tokenValue == "" || tokenValue == r.Header.Get("Authorization") {
-			http.Error(w, "missing bearer token", http.StatusUnauthorized)
+		authHeader := r.Header.Get("Authorization")
+		if !strings.HasPrefix(authHeader, "Bearer ") {
+			writeError(w, http.StatusUnauthorized, "unauthorized", "missing bearer token")
+			return
+		}
+		tokenValue := strings.TrimPrefix(authHeader, "Bearer ")
+		if tokenValue == "" {
+			writeError(w, http.StatusUnauthorized, "unauthorized", "missing bearer token")
 			return
 		}
 
@@ -48,17 +86,40 @@ func (m *Middleware) Validate(next http.Handler) http.Handler {
 		_, err := jwt.ParseWithClaims(tokenValue, claims, m.jwks.Keyfunc,
 			jwt.WithIssuer(m.issuer),
 			jwt.WithValidMethods([]string{"RS256", "RS384", "RS512"}),
+			jwt.WithExpirationRequired(),
 		)
 		if err != nil {
-			http.Error(w, "invalid token", http.StatusUnauthorized)
+			writeError(w, http.StatusUnauthorized, "unauthorized", "invalid token")
 			return
 		}
 
 		if m.audience != "" && !slices.Contains(claims.Audience, m.audience) && claims.AZP != m.audience {
-			http.Error(w, "invalid audience", http.StatusUnauthorized)
+			writeError(w, http.StatusUnauthorized, "unauthorized", "invalid audience")
 			return
 		}
 
-		next.ServeHTTP(w, r)
+		ctx := context.WithValue(r.Context(), claimsContextKey, claims)
+		next.ServeHTTP(w, r.WithContext(ctx))
 	})
+}
+
+func RequireAnyRole(roles ...string) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			claims, ok := ClaimsFromContext(r.Context())
+			if !ok {
+				writeError(w, http.StatusUnauthorized, "unauthorized", "missing auth context")
+				return
+			}
+
+			for _, role := range claims.RealmAccess.Roles {
+				if slices.Contains(roles, role) {
+					next.ServeHTTP(w, r)
+					return
+				}
+			}
+
+			writeError(w, http.StatusForbidden, "forbidden", "insufficient role")
+		})
+	}
 }
