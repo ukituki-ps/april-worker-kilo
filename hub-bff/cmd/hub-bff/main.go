@@ -38,7 +38,7 @@ func main() {
 
 	addr := ":" + cfg.Port
 	log.Printf("hub-bff listening on %s", addr)
-	if err := http.ListenAndServe(addr, mux); err != nil {
+	if err := http.ListenAndServe(addr, httpapi.CORS(cfg.CORSOrigins, mux)); err != nil {
 		log.Fatalf("server stopped: %v", err)
 	}
 }

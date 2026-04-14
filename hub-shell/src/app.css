@@ -1,0 +1,77 @@
+.zone-container {
+  max-width: 720px;
+  margin: 40px auto;
+  padding: 24px;
+  display: grid;
+  gap: 12px;
+  border: 1px solid #d0d7de;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.app-shell {
+  min-height: 100vh;
+  background: #f6f8fa;
+}
+
+.shell-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  border-bottom: 1px solid #d0d7de;
+  background: #ffffff;
+}
+
+.shell-user {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.shell-layout {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 16px;
+  padding: 16px;
+}
+
+.shell-nav {
+  display: grid;
+  gap: 8px;
+  align-content: start;
+  padding: 16px;
+  border: 1px solid #d0d7de;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.shell-content {
+  padding: 16px;
+  border: 1px solid #d0d7de;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.composition-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+.widget-card,
+.state {
+  border: 1px solid #d0d7de;
+  border-radius: 8px;
+  padding: 12px;
+  background: #fff;
+}
+
+.state-loading {
+  background: #eff6ff;
+}
+
+.state-error,
+.state-forbidden {
+  background: #fff5f5;
+}
