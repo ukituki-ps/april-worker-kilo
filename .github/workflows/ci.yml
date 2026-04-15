@@ -76,3 +76,14 @@ jobs:
       - name: Hub Shell build
         working-directory: hub-shell
         run: npm run build
+
+  aprilhub-smoke:
+    name: AprilHub runtime smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run AprilHub smoke checks
+        run: ./scripts/smoke-aprilhub.sh

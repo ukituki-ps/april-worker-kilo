@@ -32,6 +32,7 @@
 - [x] `001-aprilhub-bootstrap`: каркас `hub-bff`/`hub-shell` + dev Keycloak + health/readiness + env templates
 - [x] `002-aprilhub-auth-rbac`: OIDC flow в `hub-shell`, `/me` + role guards в `hub-bff`
 - [ ] [IN PROGRESS] `003-aprilhub-shell-design-system`: UX/layout для guest, Keycloak transitions и authorized shell по дизайн-системе
+- [ ] [IN PROGRESS] `004-hub-bff-aggregation-runtime`: постановка + план готовы, реализация aggregation runtime в `hub-bff`
 
 ## План реализации AprilHub: статусы
 
@@ -40,7 +41,7 @@
 | `001` | Bootstrap platform baseline (`hub-bff`, `hub-shell`, compose, CI) | ✅ Выполнено | [`tasks/001-aprilhub-bootstrap/REPORT.md`](./tasks/001-aprilhub-bootstrap/REPORT.md) |
 | `002` | Auth + RBAC через Keycloak (OIDC flow, JWT validation, `/me`, role gates) | ✅ Выполнено | [`tasks/002-aprilhub-auth-rbac/REPORT.md`](./tasks/002-aprilhub-auth-rbac/REPORT.md) |
 | `003` | Hub Shell composition + дизайн-системный UX (guest/Keycloak/authorized) | 🔄 В работе | [`tasks/003-aprilhub-shell-design-system/TASK.md`](./tasks/003-aprilhub-shell-design-system/TASK.md) |
-| `004` | Hub BFF aggregation MVP (fan-out adapters, partial response, timeout/retry policy) | ⏳ Не начато | — |
+| `004` | Hub BFF aggregation MVP (fan-out adapters, partial response, timeout/retry policy) | 🔄 В работе | [`tasks/004-hub-bff-aggregation-runtime/TASK.md`](./tasks/004-hub-bff-aggregation-runtime/TASK.md) |
 | `005` | Integration contracts finalization (sync/async contract hardening, OpenAPI alignment) | ⏳ Не начато | — |
 | `006` | Observability + trace propagation (`correlationId/requestId`, metrics/logging) | ⏳ Не начато | — |
 | `007` | Data/runtime dependencies and migrations readiness (если требуется persistence в Hub BFF) | ⏳ Не начато | — |

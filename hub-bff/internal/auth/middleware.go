@@ -51,16 +51,22 @@ type contextKey string
 const claimsContextKey contextKey = "auth_claims"
 
 type errorResponse struct {
-	Code    string `json:"code"`
-	Message string `json:"message"`
+	Code     string            `json:"code"`
+	Message  string            `json:"message"`
+	Metadata map[string]string `json:"metadata"`
 }
 
-func writeError(w http.ResponseWriter, code int, appCode, message string) {
+func writeError(w http.ResponseWriter, r *http.Request, code int, appCode, message string) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
 	_ = json.NewEncoder(w).Encode(errorResponse{
 		Code:    appCode,
 		Message: message,
+		Metadata: map[string]string{
+			"correlationId": r.Header.Get("X-Correlation-Id"),
+			"requestId":     r.Header.Get("X-Request-Id"),
+			"sourceService": "hub-bff",
+		},
 	})
 }
 
@@ -73,12 +79,12 @@ func (m *Middleware) Validate(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		authHeader := r.Header.Get("Authorization")
 		if !strings.HasPrefix(authHeader, "Bearer ") {
-			writeError(w, http.StatusUnauthorized, "unauthorized", "missing bearer token")
+			writeError(w, r, http.StatusUnauthorized, "unauthorized", "missing bearer token")
 			return
 		}
 		tokenValue := strings.TrimPrefix(authHeader, "Bearer ")
 		if tokenValue == "" {
-			writeError(w, http.StatusUnauthorized, "unauthorized", "missing bearer token")
+			writeError(w, r, http.StatusUnauthorized, "unauthorized", "missing bearer token")
 			return
 		}
 
@@ -89,12 +95,12 @@ func (m *Middleware) Validate(next http.Handler) http.Handler {
 			jwt.WithExpirationRequired(),
 		)
 		if err != nil {
-			writeError(w, http.StatusUnauthorized, "unauthorized", "invalid token")
+			writeError(w, r, http.StatusUnauthorized, "unauthorized", "invalid token")
 			return
 		}
 
 		if m.audience != "" && !slices.Contains(claims.Audience, m.audience) && claims.AZP != m.audience {
-			writeError(w, http.StatusUnauthorized, "unauthorized", "invalid audience")
+			writeError(w, r, http.StatusUnauthorized, "unauthorized", "invalid audience")
 			return
 		}
 
@@ -108,7 +114,7 @@ func RequireAnyRole(roles ...string) func(http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			claims, ok := ClaimsFromContext(r.Context())
 			if !ok {
-				writeError(w, http.StatusUnauthorized, "unauthorized", "missing auth context")
+				writeError(w, r, http.StatusUnauthorized, "unauthorized", "missing auth context")
 				return
 			}
 
@@ -119,7 +125,7 @@ func RequireAnyRole(roles ...string) func(http.Handler) http.Handler {
 				}
 			}
 
-			writeError(w, http.StatusForbidden, "forbidden", "insufficient role")
+			writeError(w, r, http.StatusForbidden, "forbidden", "insufficient role")
 		})
 	}
 }
