@@ -1,16 +1,17 @@
-# Integration Contracts (Draft)
+# Integration Contracts
 
-Документ фиксирует рабочий черновик контрактов интеграции между сервисами April.
+Документ фиксирует baseline контрактов интеграции между сервисами April.
 
 Источник текущих связей:
 - `structurizr/workspace.dsl`
 - `docs/architecture/INTERSERVICE_LINKS.md`
+- `openapi/aprilhub-bff.yaml`
 
 ## Статус документа
 
-- Версия: `draft v1`
-- Назначение: выровнять ожидания команд до детализации OpenAPI/event-схем
-- Поля с точными параметрами и форматами могут иметь `TBD`
+- Версия: `v1 baseline`
+- Назначение: согласовать runtime-контракты и публичный API без расхождений
+- Scope этапа `005`: финализация контрактов `Hub BFF -> downstream` и policy обратной совместимости OpenAPI `aprilhub-bff`
 
 ## Общие правила
 
@@ -18,9 +19,57 @@
 - **Sync-вызовы**: REST, явный timeout, повтор только для идемпотентных операций.
 - **Async-интеграции**: Event/API, at-least-once доставка, обязательная идемпотентность consumer.
 - **Корреляция**: во все вызовы/события передаётся `correlationId`.
-- **Трассировка**: обязательны технические метаданные (`requestId`, `sourceService`, `timestamp`).
+- **Трассировка**: обязательны технические метаданные (`requestId`, `sourceService`); `timestamp` рекомендуется, если контракт это поддерживает.
+- **Degraded policy**: для BFF-агрегации допускается partial response без повторной эскалации в UI-оркестрацию.
 
-## Sync contracts (REST)
+## Hub BFF -> downstream (agreed baseline)
+
+Контракты ниже описывают фактический runtime `hub-bff/internal/aggregation` и являются baseline для этапов `006/008`.
+
+| Producer | Consumer | Назначение | Contract ID | Path | Timeout | Retry | Idempotency | Degraded policy | Status |
+|---|---|---|---|---|---|---|---|---|---|
+| `Hub BFF` | `AprilWorkFlow` | Dashboard workflow widget | `SYNC-HB-AWF-001` | `/api/v1/ui/dashboard/workflow` | `2s` | `1` retry only on transport timeout for safe GET | Required (GET) | Mark source degraded, keep `200` with partial payload | Agreed |
+| `Hub BFF` | `AprilNFlow` | Dashboard notifications widget | `SYNC-HB-ANF-001` | `/api/v1/ui/dashboard/notifications` | `2s` | `1` retry only on transport timeout for safe GET | Required (GET) | Mark source degraded, keep `200` with partial payload | Agreed |
+| `Hub BFF` | `AprilProfil` | Dashboard profile widget | `SYNC-HB-APR-001` | `/api/v1/ui/dashboard/profile` | `2s` | `1` retry only on transport timeout for safe GET | Required (GET) | Mark source degraded, keep `200` with partial payload | Agreed |
+| `Hub BFF` | `AprilWorkFlow` | Home workflow block | `SYNC-HB-AWF-002` | `/api/v1/ui/home/workflow` | `2s` | `1` retry only on transport timeout for safe GET | Required (GET) | Mark source degraded, keep `200` with partial payload | Agreed |
+| `Hub BFF` | `AprilOrgFlow` | Home org block | `SYNC-HB-AOF-001` | `/api/v1/ui/home/org` | `2s` | `1` retry only on transport timeout for safe GET | Required (GET) | Mark source degraded, keep `200` with partial payload | Agreed |
+| `Hub BFF` | `AprilNFlow` | Home notifications block | `SYNC-HB-ANF-002` | `/api/v1/ui/home/notifications` | `2s` | `1` retry only on transport timeout for safe GET | Required (GET) | Mark source degraded, keep `200` with partial payload | Agreed |
+| `Hub BFF` | `AprilReport` | Summary report block | `SYNC-HB-ARP-001` | `/api/v1/ui/summary/report` | `2s` | `1` retry only on transport timeout for safe GET | Required (GET) | Mark source degraded, keep `200` with partial payload | Agreed |
+| `Hub BFF` | `AprilWorkFlow` | Summary workflow block | `SYNC-HB-AWF-003` | `/api/v1/ui/summary/workflow` | `2s` | `1` retry only on transport timeout for safe GET | Required (GET) | Mark source degraded, keep `200` with partial payload | Agreed |
+| `Hub BFF` | `AprilProfil` | Summary profile block | `SYNC-HB-APR-002` | `/api/v1/ui/summary/profile` | `2s` | `1` retry only on transport timeout for safe GET | Required (GET) | Mark source degraded, keep `200` with partial payload | Agreed |
+
+### Технические метаданные sync-вызовов BFF
+
+- `X-Correlation-Id` -> обязательный; если отсутствует во входящем запросе, генерируется в middleware BFF.
+- `X-Request-Id` -> обязательный; если отсутствует во входящем запросе, генерируется в middleware BFF.
+- `X-Source-Service` -> outbound всегда `hub-bff`.
+- `timestamp` -> не передаётся отдельным заголовком в текущем runtime BFF, но может присутствовать в downstream payload/error для трассировки.
+
+### Единая policy ошибок и degraded режима для BFF
+
+- При недоступности downstream или невалидном downstream JSON BFF не возвращает `5xx` клиенту по aggregation endpoint-ам.
+- Ответ BFF остаётся `200`, `status` переключается в `degraded`, а источник добавляется в `degraded[]`.
+- Код деградации: `downstream_unavailable`.
+- Для auth/role ошибок BFF использует единый формат:
+  - `401` -> `{ code: "unauthorized", message, metadata }`
+  - `403` -> `{ code: "forbidden", message, metadata }`
+
+### Версионирование и backward compatibility (OpenAPI aprilhub-bff)
+
+- Текущий baseline: `v1` (`/api/v1/*` и `openapi.info.version` серии `1.x`).
+- Non-breaking изменения:
+  - добавление optional полей в response;
+  - добавление новых endpoint-ов внутри `v1`;
+  - добавление новых `enum` значений только если consumer это допускает как расширение.
+- Breaking изменения:
+  - удаление/renaming endpoint path или обязательного поля;
+  - изменение типа поля;
+  - ужесточение требований авторизации без миграционного окна.
+- Депрекация:
+  - endpoint/поле сначала маркируется как `deprecated` в OpenAPI и поддерживается минимум один релизный цикл;
+  - пример: `/api/v1/overview` оставлен как compatibility endpoint с приоритетом `/api/v1/aggregation/dashboard`.
+
+## Sync contracts (REST) for core backend services
 
 | Producer | Consumer | Назначение | Contract ID | Timeout | Retry | Idempotency | Owner | Status |
 |---|---|---|---|---|---|---|---|---|
@@ -86,7 +135,7 @@
 
 ## Что уточнить в следующей итерации
 
-- Утвердить точные endpoint paths и response-коды.
-- Определить строгие SLA/timeout/retry по каждой связи.
-- Зафиксировать версии контрактов (`v1`, `v2`) и политику обратной совместимости.
+- Утвердить отдельные SLO/SLA per downstream для Hub BFF (сейчас применяется общий runtime timeout).
+- Добавить формализованный список retryable ошибок по типам сетевых сбоев.
+- Зафиксировать контракт `timestamp` для sync-вызовов в едином формате заголовка/поля.
 - Согласовать DLQ/retry policy для async-потоков `AprilEDC`.

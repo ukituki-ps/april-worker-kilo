@@ -36,6 +36,10 @@ func main() {
 	mux.HandleFunc("/healthz", httpapi.Healthz)
 	mux.HandleFunc("/readyz", httpapi.Readyz)
 	mux.Handle(
+		"/api/v1/overview",
+		authMiddleware.Validate(auth.RequireAnyRole("user", "admin")(http.HandlerFunc(handlers.Overview))),
+	)
+	mux.Handle(
 		"/api/v1/aggregation/dashboard",
 		authMiddleware.Validate(auth.RequireAnyRole("user", "admin")(http.HandlerFunc(handlers.Dashboard))),
 	)

@@ -57,6 +57,41 @@ func TestDashboardHappyPath(t *testing.T) {
 	}
 }
 
+func TestOverviewCompatibilityPath(t *testing.T) {
+	t.Parallel()
+
+	handlers := NewHandlers(fakeAggregationService{})
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/overview", nil)
+	req = req.WithContext(context.WithValue(req.Context(), requestMetadataKey, aggregation.Metadata{
+		CorrelationID: "corr-1",
+		RequestID:     "req-1",
+		SourceService: "hub-shell",
+	}))
+	rec := httptest.NewRecorder()
+
+	handlers.Overview(rec, req)
+	if rec.Code != http.StatusOK {
+		t.Fatalf("status = %d, want 200", rec.Code)
+	}
+
+	var got struct {
+		Status  string `json:"status"`
+		Widgets []struct {
+			ID    string `json:"id"`
+			State string `json:"state"`
+		} `json:"widgets"`
+	}
+	if err := json.Unmarshal(rec.Body.Bytes(), &got); err != nil {
+		t.Fatalf("decode response: %v", err)
+	}
+	if got.Status == "" {
+		t.Fatal("status must be present")
+	}
+	if len(got.Widgets) == 0 {
+		t.Fatal("widgets must not be empty")
+	}
+}
+
 func TestMeUnauthorizedWithoutClaims(t *testing.T) {
 	t.Parallel()
 

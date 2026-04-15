@@ -12,6 +12,29 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  openapi-compatibility:
+    name: OpenAPI compatibility (no breaking changes)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+
+      - name: Install oasdiff
+        run: go install github.com/oasdiff/oasdiff@latest
+
+      - name: Check OpenAPI backward compatibility
+        run: |
+          export PATH="$HOME/go/bin:$PATH"
+          scripts/check-openapi-compat.sh
+
   quality:
     name: Lint OpenAPI and build docs
     runs-on: ubuntu-latest

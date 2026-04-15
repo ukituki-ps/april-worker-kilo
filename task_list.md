@@ -33,6 +33,7 @@
 - [x] `002-aprilhub-auth-rbac`: OIDC flow в `hub-shell`, `/me` + role guards в `hub-bff`
 - [ ] [IN PROGRESS] `003-aprilhub-shell-design-system`: UX/layout для guest, Keycloak transitions и authorized shell по дизайн-системе
 - [ ] [IN PROGRESS] `004-hub-bff-aggregation-runtime`: постановка + план готовы, реализация aggregation runtime в `hub-bff`
+- [x] `005-hub-contracts-openapi-hardening`: контракты BFF/OpenAPI синхронизированы, отчёт оформлен
 
 ## План реализации AprilHub: статусы
 
@@ -42,7 +43,7 @@
 | `002` | Auth + RBAC через Keycloak (OIDC flow, JWT validation, `/me`, role gates) | ✅ Выполнено | [`tasks/002-aprilhub-auth-rbac/REPORT.md`](./tasks/002-aprilhub-auth-rbac/REPORT.md) |
 | `003` | Hub Shell composition + дизайн-системный UX (guest/Keycloak/authorized) | 🔄 В работе | [`tasks/003-aprilhub-shell-design-system/TASK.md`](./tasks/003-aprilhub-shell-design-system/TASK.md) |
 | `004` | Hub BFF aggregation MVP (fan-out adapters, partial response, timeout/retry policy) | 🔄 В работе | [`tasks/004-hub-bff-aggregation-runtime/TASK.md`](./tasks/004-hub-bff-aggregation-runtime/TASK.md) |
-| `005` | Integration contracts finalization (sync/async contract hardening, OpenAPI alignment) | ⏳ Не начато | — |
+| `005` | Integration contracts finalization (sync/async contract hardening, OpenAPI alignment) | ✅ Выполнено | [`tasks/005-hub-contracts-openapi-hardening/REPORT.md`](./tasks/005-hub-contracts-openapi-hardening/REPORT.md) |
 | `006` | Observability + trace propagation (`correlationId/requestId`, metrics/logging) | ⏳ Не начато | — |
 | `007` | Data/runtime dependencies and migrations readiness (если требуется persistence в Hub BFF) | ⏳ Не начато | — |
 | `008` | Testing completion (unit/integration/smoke E2E + k6 baseline) | ⏳ Не начато | — |

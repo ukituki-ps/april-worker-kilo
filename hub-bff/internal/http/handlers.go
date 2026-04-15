@@ -42,6 +42,28 @@ func (h *Handlers) Dashboard(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, h.aggregation.Dashboard(r.Context(), md))
 }
 
+func (h *Handlers) Overview(w http.ResponseWriter, r *http.Request) {
+	md := MetadataFromContext(r.Context())
+	dashboard := h.aggregation.Dashboard(r.Context(), md)
+
+	type widgetState struct {
+		ID    string `json:"id"`
+		State string `json:"state"`
+	}
+	widgets := make([]widgetState, 0, len(dashboard.Data)+len(dashboard.Degraded))
+	for id := range dashboard.Data {
+		widgets = append(widgets, widgetState{ID: id, State: "ok"})
+	}
+	for _, degraded := range dashboard.Degraded {
+		widgets = append(widgets, widgetState{ID: degraded.SourceService, State: "degraded"})
+	}
+
+	writeJSON(w, http.StatusOK, map[string]any{
+		"status":  dashboard.Status,
+		"widgets": widgets,
+	})
+}
+
 func (h *Handlers) Home(w http.ResponseWriter, r *http.Request) {
 	md := MetadataFromContext(r.Context())
 	writeJSON(w, http.StatusOK, h.aggregation.Home(r.Context(), md))
