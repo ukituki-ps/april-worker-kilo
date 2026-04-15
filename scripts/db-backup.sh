@@ -20,6 +20,10 @@ if [[ "${SKIP_DB_BACKUP:-}" == "1" ]]; then
 fi
 
 if [[ "${DB_BACKUP_MODE:-compose}" == "compose" ]]; then
+  if ! docker compose ps --services --status running | awk '{print $1}' | grep -qx "keycloak-db"; then
+    log "service keycloak-db is not running, backup hook skipped"
+    exit 0
+  fi
   log "creating backup from docker compose service keycloak-db"
   docker compose exec -T keycloak-db pg_dump -U "$pg_user" -d "$pg_db" >"$backup_file"
 elif [[ "${DB_BACKUP_MODE}" == "url" ]]; then

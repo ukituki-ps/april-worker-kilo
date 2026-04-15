@@ -25,8 +25,8 @@
 - [x] `007`: Data/runtime dependencies and migrations readiness (если требуется persistence в Hub BFF)
 - [x] `008`: Testing completion (unit/integration/smoke E2E + k6 baseline)
 - [x] `009`: Deployment hardening for dev (images.env flow, backups, rollback, smoke-after-deploy)
-- [ ] `010`: Docs/ADR/C4 final sync and release readiness
-- [ ] `011`: Infra PostgreSQL/Redis production readiness (HA/backup/restore/ops runbooks)
+- [x] `010`: Docs/ADR/C4 final sync and release readiness
+- [x] `011`: Infra PostgreSQL/Redis production readiness (HA/backup/restore/ops runbooks)
 
 ## Текущий фокус
 
@@ -39,7 +39,8 @@
 - [x] `007-hub-data-runtime-readiness`: решение по stateless readiness зафиксировано, проверки пройдены, отчёт оформлен
 - [x] `008-hub-testing-completion`: test contour закрыт (unit/smoke/k6 baseline), CI обновлён, отчёт оформлен
 - [x] `009-hub-deployment-hardening-dev`: deploy hardening baseline реализован, `PLAN.md`/`REPORT.md` оформлены
-- [ ] `011-infra-postgres-redis-production-readiness`: постановка готова, запуск после закрытия `007-010`
+- [x] `010-hub-architecture-docs-release-gate`: выполнена синхронизация docs/ADR/C4 и оформлен release checklist v1
+- [x] `011-infra-postgres-redis-production-readiness`: production-readiness baseline PostgreSQL/Redis реализован, runbooks и проверки оформлены
 
 ## План реализации AprilHub: статусы
 
@@ -54,5 +55,5 @@
 | `007` | Data/runtime dependencies and migrations readiness (если требуется persistence в Hub BFF) | ✅ Выполнено | [`tasks/007-hub-data-runtime-readiness/REPORT.md`](./tasks/007-hub-data-runtime-readiness/REPORT.md) |
 | `008` | Testing completion (unit/integration/smoke E2E + k6 baseline) | ✅ Выполнено | [`tasks/008-hub-testing-completion/REPORT.md`](./tasks/008-hub-testing-completion/REPORT.md) |
 | `009` | Deployment hardening for dev (images.env flow, backups, rollback, smoke-after-deploy) | ✅ Выполнено | [`tasks/009-hub-deployment-hardening-dev/REPORT.md`](./tasks/009-hub-deployment-hardening-dev/REPORT.md) |
-| `010` | Docs/ADR/C4 final sync and release readiness | ⏳ Не начато | — |
-| `011` | Infra PostgreSQL/Redis production readiness (HA/backup/restore/ops runbooks) | ⏳ Не начато | [`tasks/011-infra-postgres-redis-production-readiness/TASK.md`](./tasks/011-infra-postgres-redis-production-readiness/TASK.md) |
+| `010` | Docs/ADR/C4 final sync and release readiness | ✅ Выполнено | [`tasks/010-hub-architecture-docs-release-gate/REPORT.md`](./tasks/010-hub-architecture-docs-release-gate/REPORT.md) |
+| `011` | Infra PostgreSQL/Redis production readiness (HA/backup/restore/ops runbooks) | ✅ Выполнено | [`tasks/011-infra-postgres-redis-production-readiness/REPORT.md`](./tasks/011-infra-postgres-redis-production-readiness/REPORT.md) |

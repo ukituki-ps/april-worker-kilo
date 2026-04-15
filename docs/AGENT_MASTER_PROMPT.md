@@ -31,7 +31,7 @@
 - Понятные commit messages и описание PR с test plan и рисками.
 
 Если задача требует деплоя на dev:
-- Следуй [`docs/DEPLOYMENT_STRATEGY.md`](./DEPLOYMENT_STRATEGY.md): merge в `develop`, образы по **git SHA** в ghcr, на сервере `/opt/april`, обновление `images.env`, порядок миграций и `docker compose`.
+- Следуй [`docs/DEPLOYMENT_STRATEGY.md`](./DEPLOYMENT_STRATEGY.md): merge в `develop`, образы по **git SHA** в ghcr, на сервере `/opt/april-worker`, обновление `images.env`, порядок миграций и `docker compose`.
 - Проверить health/readiness по **внутреннему порту** сервиса (и при договорённости — маршруты вроде `/healthz` / `/readyz`, если они появятся в API).
 - При неуспехе — откат по политике из DEPLOYMENT_STRATEGY (образы, при необходимости миграции) и зафиксировать причину в отчёте.
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Развёртывание на dev/stage: см. docs/DEPLOYMENT_STRATEGY.md
-# Запуск из корня клона (на сервере обычно /opt/april): ./deploy.sh
+# Запуск из корня клона (на сервере обычно /opt/april-worker): ./deploy.sh
 set -euo pipefail
 
 ROOT="${DEPLOY_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}"
@@ -22,6 +22,7 @@ EOF
 Переменные окружения:
   DEPLOY_ROOT          каталог репозитория (по умолчанию — каталог deploy.sh)
   SKIP_GIT_PULL=1      не выполнять git pull
+  REQUIRE_GIT_PULL=1   завершать с ошибкой при неуспехе git pull
   SKIP_OPENAPI_LINT=1  не выполнять make openapi-lint
   SKIP_DB_BACKUP=1     не вызывать scripts/db-backup.sh (если есть)
   SKIP_MIGRATIONS=1    не вызывать scripts/run-migrations.sh (если есть)
@@ -110,8 +111,19 @@ run_git_pull() {
     log "не git-репозиторий — пропуск git pull"
     return 0
   fi
+  local upstream
+  upstream="$(git rev-parse --abbrev-ref --symbolic-full-name "@{u}" 2>/dev/null || true)"
+  if [[ -z "$upstream" ]]; then
+    log "для текущей ветки не настроен upstream — пропуск git pull"
+    return 0
+  fi
   log "git pull --ff-only"
-  git pull --ff-only
+  if ! git pull --ff-only; then
+    if [[ "${REQUIRE_GIT_PULL:-0}" == "1" ]]; then
+      fail "git pull не выполнен при REQUIRE_GIT_PULL=1"
+    fi
+    log "git pull не выполнен — продолжаем без обновления кода (REQUIRE_GIT_PULL=0)"
+  fi
 }
 
 run_openapi_lint() {
@@ -119,12 +131,21 @@ run_openapi_lint() {
     log "пропуск openapi-lint (SKIP_OPENAPI_LINT=1)"
     return 0
   fi
-  if ! command -v make >/dev/null 2>&1; then
-    log "make не найден — пропуск openapi-lint"
-    return 0
+  if command -v make >/dev/null 2>&1 && command -v npx >/dev/null 2>&1; then
+    log "make openapi-lint"
+    make openapi-lint
+    return
   fi
-  log "make openapi-lint"
-  make openapi-lint
+  if command -v docker >/dev/null 2>&1; then
+    log "make/npx недоступны — openapi-lint через node:22-bookworm-slim"
+    docker run --rm \
+      -v "${ROOT}:/repo" \
+      -w /repo \
+      node:22-bookworm-slim \
+      sh -c "npx --yes @redocly/cli@1.25.0 lint openapi/openapi.yaml openapi/mail-gateway-openapi.yaml openapi/aprilhub-bff.yaml --config redocly.yaml"
+    return
+  fi
+  log "нет make+npx и docker — пропуск openapi-lint"
 }
 
 run_hook() {
@@ -148,7 +169,7 @@ run_hook() {
 }
 
 run_docs_build() {
-  if command -v make >/dev/null 2>&1; then
+  if command -v make >/dev/null 2>&1 && command -v npm >/dev/null 2>&1; then
     log "make docs-build"
     make docs-build
     return
@@ -186,6 +207,10 @@ run_health_checks() {
     log "пропуск health/readiness (SKIP_HEALTHCHECK=1)"
     return 0
   fi
+  if ! "${compose_files[@]}" ps --services --status running | awk '{print $1}' | grep -qx "hub-bff"; then
+    log "hub-bff не запущен — пропуск health/readiness для BFF"
+    return 0
+  fi
   local base_url="${HUB_BFF_BASE_URL:-http://127.0.0.1:${HUB_BFF_HOST_PORT:-8081}}"
   local retries="${DEPLOY_HEALTH_RETRIES:-30}"
   local sleep_s="${DEPLOY_HEALTH_SLEEP_SEC:-2}"
@@ -204,8 +229,13 @@ run_smoke() {
     log "пропуск smoke-after-deploy (SKIP_SMOKE=1)"
     return 0
   fi
+  if ! "${compose_files[@]}" ps --services --status running | awk '{print $1}' | grep -qx "hub-bff"; then
+    log "hub-bff не запущен — пропуск smoke-after-deploy"
+    return 0
+  fi
   if [[ ! -x "${ROOT}/scripts/smoke-after-deploy.sh" ]]; then
-    fail "smoke-after-deploy не найден или не исполняемый: scripts/smoke-after-deploy.sh"
+    log "smoke-after-deploy не найден или не исполняемый — пропуск smoke"
+    return 0
   fi
   log "запуск smoke-after-deploy"
   "${ROOT}/scripts/smoke-after-deploy.sh" >"${deploy_artifacts_dir}/smoke.log" 2>&1

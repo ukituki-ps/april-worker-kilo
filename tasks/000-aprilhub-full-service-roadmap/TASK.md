@@ -90,6 +90,7 @@
 
 ## Definition of Done для AprilHub как полноценного сервиса
 - [ ] Реализованы и приняты эпики `001-010`.
+- [ ] Release checklist v1 пройден и приложен: `docs/guides/APRILHUB_RELEASE_CHECKLIST_V1.md`.
 - [ ] Реализация не противоречит `docs/architecture/*` и `structurizr/workspace.dsl`.
 - [ ] Контракты `Hub BFF` согласованы и отражены в OpenAPI.
 - [ ] Пройдены тестовые уровни (unit/integration/smoke E2E + k6 baseline).
