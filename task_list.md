@@ -21,7 +21,7 @@
 - [x] `003`: Hub Shell composition + дизайн-системный UX (guest/Keycloak/authorized)
 - [x] `004`: Hub BFF aggregation MVP (fan-out adapters, partial response, timeout/retry policy)
 - [ ] `005`: Integration contracts finalization (sync/async contract hardening, OpenAPI alignment)
-- [ ] `006`: Observability + trace propagation (`correlationId/requestId`, metrics/logging)
+- [x] `006`: Observability + trace propagation (`correlationId/requestId`, metrics/logging)
 - [ ] `007`: Data/runtime dependencies and migrations readiness (если требуется persistence в Hub BFF)
 - [ ] `008`: Testing completion (unit/integration/smoke E2E + k6 baseline)
 - [ ] `009`: Deployment hardening for dev (images.env flow, backups, rollback, smoke-after-deploy)
@@ -34,6 +34,7 @@
 - [x] `003-aprilhub-shell-design-system`: UX/layout для guest, Keycloak transitions и authorized shell по дизайн-системе
 - [x] `004-hub-bff-aggregation-runtime`: aggregation runtime в `hub-bff` реализован и проверен
 - [x] `005-hub-contracts-openapi-hardening`: контракты BFF/OpenAPI синхронизированы, отчёт оформлен
+- [x] `006-hub-observability-operability`: baseline observability в `hub-bff` реализован, smoke/проверки пройдены, отчёт оформлен
 
 ## План реализации AprilHub: статусы
 
@@ -44,7 +45,7 @@
 | `003` | Hub Shell composition + дизайн-системный UX (guest/Keycloak/authorized) | ✅ Выполнено | [`tasks/003-aprilhub-shell-design-system/REPORT.md`](./tasks/003-aprilhub-shell-design-system/REPORT.md) |
 | `004` | Hub BFF aggregation MVP (fan-out adapters, partial response, timeout/retry policy) | ✅ Выполнено | [`tasks/004-hub-bff-aggregation-runtime/REPORT.md`](./tasks/004-hub-bff-aggregation-runtime/REPORT.md) |
 | `005` | Integration contracts finalization (sync/async contract hardening, OpenAPI alignment) | ✅ Выполнено | [`tasks/005-hub-contracts-openapi-hardening/REPORT.md`](./tasks/005-hub-contracts-openapi-hardening/REPORT.md) |
-| `006` | Observability + trace propagation (`correlationId/requestId`, metrics/logging) | ⏳ Не начато | — |
+| `006` | Observability + trace propagation (`correlationId/requestId`, metrics/logging) | ✅ Выполнено | [`tasks/006-hub-observability-operability/REPORT.md`](./tasks/006-hub-observability-operability/REPORT.md) |
 | `007` | Data/runtime dependencies and migrations readiness (если требуется persistence в Hub BFF) | ⏳ Не начато | — |
 | `008` | Testing completion (unit/integration/smoke E2E + k6 baseline) | ⏳ Не начато | — |
 | `009` | Deployment hardening for dev (images.env flow, backups, rollback, smoke-after-deploy) | ⏳ Не начато | — |
