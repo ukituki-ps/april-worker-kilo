@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"sync"
 	"testing"
 	"time"
 )
@@ -70,4 +71,101 @@ func TestServiceAdapterRetryAndTimeout(t *testing.T) {
 	if calls < 2 {
 		t.Fatalf("calls = %d, want at least 2 attempts", calls)
 	}
+}
+
+func TestRuntimeDoesNotLeakStateAcrossCalls(t *testing.T) {
+	t.Parallel()
+
+	okServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		_ = json.NewEncoder(w).Encode(map[string]any{"value": "ok"})
+	}))
+	defer okServer.Close()
+
+	failServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(http.StatusServiceUnavailable)
+	}))
+	defer failServer.Close()
+
+	runtime := NewRuntime(&http.Client{}, Options{Timeout: time.Second, Retries: 0}, map[string]string{
+		"workflow": okServer.URL,
+		"nflow":    failServer.URL,
+		"profil":   okServer.URL,
+	})
+
+	first := runtime.Dashboard(context.Background(), Metadata{
+		CorrelationID: "corr-1",
+		RequestID:     "req-1",
+		SourceService: "hub-shell",
+	})
+	second := runtime.Dashboard(context.Background(), Metadata{
+		CorrelationID: "corr-2",
+		RequestID:     "req-2",
+		SourceService: "hub-shell",
+	})
+
+	if first.Metadata.CorrelationID != "corr-1" || second.Metadata.CorrelationID != "corr-2" {
+		t.Fatalf("unexpected metadata isolation: first=%+v second=%+v", first.Metadata, second.Metadata)
+	}
+	if len(first.Degraded) != 1 || len(second.Degraded) != 1 {
+		t.Fatalf("degraded results must be request-local: first=%d second=%d", len(first.Degraded), len(second.Degraded))
+	}
+	if len(first.Data) != len(second.Data) {
+		t.Fatalf("data payload mismatch across stateless calls: first=%d second=%d", len(first.Data), len(second.Data))
+	}
+}
+
+func TestRuntimeConcurrentCallsRemainIndependent(t *testing.T) {
+	t.Parallel()
+
+	okServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		_ = json.NewEncoder(w).Encode(map[string]any{"value": "ok"})
+	}))
+	defer okServer.Close()
+
+	runtime := NewRuntime(&http.Client{}, Options{Timeout: time.Second, Retries: 0}, map[string]string{
+		"workflow": okServer.URL,
+		"nflow":    okServer.URL,
+		"profil":   okServer.URL,
+	})
+
+	const requests = 8
+	results := make(chan aggregationResult, requests)
+	var wg sync.WaitGroup
+	for i := 0; i < requests; i++ {
+		i := i
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			md := Metadata{
+				CorrelationID: "corr-" + string(rune('A'+i)),
+				RequestID:     "req-" + string(rune('A'+i)),
+				SourceService: "hub-shell",
+			}
+			resp := runtime.Dashboard(context.Background(), md)
+			results <- aggregationResult{metadata: md, response: resp}
+		}()
+	}
+	wg.Wait()
+	close(results)
+
+	seen := map[string]bool{}
+	for result := range results {
+		gotCorr := result.response.Metadata.CorrelationID
+		if gotCorr != result.metadata.CorrelationID {
+			t.Fatalf("response metadata mismatch: got=%s want=%s", gotCorr, result.metadata.CorrelationID)
+		}
+		if seen[gotCorr] {
+			t.Fatalf("duplicate correlation id in concurrent results: %s", gotCorr)
+		}
+		seen[gotCorr] = true
+	}
+
+	if len(seen) != requests {
+		t.Fatalf("seen results = %d, want %d", len(seen), requests)
+	}
+}
+
+type aggregationResult struct {
+	metadata Metadata
+	response ResponseEnvelope
 }
