@@ -5,9 +5,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"sync"
 	"time"
+
+	"github.com/ukituki-ps/april-worker/hub-bff/internal/observability"
 )
 
 const bffSourceService = "hub-bff"
@@ -119,6 +122,14 @@ func composeResponse(ctx context.Context, md Metadata, calls []sourceCall) Respo
 	degraded := make([]DegradedSource, 0)
 	for result := range out {
 		if result.err != nil {
+			observability.ObserveDegraded(result.src, "downstream_unavailable")
+			slog.Warn("hub-bff degraded source detected",
+				"event", "degraded_mode",
+				"sourceService", result.src,
+				"reason", result.err.Error(),
+				"correlationId", md.CorrelationID,
+				"requestId", md.RequestID,
+			)
 			degraded = append(degraded, DegradedSource{
 				SourceService: result.src,
 				Code:          "downstream_unavailable",

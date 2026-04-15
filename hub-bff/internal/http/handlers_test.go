@@ -129,3 +129,34 @@ func TestMetadataMiddlewarePropagation(t *testing.T) {
 		t.Fatalf("metadata propagation failed: %+v", md)
 	}
 }
+
+func TestMetadataMiddlewareNormalizesEmptyHeaders(t *testing.T) {
+	t.Parallel()
+
+	handler := Metadata(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		md := MetadataFromContext(r.Context())
+		writeJSON(w, http.StatusOK, md)
+	}))
+
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/aggregation/home", nil)
+	req.Header.Set("X-Correlation-Id", "   ")
+	req.Header.Set("X-Request-Id", "   ")
+	req.Header.Set("X-Source-Service", "   ")
+	rec := httptest.NewRecorder()
+
+	handler.ServeHTTP(rec, req)
+	if rec.Code != http.StatusOK {
+		t.Fatalf("status = %d, want 200", rec.Code)
+	}
+
+	var md aggregation.Metadata
+	if err := json.Unmarshal(rec.Body.Bytes(), &md); err != nil {
+		t.Fatalf("decode metadata response: %v", err)
+	}
+	if md.CorrelationID == "" || md.RequestID == "" {
+		t.Fatalf("generated ids must be present: %+v", md)
+	}
+	if md.SourceService != "hub-shell" {
+		t.Fatalf("sourceService = %s, want hub-shell", md.SourceService)
+	}
+}

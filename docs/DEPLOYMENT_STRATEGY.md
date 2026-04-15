@@ -63,17 +63,27 @@
 
 ### Версии образов и источник истины
 
-- **Теги образов (SHA)** задаются через **`.env`** и/или отдельный **`images.env`** на сервере. Compose-файлы в git ссылаются на переменные (например `IMAGE_TAG_BACKEND=${BACKEND_SHA}`), а конкретные значения подставляются из этих файлов.
+- **Теги образов (SHA)** задаются через **`.env`** и/или отдельный **`images.env`** на сервере. Compose-файлы в git ссылаются на переменные (например `HUB_BFF_IMAGE` / `HUB_SHELL_IMAGE`), а конкретные значения подставляются из этих файлов.
 - **`images.env` (и при необходимости server-local override)** — **не коммитятся** в репозиторий (или коммитится только шаблон без секретов). Так `git pull` в **`DEPLOY_ROOT`** не перезаписывает задеплоенные версии образов и не требует обратных коммитов из CI.
 
-## 6. База данных и миграции
+## 6. Data-layer: PostgreSQL + Redis
 
 | Решение | Значение |
 |--------|----------|
-| PostgreSQL | Контейнер на том же хосте |
-| Резервная копия перед изменением БД | Перед миграциями и `docker compose up` **обязательно** снять дамп БД dev-стенда командой **`pg_dump`** (путь хранения и ротация — зафиксировать в скрипте/репо при появлении кода) |
-| Миграции | Отдельный шаг **до** `docker compose up` |
-| Откат | При неуспехе — авто-откат миграций + откат образов (реализация «down» должна быть предусмотрена в tooling миграций) |
+| PostgreSQL | Контейнер на том же хосте (baseline stage `011`) |
+| Redis | Контейнер на том же хосте, `appendonly yes`, `requirepass`, отдельный volume (`redis_data`) |
+| Резервная копия перед изменением БД | Перед миграциями и `docker compose up` **обязательно** снять дамп БД dev-стенда командой **`pg_dump`** через `scripts/db-backup.sh` |
+| Миграции | Отдельный шаг **до** `docker compose up` через `scripts/run-migrations.sh` (Atlas-ready, fail-fast при явной конфигурации и отсутствии tooling) |
+| Откат | При неуспехе — авто-rollback: откат `images.env` на `last-good`, запуск `scripts/rollback-migrations.sh` (если настроен), затем повторный `compose up` + health/smoke |
+
+### Stage `011`: operational readiness artifacts
+
+- Target-state and ownership split: [`infra/POSTGRES_REDIS_PROD_READINESS.md`](./infra/POSTGRES_REDIS_PROD_READINESS.md).
+- PostgreSQL backup/restore runbook: [`runbooks/POSTGRES_BACKUP_RESTORE.md`](./runbooks/POSTGRES_BACKUP_RESTORE.md).
+- Redis failure/recovery runbook: [`runbooks/REDIS_FAILURE_RECOVERY.md`](./runbooks/REDIS_FAILURE_RECOVERY.md).
+- Validation scripts:
+  - `scripts/validate-postgres-restore.sh`
+  - `scripts/redis-resilience-check.sh`
 
 ## 7. Сеть, Nginx, домен
 
@@ -108,12 +118,16 @@
 
 1. **Git tag** — метка успешного деплоя на **commit** (например `deploy/dev-last-good` перемещается на последний зелёный commit, или используется отдельный префикс тегов по окружениям). По тегу однозначно восстанавливается код и ожидаемые версии в git.
 2. **Теги образов на сервере** — **источник истины в рантайме**: файл **`images.env`** (и при необходимости server-local override), обновляемый пайплайном при успешном деплое. Так не нужно править закоммиченный `docker-compose.yml` при каждом релизе и нет конфликта с `git pull`.
+3. `deploy.sh` поддерживает server-local состояние: `.deploy-state/images.env.previous` и `.deploy-state/images.env.last-good`.
 
 При rollback: откатить **images.env** к предыдущим SHA, при необходимости выполнить откат миграций, затем `compose pull` / `up`, снова health + smoke.
 
+Release-gate checklist для завершения AprilHub roadmap `001-010`: [`guides/APRILHUB_RELEASE_CHECKLIST_V1.md`](./guides/APRILHUB_RELEASE_CHECKLIST_V1.md).
+
 ## 11. Операционка
 
-- Ручной redeploy на сервере: из каталога клона (**`DEPLOY_ROOT`**, для april-worker: `/opt/april-worker`) выполнить **`./deploy.sh`** (обёртка над шагами ниже; см. `--help` и переменные `SKIP_*`). Альтернатива — отдельный job в GitHub Actions (`workflow_dispatch`) по согласованию с командой.
+- Ручной redeploy на сервере: из каталога клона (**`DEPLOY_ROOT`**, для april-worker: `/opt/april-worker`) выполнить **`./deploy.sh`** (обёртка над шагами ниже; см. `--help` и переменные `SKIP_*` / `AUTO_ROLLBACK` / `REQUIRE_IMAGES_ENV`).
+- Артефакты деплоя (`compose config`, `compose ps`, smoke/rollback логи, commit SHA) сохраняются в `.deploy-artifacts/deploy-<timestamp>` и подхватываются workflow как artifacts.
 - Уведомления (Telegram, Slack, email): не используются.
 
 ## 12. Порядок шагов для агента (скелет pipeline)
@@ -121,14 +135,16 @@
 1. Job на runner с labels `self-hosted`, `dev`, **`RUNNER_LABEL_EXTRA`** (для april-worker: `worker`), ref = commit после merge в `develop`.
 2. Сборка и тесты (как принято в репо).
 3. Сборка образов, push в ghcr.io с тегом по **git sha**.
-4. На сервере: `cd` в **`DEPLOY_ROOT`** → **`./deploy.sh`** (внутри: `git pull`, при необходимости хуки `scripts/db-backup.sh` / `scripts/run-migrations.sh`, `make openapi-lint`, `make docs-build`, `docker compose pull` → `up -d` с учётом `.env` и **`images.env`**). Либо те же шаги вручную: `git pull` → п.5–8.
+4. На сервере: `cd` в **`DEPLOY_ROOT`** → **`./deploy.sh`** (внутри: preflight + `git pull`, `make openapi-lint`, `scripts/db-backup.sh`, `scripts/run-migrations.sh`, `make docs-build`, `docker compose pull` → `up -d`, health/readiness, `scripts/smoke-after-deploy.sh`, фиксация `last-good`). Либо те же шаги вручную: `git pull` → п.5–9.
 5. Обновить **`images.env`** / `.env` под новые SHA образов (часто делает CI перед вызовом деплоя или вручную до/после `git pull`).
 6. **Обязательно** снять дамп БД dev-стенда: **`pg_dump`** (до миграций и поднятия compose) — в скрипте деплоя: исполняемый **`scripts/db-backup.sh`**, если добавлен в репозиторий.
-7. Миграции (отдельная команда **до** `up`) — **`scripts/run-migrations.sh`**, если добавлен.
-8. `docker compose pull` → `docker compose up -d` (с overrides) — входит в **`deploy.sh`**.
-9. Health по внутреннему URL/порту → smoke: endpoint → логин → E2E.
-10. Успех: обновить **images.env** как зафиксированный good (если ещё не записан), поставить/сдвинуть **git tag** успешного деплоя, загрузить артефакты (логи, `docker compose ps`, commit).
-11. Провал: откат миграций (по политике) + откат **images.env** на предыдущие SHA из last good + при необходимости `git checkout` на commit по тегу; снова health; fail job при повторном провале.
+7. Выполнить проверку restore-пути PostgreSQL: **`scripts/validate-postgres-restore.sh`** (на последнем backup или указанном dump-файле).
+8. Выполнить baseline recovery-check Redis: **`scripts/redis-resilience-check.sh`**.
+9. Миграции (отдельная команда **до** `up`) — **`scripts/run-migrations.sh`**, если добавлен.
+10. `docker compose pull` → `docker compose up -d` (с overrides) — входит в **`deploy.sh`**.
+11. Health по внутреннему URL/порту → smoke: endpoint → логин → E2E (`scripts/smoke-after-deploy.sh`).
+12. Успех: обновить **images.env** как зафиксированный good (если ещё не записан), поставить/сдвинуть **git tag** успешного деплоя, загрузить артефакты (логи, `docker compose ps`, commit).
+13. Провал: auto-rollback (`images.env.last-good` + `scripts/rollback-migrations.sh` при наличии) + повторные health/smoke; fail job при повторном провале.
 
 ## 13. Документация (Docusaurus, OpenAPI, Structurizr) на dev
 

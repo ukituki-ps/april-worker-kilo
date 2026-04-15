@@ -35,7 +35,7 @@ services:
     restart: unless-stopped
 
   hub-bff:
-    image: golang:1.22-alpine
+    image: ${HUB_BFF_IMAGE:-golang:1.24-alpine}
     profiles: ["aprilhub"]
     working_dir: /workspace/hub-bff
     command: sh -c "go mod download && go run ./cmd/hub-bff"
@@ -55,7 +55,7 @@ services:
     restart: unless-stopped
 
   hub-shell:
-    image: node:20-alpine
+    image: ${HUB_SHELL_IMAGE:-node:20-alpine}
     profiles: ["aprilhub"]
     working_dir: /workspace/hub-shell
     command: sh -c "npm install && npm run dev -- --host 0.0.0.0 --port ${HUB_SHELL_PORT:-4173}"
@@ -103,5 +103,18 @@ services:
       - keycloak_pgdata:/var/lib/postgresql/data
     restart: unless-stopped
 
+  redis:
+    image: ${REDIS_IMAGE:-redis:7-alpine}
+    profiles: ["aprilhub"]
+    command: >
+      redis-server
+      --appendonly yes
+      --save 60 1
+      --requirepass ${REDIS_PASSWORD:-redis-dev-change-me}
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+
 volumes:
   keycloak_pgdata:
+  redis_data:

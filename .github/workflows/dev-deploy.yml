@@ -21,13 +21,13 @@ jobs:
     name: Sync repo and run deploy.sh
     runs-on: [self-hosted, dev, worker]
     timeout-minutes: 60
+    env:
+      APRIL_DEPLOY_ROOT: ${{ vars.APRIL_DEPLOY_ROOT != '' && vars.APRIL_DEPLOY_ROOT || '/opt/april-worker' }}
     steps:
       - name: Checkout ref and deploy
-        env:
-          APRIL_DEPLOY_ROOT: ${{ vars.APRIL_DEPLOY_ROOT }}
         run: |
           set -euo pipefail
-          ROOT="${APRIL_DEPLOY_ROOT:-/opt/april-worker}"
+          ROOT="${APRIL_DEPLOY_ROOT}"
           echo "Deploy root: ${ROOT}"
           echo "Commit: ${{ github.sha }}"
           test -d "${ROOT}/.git"
@@ -35,4 +35,13 @@ jobs:
           git fetch origin
           git checkout "${{ github.sha }}"
           test -x ./deploy.sh
-          SKIP_GIT_PULL=1 ./deploy.sh
+          SKIP_GIT_PULL=1 DEPLOY_ARTIFACTS_DIR="${ROOT}/.deploy-artifacts" ./deploy.sh
+
+      - name: Upload deploy artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dev-deploy-artifacts-${{ github.run_id }}
+          path: |
+            ${{ env.APRIL_DEPLOY_ROOT }}/.deploy-artifacts/**
+          if-no-files-found: warn

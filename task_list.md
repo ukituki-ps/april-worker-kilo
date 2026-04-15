@@ -18,22 +18,29 @@
 
 - [x] `001`: Bootstrap platform baseline (`hub-bff`, `hub-shell`, compose, CI)
 - [x] `002`: Auth + RBAC через Keycloak (OIDC flow, JWT validation, `/me`, role gates)
-- [ ] `003`: Hub Shell composition + дизайн-системный UX (guest/Keycloak/authorized)
-- [ ] `004`: Hub BFF aggregation MVP (fan-out adapters, partial response, timeout/retry policy)
+- [x] `003`: Hub Shell composition + дизайн-системный UX (guest/Keycloak/authorized)
+- [x] `004`: Hub BFF aggregation MVP (fan-out adapters, partial response, timeout/retry policy)
 - [ ] `005`: Integration contracts finalization (sync/async contract hardening, OpenAPI alignment)
-- [ ] `006`: Observability + trace propagation (`correlationId/requestId`, metrics/logging)
-- [ ] `007`: Data/runtime dependencies and migrations readiness (если требуется persistence в Hub BFF)
-- [ ] `008`: Testing completion (unit/integration/smoke E2E + k6 baseline)
-- [ ] `009`: Deployment hardening for dev (images.env flow, backups, rollback, smoke-after-deploy)
-- [ ] `010`: Docs/ADR/C4 final sync and release readiness
+- [x] `006`: Observability + trace propagation (`correlationId/requestId`, metrics/logging)
+- [x] `007`: Data/runtime dependencies and migrations readiness (если требуется persistence в Hub BFF)
+- [x] `008`: Testing completion (unit/integration/smoke E2E + k6 baseline)
+- [x] `009`: Deployment hardening for dev (images.env flow, backups, rollback, smoke-after-deploy)
+- [x] `010`: Docs/ADR/C4 final sync and release readiness
+- [x] `011`: Infra PostgreSQL/Redis production readiness (HA/backup/restore/ops runbooks)
 
 ## Текущий фокус
 
 - [x] `001-aprilhub-bootstrap`: каркас `hub-bff`/`hub-shell` + dev Keycloak + health/readiness + env templates
 - [x] `002-aprilhub-auth-rbac`: OIDC flow в `hub-shell`, `/me` + role guards в `hub-bff`
-- [ ] [IN PROGRESS] `003-aprilhub-shell-design-system`: UX/layout для guest, Keycloak transitions и authorized shell по дизайн-системе
-- [ ] [IN PROGRESS] `004-hub-bff-aggregation-runtime`: постановка + план готовы, реализация aggregation runtime в `hub-bff`
+- [x] `003-aprilhub-shell-design-system`: UX/layout для guest, Keycloak transitions и authorized shell по дизайн-системе
+- [x] `004-hub-bff-aggregation-runtime`: aggregation runtime в `hub-bff` реализован и проверен
 - [x] `005-hub-contracts-openapi-hardening`: контракты BFF/OpenAPI синхронизированы, отчёт оформлен
+- [x] `006-hub-observability-operability`: baseline observability в `hub-bff` реализован, smoke/проверки пройдены, отчёт оформлен
+- [x] `007-hub-data-runtime-readiness`: решение по stateless readiness зафиксировано, проверки пройдены, отчёт оформлен
+- [x] `008-hub-testing-completion`: test contour закрыт (unit/smoke/k6 baseline), CI обновлён, отчёт оформлен
+- [x] `009-hub-deployment-hardening-dev`: deploy hardening baseline реализован, `PLAN.md`/`REPORT.md` оформлены
+- [x] `010-hub-architecture-docs-release-gate`: выполнена синхронизация docs/ADR/C4 и оформлен release checklist v1
+- [x] `011-infra-postgres-redis-production-readiness`: production-readiness baseline PostgreSQL/Redis реализован, runbooks и проверки оформлены
 
 ## План реализации AprilHub: статусы
 
@@ -41,11 +48,12 @@
 |------|--------|--------|-----------------------|
 | `001` | Bootstrap platform baseline (`hub-bff`, `hub-shell`, compose, CI) | ✅ Выполнено | [`tasks/001-aprilhub-bootstrap/REPORT.md`](./tasks/001-aprilhub-bootstrap/REPORT.md) |
 | `002` | Auth + RBAC через Keycloak (OIDC flow, JWT validation, `/me`, role gates) | ✅ Выполнено | [`tasks/002-aprilhub-auth-rbac/REPORT.md`](./tasks/002-aprilhub-auth-rbac/REPORT.md) |
-| `003` | Hub Shell composition + дизайн-системный UX (guest/Keycloak/authorized) | 🔄 В работе | [`tasks/003-aprilhub-shell-design-system/TASK.md`](./tasks/003-aprilhub-shell-design-system/TASK.md) |
-| `004` | Hub BFF aggregation MVP (fan-out adapters, partial response, timeout/retry policy) | 🔄 В работе | [`tasks/004-hub-bff-aggregation-runtime/TASK.md`](./tasks/004-hub-bff-aggregation-runtime/TASK.md) |
+| `003` | Hub Shell composition + дизайн-системный UX (guest/Keycloak/authorized) | ✅ Выполнено | [`tasks/003-aprilhub-shell-design-system/REPORT.md`](./tasks/003-aprilhub-shell-design-system/REPORT.md) |
+| `004` | Hub BFF aggregation MVP (fan-out adapters, partial response, timeout/retry policy) | ✅ Выполнено | [`tasks/004-hub-bff-aggregation-runtime/REPORT.md`](./tasks/004-hub-bff-aggregation-runtime/REPORT.md) |
 | `005` | Integration contracts finalization (sync/async contract hardening, OpenAPI alignment) | ✅ Выполнено | [`tasks/005-hub-contracts-openapi-hardening/REPORT.md`](./tasks/005-hub-contracts-openapi-hardening/REPORT.md) |
-| `006` | Observability + trace propagation (`correlationId/requestId`, metrics/logging) | ⏳ Не начато | — |
-| `007` | Data/runtime dependencies and migrations readiness (если требуется persistence в Hub BFF) | ⏳ Не начато | — |
-| `008` | Testing completion (unit/integration/smoke E2E + k6 baseline) | ⏳ Не начато | — |
-| `009` | Deployment hardening for dev (images.env flow, backups, rollback, smoke-after-deploy) | ⏳ Не начато | — |
-| `010` | Docs/ADR/C4 final sync and release readiness | ⏳ Не начато | — |
+| `006` | Observability + trace propagation (`correlationId/requestId`, metrics/logging) | ✅ Выполнено | [`tasks/006-hub-observability-operability/REPORT.md`](./tasks/006-hub-observability-operability/REPORT.md) |
+| `007` | Data/runtime dependencies and migrations readiness (если требуется persistence в Hub BFF) | ✅ Выполнено | [`tasks/007-hub-data-runtime-readiness/REPORT.md`](./tasks/007-hub-data-runtime-readiness/REPORT.md) |
+| `008` | Testing completion (unit/integration/smoke E2E + k6 baseline) | ✅ Выполнено | [`tasks/008-hub-testing-completion/REPORT.md`](./tasks/008-hub-testing-completion/REPORT.md) |
+| `009` | Deployment hardening for dev (images.env flow, backups, rollback, smoke-after-deploy) | ✅ Выполнено | [`tasks/009-hub-deployment-hardening-dev/REPORT.md`](./tasks/009-hub-deployment-hardening-dev/REPORT.md) |
+| `010` | Docs/ADR/C4 final sync and release readiness | ✅ Выполнено | [`tasks/010-hub-architecture-docs-release-gate/REPORT.md`](./tasks/010-hub-architecture-docs-release-gate/REPORT.md) |
+| `011` | Infra PostgreSQL/Redis production readiness (HA/backup/restore/ops runbooks) | ✅ Выполнено | [`tasks/011-infra-postgres-redis-production-readiness/REPORT.md`](./tasks/011-infra-postgres-redis-production-readiness/REPORT.md) |

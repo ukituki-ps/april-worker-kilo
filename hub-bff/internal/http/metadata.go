@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"net/http"
+	"strings"
 
 	"github.com/ukituki-ps/april-worker/hub-bff/internal/aggregation"
 )
@@ -43,15 +44,17 @@ func MetadataFromContext(ctx context.Context) aggregation.Metadata {
 }
 
 func fromHeaderOrDefault(value, fallback string) string {
-	if value != "" {
-		return value
+	normalized := strings.TrimSpace(value)
+	if normalized != "" {
+		return normalized
 	}
 	return fallback
 }
 
 func fromHeaderOrNew(value string) string {
-	if value != "" {
-		return value
+	normalized := strings.TrimSpace(value)
+	if normalized != "" {
+		return normalized
 	}
 	return newID()
 }

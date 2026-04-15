@@ -13,6 +13,7 @@ title: Architecture Decision Records
 | ID | Заголовок | Статус |
 |----|-----------|--------|
 | [0001](0001-record-architecture-decisions.md) | Ведение ADR | принято |
+| [0002](0002-aprilhub-sha-image-lifecycle-policy.md) | Политика lifecycle SHA-образов AprilHub | принято |
 
 ## Как добавить запись
 
