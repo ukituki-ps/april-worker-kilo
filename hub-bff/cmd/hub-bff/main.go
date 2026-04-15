@@ -2,19 +2,29 @@ package main
 
 import (
 	"log"
+	"log/slog"
 	"net/http"
+	"os"
 
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/ukituki-ps/april-worker/hub-bff/internal/aggregation"
 	"github.com/ukituki-ps/april-worker/hub-bff/internal/auth"
 	"github.com/ukituki-ps/april-worker/hub-bff/internal/config"
 	httpapi "github.com/ukituki-ps/april-worker/hub-bff/internal/http"
+	"github.com/ukituki-ps/april-worker/hub-bff/internal/observability"
 )
 
 func main() {
+	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelInfo})))
+
 	cfg, err := config.Load()
 	if err != nil {
 		log.Fatalf("load config: %v", err)
 	}
+
+	registry := prometheus.NewRegistry()
+	observability.SetRecorder(observability.NewPrometheusRecorder(registry))
 
 	authMiddleware, err := auth.NewMiddleware(cfg.KeycloakIssuer, cfg.KeycloakAud, cfg.KeycloakJWKS)
 	if err != nil {
@@ -35,6 +45,7 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/healthz", httpapi.Healthz)
 	mux.HandleFunc("/readyz", httpapi.Readyz)
+	mux.Handle("/metrics", promhttp.HandlerFor(registry, promhttp.HandlerOpts{}))
 	mux.Handle(
 		"/api/v1/overview",
 		authMiddleware.Validate(auth.RequireAnyRole("user", "admin")(http.HandlerFunc(handlers.Overview))),
@@ -62,7 +73,8 @@ func main() {
 
 	addr := ":" + cfg.Port
 	log.Printf("hub-bff listening on %s", addr)
-	if err := http.ListenAndServe(addr, httpapi.CORS(cfg.CORSOrigins, httpapi.Metadata(mux))); err != nil {
+	handler := httpapi.CORS(cfg.CORSOrigins, httpapi.Metadata(httpapi.AccessLog(mux)))
+	if err := http.ListenAndServe(addr, handler); err != nil {
 		log.Fatalf("server stopped: %v", err)
 	}
 }
