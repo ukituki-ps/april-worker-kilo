@@ -1,4 +1,4 @@
-.PHONY: help docs-build docs-serve openapi-lint compose-config compose-up compose-down structurizr-url deploy
+.PHONY: help docs-build docs-serve openapi-lint compose-config compose-up compose-down structurizr-url deploy aprilhub-k6-baseline
 
 help:
 	@echo "April bootstrap — цели:"
@@ -8,6 +8,7 @@ help:
 	@echo "  make compose-config — docker compose config"
 	@echo "  make compose-up     — сборка статики + docker compose up -d"
 	@echo "  make compose-down   — docker compose down"
+	@echo "  make aprilhub-k6-baseline — k6 baseline для hub-bff через aprilhub profile"
 	@echo "  make structurizr-url — напечатать URL Structurizr Lite (порт из STRUCTURIZR_HTTP_PORT или 8091)"
 	@echo "  make deploy         — ./deploy.sh (серверный деплой; см. docs/DEPLOYMENT_STRATEGY.md)"
 
@@ -31,6 +32,9 @@ compose-up: docs-build
 
 compose-down:
 	docker compose down
+
+aprilhub-k6-baseline:
+	./scripts/run-k6-aprilhub.sh
 
 deploy:
 	./deploy.sh

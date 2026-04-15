@@ -23,7 +23,7 @@
 - [ ] `005`: Integration contracts finalization (sync/async contract hardening, OpenAPI alignment)
 - [x] `006`: Observability + trace propagation (`correlationId/requestId`, metrics/logging)
 - [x] `007`: Data/runtime dependencies and migrations readiness (если требуется persistence в Hub BFF)
-- [ ] `008`: Testing completion (unit/integration/smoke E2E + k6 baseline)
+- [x] `008`: Testing completion (unit/integration/smoke E2E + k6 baseline)
 - [ ] `009`: Deployment hardening for dev (images.env flow, backups, rollback, smoke-after-deploy)
 - [ ] `010`: Docs/ADR/C4 final sync and release readiness
 - [ ] `011`: Infra PostgreSQL/Redis production readiness (HA/backup/restore/ops runbooks)
@@ -37,6 +37,7 @@
 - [x] `005-hub-contracts-openapi-hardening`: контракты BFF/OpenAPI синхронизированы, отчёт оформлен
 - [x] `006-hub-observability-operability`: baseline observability в `hub-bff` реализован, smoke/проверки пройдены, отчёт оформлен
 - [x] `007-hub-data-runtime-readiness`: решение по stateless readiness зафиксировано, проверки пройдены, отчёт оформлен
+- [x] `008-hub-testing-completion`: test contour закрыт (unit/smoke/k6 baseline), CI обновлён, отчёт оформлен
 - [ ] `011-infra-postgres-redis-production-readiness`: постановка готова, запуск после закрытия `007-010`
 
 ## План реализации AprilHub: статусы
@@ -50,7 +51,7 @@
 | `005` | Integration contracts finalization (sync/async contract hardening, OpenAPI alignment) | ✅ Выполнено | [`tasks/005-hub-contracts-openapi-hardening/REPORT.md`](./tasks/005-hub-contracts-openapi-hardening/REPORT.md) |
 | `006` | Observability + trace propagation (`correlationId/requestId`, metrics/logging) | ✅ Выполнено | [`tasks/006-hub-observability-operability/REPORT.md`](./tasks/006-hub-observability-operability/REPORT.md) |
 | `007` | Data/runtime dependencies and migrations readiness (если требуется persistence в Hub BFF) | ✅ Выполнено | [`tasks/007-hub-data-runtime-readiness/REPORT.md`](./tasks/007-hub-data-runtime-readiness/REPORT.md) |
-| `008` | Testing completion (unit/integration/smoke E2E + k6 baseline) | ⏳ Не начато | — |
+| `008` | Testing completion (unit/integration/smoke E2E + k6 baseline) | ✅ Выполнено | [`tasks/008-hub-testing-completion/REPORT.md`](./tasks/008-hub-testing-completion/REPORT.md) |
 | `009` | Deployment hardening for dev (images.env flow, backups, rollback, smoke-after-deploy) | ⏳ Не начато | — |
 | `010` | Docs/ADR/C4 final sync and release readiness | ⏳ Не начато | — |
 | `011` | Infra PostgreSQL/Redis production readiness (HA/backup/restore/ops runbooks) | ⏳ Не начато | [`tasks/011-infra-postgres-redis-production-readiness/TASK.md`](./tasks/011-infra-postgres-redis-production-readiness/TASK.md) |
