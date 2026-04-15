@@ -1,8 +1,10 @@
 openapi: 3.1.0
 info:
   title: AprilHub BFF API
-  version: 0.1.0
-  description: MVP контракт для bootstrap AprilHub.
+  version: 1.0.0
+  description: |
+    Baseline v1 контракт Hub BFF для UI-агрегации AprilHub.
+    Non-breaking изменения вносятся внутри `/api/v1/*`, breaking изменения требуют новой версии API.
   license:
     name: UNLICENSED
 servers:
@@ -37,7 +39,11 @@ paths:
                 $ref: "#/components/schemas/ReadinessResponse"
   /api/v1/overview:
     get:
-      summary: Aggregated dashboard overview
+      deprecated: true
+      summary: Aggregated dashboard overview (compatibility endpoint)
+      description: |
+        Backward-compatible endpoint kept for existing clients.
+        Prefer `/api/v1/aggregation/dashboard`.
       operationId: getHubOverview
       tags: [Overview]
       security:
@@ -49,6 +55,84 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/OverviewResponse"
+        "401":
+          description: Missing or invalid token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: Insufficient role
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/aggregation/dashboard:
+    get:
+      summary: Aggregated dashboard data for hub shell
+      operationId: getHubAggregationDashboard
+      tags: [Aggregation]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Aggregated dashboard payload
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AggregationResponse"
+        "401":
+          description: Missing or invalid token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: Insufficient role
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/aggregation/home:
+    get:
+      summary: Aggregated home data for hub shell
+      operationId: getHubAggregationHome
+      tags: [Aggregation]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Aggregated home payload
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AggregationResponse"
+        "401":
+          description: Missing or invalid token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: Insufficient role
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/aggregation/summary:
+    get:
+      summary: Aggregated summary data for hub shell
+      operationId: getHubAggregationSummary
+      tags: [Aggregation]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Aggregated summary payload
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AggregationResponse"
         "401":
           description: Missing or invalid token
           content:
@@ -157,6 +241,23 @@ components:
                 type: string
               state:
                 type: string
+    AggregationResponse:
+      type: object
+      required: [status, data, metadata]
+      properties:
+        status:
+          type: string
+          enum: [ok, degraded]
+          example: degraded
+        data:
+          type: object
+          additionalProperties: true
+        degraded:
+          type: array
+          items:
+            $ref: "#/components/schemas/DegradedSource"
+        metadata:
+          $ref: "#/components/schemas/Metadata"
     CurrentUserProfile:
       type: object
       required: [sub, username, email, name, roles]
@@ -176,9 +277,36 @@ components:
             type: string
     Error:
       type: object
-      required: [code, message]
+      required: [code, message, metadata]
       properties:
         code:
           type: string
         message:
           type: string
+        metadata:
+          $ref: "#/components/schemas/Metadata"
+    DegradedSource:
+      type: object
+      required: [sourceService, code, message]
+      properties:
+        sourceService:
+          type: string
+        code:
+          type: string
+          example: downstream_unavailable
+        message:
+          type: string
+    Metadata:
+      type: object
+      required: [correlationId, requestId, sourceService]
+      properties:
+        correlationId:
+          type: string
+        requestId:
+          type: string
+        sourceService:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+          description: Optional timestamp when available in upstream context.

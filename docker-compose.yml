@@ -49,7 +49,7 @@ services:
     volumes:
       - ./:/workspace
     ports:
-      - "${HUB_BFF_PORT:-8081}:8081"
+      - "${HUB_BFF_HOST_PORT:-8081}:${HUB_BFF_PORT:-8081}"
     depends_on:
       - keycloak
     restart: unless-stopped
