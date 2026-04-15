@@ -5,10 +5,12 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT_DIR"
 
 COMPOSE_PROJECT_NAME="${COMPOSE_PROJECT_NAME:-aprilhub-smoke}"
-HUB_BFF_HOST_PORT="${HUB_BFF_HOST_PORT:-18081}"
-KEYCLOAK_HTTP_PORT="${KEYCLOAK_HTTP_PORT:-18082}"
-KEYCLOAK_ISSUER="${KEYCLOAK_ISSUER:-http://localhost:${KEYCLOAK_HTTP_PORT}/realms/april}"
-export HUB_BFF_HOST_PORT KEYCLOAK_HTTP_PORT KEYCLOAK_ISSUER
+INGRESS_HTTP_PORT="${INGRESS_HTTP_PORT:-18080}"
+DOCS_HTTP_PORT="${DOCS_HTTP_PORT:-${INGRESS_HTTP_PORT}}"
+KEYCLOAK_ISSUER="${KEYCLOAK_ISSUER:-http://localhost/auth/realms/april}"
+export DOCS_HTTP_PORT KEYCLOAK_ISSUER
+
+ingress_base="http://localhost:${DOCS_HTTP_PORT}"
 
 compose() {
   docker compose -p "$COMPOSE_PROJECT_NAME" "$@"
@@ -20,25 +22,25 @@ cleanup() {
 trap cleanup EXIT
 
 echo "[smoke] starting aprilhub profile"
-compose --profile aprilhub up -d keycloak-db keycloak hub-bff
+compose --profile aprilhub up -d keycloak-db keycloak hub-bff hub-shell nginx-docs
 
-echo "[smoke] waiting for hub-bff health"
+echo "[smoke] waiting for ingress health endpoint"
 for _ in {1..60}; do
-  if curl -fsS "http://localhost:${HUB_BFF_HOST_PORT}/healthz" >/dev/null; then
+  if curl -fsS "${ingress_base}/healthz" >/dev/null; then
     break
   fi
   sleep 2
 done
-curl -fsS "http://localhost:${HUB_BFF_HOST_PORT}/healthz" >/dev/null
+curl -fsS "${ingress_base}/healthz" >/dev/null
 
 echo "[smoke] waiting for keycloak token endpoint"
 for _ in {1..60}; do
-  if curl -fsS "http://localhost:${KEYCLOAK_HTTP_PORT}/realms/april/.well-known/openid-configuration" >/dev/null; then
+  if curl -fsS "${ingress_base}/auth/realms/april/.well-known/openid-configuration" >/dev/null; then
     break
   fi
   sleep 2
 done
-curl -fsS "http://localhost:${KEYCLOAK_HTTP_PORT}/realms/april/.well-known/openid-configuration" >/dev/null
+curl -fsS "${ingress_base}/auth/realms/april/.well-known/openid-configuration" >/dev/null
 
 expect_http_code() {
   local expected="$1"
@@ -53,12 +55,15 @@ expect_http_code() {
   fi
 }
 
+echo "[smoke] checking shell entrypoint"
+expect_http_code "200" "${ingress_base}/"
+
 echo "[smoke] checking unauthenticated path"
-expect_http_code "401" "http://localhost:${HUB_BFF_HOST_PORT}/api/v1/aggregation/dashboard"
+expect_http_code "401" "${ingress_base}/api/v1/aggregation/dashboard"
 
 echo "[smoke] obtaining Keycloak dev token"
 TOKEN="$(
-  curl -sS -X POST "http://localhost:${KEYCLOAK_HTTP_PORT}/realms/april/protocol/openid-connect/token" \
+  curl -sS -X POST "${ingress_base}/auth/realms/april/protocol/openid-connect/token" \
     -H "Content-Type: application/x-www-form-urlencoded" \
     -d "grant_type=password" \
     -d "client_id=aprilhub-shell" \
@@ -72,9 +77,9 @@ if [[ -z "$TOKEN" ]]; then
 fi
 
 echo "[smoke] checking authorized and role-guard paths"
-expect_http_code "200" "http://localhost:${HUB_BFF_HOST_PORT}/api/v1/me" -H "Authorization: Bearer $TOKEN"
-expect_http_code "403" "http://localhost:${HUB_BFF_HOST_PORT}/api/v1/admin/ping" -H "Authorization: Bearer $TOKEN"
-expect_http_code "200" "http://localhost:${HUB_BFF_HOST_PORT}/api/v1/aggregation/dashboard" \
+expect_http_code "200" "${ingress_base}/api/v1/me" -H "Authorization: Bearer $TOKEN"
+expect_http_code "403" "${ingress_base}/api/v1/admin/ping" -H "Authorization: Bearer $TOKEN"
+expect_http_code "200" "${ingress_base}/api/v1/aggregation/dashboard" \
   -H "Authorization: Bearer $TOKEN" \
   -H "X-Correlation-Id: corr-smoke-ci" \
   -H "X-Request-Id: req-smoke-ci"

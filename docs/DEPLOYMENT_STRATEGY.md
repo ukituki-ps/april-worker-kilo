@@ -90,7 +90,17 @@
 | Решение | Значение |
 |--------|----------|
 | Health / readiness | Проверка по **внутреннему порту** |
-| Nginx | В контейнере; обновление через compose, не reload nginx на хосте |
+| Nginx | Единый ingress в контейнере; обновление через compose, без reload nginx на хосте |
+
+### Единый ingress без ручных портов (stage `012`)
+
+- Публичная точка входа dev-стенда: `http://<host>:${DOCS_HTTP_PORT}` (или домен reverse proxy).
+- Маршрутизация:
+  - `/` -> `hub-shell` (guest/transition/authorized UX),
+  - `/api/*` -> `hub-bff`,
+  - `/auth/*` -> `keycloak`,
+  - `/docs/*`, `/openapi/*`, `/swagger/*` -> документация и контрактные артефакты.
+- Для smoke/deploy проверок по умолчанию используется ingress URL, а не прямые порты `hub-bff`/`keycloak`.
 
 ## 8. Keycloak и остальная архитектура
 
@@ -155,13 +165,13 @@ Release-gate checklist для завершения AprilHub roadmap `001-010`: [
 - На **pull request** и **push** в `main` / `develop`: workflow **CI** (`.github/workflows/ci.yml`) на GitHub-hosted runner выполняет `make openapi-lint` и `make docs-build` (без деплоя).
 - Сборка сайта: из корня репозитория `make docs-build` (внутри: `npm ci` + `npm run build` в `docs-site/`).
 - Проверка OpenAPI: `make openapi-lint` (Redocly, конфиг `redocly.yaml`).
-- Просмотр через Compose: после `make docs-build` — `docker compose up -d`; Nginx раздаёт `docs-site/build`, пути `/openapi/`, `/swagger/`; Structurizr Lite — отдельный порт (см. `.env.example`).
+- Просмотр через Compose: после `make docs-build` — `docker compose up -d`; Nginx работает как unified ingress: `hub-shell` на `/`, docs на `/docs/`, OpenAPI на `/openapi/`, Swagger UI на `/swagger/`; Structurizr Lite — отдельный порт (см. `.env.example`).
 
 ### На dev-хосте (`DEV_HOST`, для april-worker: `dev.example.com`)
 
 1. После `git pull` в **`DEPLOY_ROOT`** — **`./deploy.sh`** (включает `make docs-build`; нужны Node.js 18+ и npm на сервере, либо собрать статику в CI и скопировать артефакт — по договорённости) или вручную `make docs-build`.
-2. Поднять/обновить сервисы — шаг `docker compose up -d` внутри **`deploy.sh`** с тем же `docker-compose.yml` (порты и TLS — за reverse proxy/Nginx на хосте или в отдельном контейнере; TLS не хранить в репозитории).
-3. Проверить в браузере: главная страница документации (статика Docusaurus), `https://<host>/openapi/openapi.yaml`, `https://<host>/swagger/`, при открытом в firewall порте — Structurizr Lite на согласованном порту.
+2. Поднять/обновить сервисы — шаг `docker compose up -d` внутри **`deploy.sh`** с тем же `docker-compose.yml` (публично достаточно ingress-порта Nginx; TLS остаётся на внешнем reverse proxy/edge).
+3. Проверить в браузере: shell на `https://<host>/`, docs на `https://<host>/docs/`, `https://<host>/openapi/openapi.yaml`, `https://<host>/swagger/`; при открытом в firewall порте — Structurizr Lite на согласованном порту.
 
 Когда появятся образы приложений и отдельный compose-профиль, документацию можно вынести в тот же compose-стек или оставить отдельным профилем `docs` — важно зафиксировать один способ в этом документе при первом полном деплое.
 

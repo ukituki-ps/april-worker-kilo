@@ -31,7 +31,7 @@ EOF
   AUTO_ROLLBACK=0      отключить авто-rollback (по умолчанию включён)
   REQUIRE_IMAGES_ENV=0 не требовать images.env (по умолчанию REQUIRE_IMAGES_ENV=1)
   DEPLOY_ARTIFACTS_DIR каталог артефактов (по умолчанию .deploy-artifacts)
-  HUB_BFF_BASE_URL     базовый URL для health/readiness (по умолчанию http://127.0.0.1:${HUB_BFF_HOST_PORT:-8081})
+  HUB_BFF_BASE_URL     базовый URL для health/readiness (по умолчанию http://127.0.0.1:${DOCS_HTTP_PORT:-8080})
 
 Опциональные хуки (если исполняемы):
   scripts/db-backup.sh      дамп БД до миграций/up (см. DEPLOYMENT_STRATEGY.md)
@@ -211,7 +211,7 @@ run_health_checks() {
     log "hub-bff не запущен — пропуск health/readiness для BFF"
     return 0
   fi
-  local base_url="${HUB_BFF_BASE_URL:-http://127.0.0.1:${HUB_BFF_HOST_PORT:-8081}}"
+  local base_url="${HUB_BFF_BASE_URL:-http://127.0.0.1:${DOCS_HTTP_PORT:-8080}}"
   local retries="${DEPLOY_HEALTH_RETRIES:-30}"
   local sleep_s="${DEPLOY_HEALTH_SLEEP_SEC:-2}"
   log "health-check ${base_url}/healthz + ${base_url}/readyz"

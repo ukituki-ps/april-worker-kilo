@@ -3,8 +3,9 @@ set -euo pipefail
 
 log() { echo "[smoke-after-deploy] $*" >&2; }
 
-hub_bff_base="${HUB_BFF_BASE_URL:-http://127.0.0.1:${HUB_BFF_HOST_PORT:-8081}}"
-keycloak_base="${KEYCLOAK_BASE_URL:-http://localhost:${KEYCLOAK_HTTP_PORT:-8082}}"
+ingress_base="${INGRESS_BASE_URL:-http://127.0.0.1:${DOCS_HTTP_PORT:-8080}}"
+hub_bff_base="${HUB_BFF_BASE_URL:-${ingress_base}}"
+keycloak_base="${KEYCLOAK_BASE_URL:-${ingress_base}/auth}"
 keycloak_realm="${KEYCLOAK_REALM:-april}"
 keycloak_client_id="${SMOKE_KEYCLOAK_CLIENT_ID:-aprilhub-shell}"
 keycloak_user="${SMOKE_KEYCLOAK_USERNAME:-april-dev}"
@@ -41,6 +42,7 @@ log "waiting for health/readiness endpoints"
 wait_for_ok "${hub_bff_base}/healthz"
 wait_for_ok "${hub_bff_base}/readyz"
 wait_for_ok "${keycloak_base}/realms/${keycloak_realm}/.well-known/openid-configuration"
+wait_for_ok "${ingress_base}/"
 
 log "checking unauthenticated API path"
 expect_http_code "401" "${hub_bff_base}/api/v1/aggregation/dashboard"

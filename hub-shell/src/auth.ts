@@ -5,9 +5,20 @@ export type AuthConfig = {
   apiBaseUrl: string;
 };
 
+function resolveRuntimeUrl(value: string, fallback: string): string {
+  const normalized = value.trim();
+  if (normalized.length === 0) {
+    return fallback;
+  }
+  if (normalized.startsWith("/")) {
+    return `${window.location.origin}${normalized}`;
+  }
+  return normalized;
+}
+
 export const authConfig: AuthConfig = {
-  keycloakUrl: import.meta.env.VITE_KEYCLOAK_URL ?? "",
+  keycloakUrl: resolveRuntimeUrl(import.meta.env.VITE_KEYCLOAK_URL ?? "/auth", `${window.location.origin}/auth`),
   realm: import.meta.env.VITE_KEYCLOAK_REALM ?? "april",
   clientId: import.meta.env.VITE_KEYCLOAK_CLIENT_ID ?? "aprilhub-shell",
-  apiBaseUrl: import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8081",
+  apiBaseUrl: resolveRuntimeUrl(import.meta.env.VITE_API_BASE_URL ?? "/api", `${window.location.origin}/api`),
 };

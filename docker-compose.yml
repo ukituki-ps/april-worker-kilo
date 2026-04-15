@@ -4,6 +4,7 @@
 services:
   nginx-docs:
     image: nginx:1.27-alpine
+    profiles: ["aprilhub", "docs"]
     ports:
       - "${DOCS_HTTP_PORT:-8080}:80"
     volumes:
@@ -41,15 +42,15 @@ services:
     command: sh -c "go mod download && go run ./cmd/hub-bff"
     environment:
       HUB_BFF_PORT: ${HUB_BFF_PORT:-8081}
-      KEYCLOAK_URL: ${KEYCLOAK_URL:-http://keycloak:8080}
+      KEYCLOAK_URL: ${KEYCLOAK_URL:-http://keycloak:8080/auth}
       KEYCLOAK_REALM: ${KEYCLOAK_REALM:-april}
-      KEYCLOAK_ISSUER: ${KEYCLOAK_ISSUER:-http://localhost:8082/realms/april}
+      KEYCLOAK_ISSUER: ${KEYCLOAK_ISSUER:-http://localhost/auth/realms/april}
       KEYCLOAK_AUDIENCE: ${KEYCLOAK_AUDIENCE:-aprilhub-shell}
-      KEYCLOAK_JWKS_URL: ${KEYCLOAK_JWKS_URL:-http://keycloak:8080/realms/april/protocol/openid-connect/certs}
+      KEYCLOAK_JWKS_URL: ${KEYCLOAK_JWKS_URL:-http://keycloak:8080/auth/realms/april/protocol/openid-connect/certs}
     volumes:
       - ./:/workspace
-    ports:
-      - "${HUB_BFF_HOST_PORT:-8081}:${HUB_BFF_PORT:-8081}"
+    expose:
+      - "${HUB_BFF_PORT:-8081}"
     depends_on:
       - keycloak
     restart: unless-stopped
@@ -60,14 +61,14 @@ services:
     working_dir: /workspace/hub-shell
     command: sh -c "npm install && npm run dev -- --host 0.0.0.0 --port ${HUB_SHELL_PORT:-4173}"
     environment:
-      VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8081}
-      VITE_KEYCLOAK_URL: ${VITE_KEYCLOAK_URL:-http://localhost:8082}
+      VITE_API_BASE_URL: ${VITE_API_BASE_URL:-/api}
+      VITE_KEYCLOAK_URL: ${VITE_KEYCLOAK_URL:-/auth}
       VITE_KEYCLOAK_REALM: ${VITE_KEYCLOAK_REALM:-april}
       VITE_KEYCLOAK_CLIENT_ID: ${VITE_KEYCLOAK_CLIENT_ID:-aprilhub-shell}
     volumes:
       - ./:/workspace
-    ports:
-      - "${HUB_SHELL_PORT:-4173}:4173"
+    expose:
+      - "4173"
     depends_on:
       - hub-bff
     restart: unless-stopped
@@ -75,7 +76,7 @@ services:
   keycloak:
     image: quay.io/keycloak/keycloak:26.1
     profiles: ["aprilhub"]
-    command: start-dev --import-realm
+    command: start-dev --import-realm --http-relative-path /auth
     environment:
       KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN:-admin}
       KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin}
@@ -86,8 +87,8 @@ services:
       KC_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD:-keycloak}
     volumes:
       - ./infra/keycloak/realm:/opt/keycloak/data/import:ro
-    ports:
-      - "${KEYCLOAK_HTTP_PORT:-8082}:8080"
+    expose:
+      - "8080"
     depends_on:
       - keycloak-db
     restart: unless-stopped

@@ -27,6 +27,7 @@
 - [x] `009`: Deployment hardening for dev (images.env flow, backups, rollback, smoke-after-deploy)
 - [x] `010`: Docs/ADR/C4 final sync and release readiness
 - [x] `011`: Infra PostgreSQL/Redis production readiness (HA/backup/restore/ops runbooks)
+- [x] `012`: Unified ingress and auth UX hardening (single Nginx entrypoint for guest/Keycloak/authorized zones)
 
 ## Текущий фокус
 
@@ -41,6 +42,7 @@
 - [x] `009-hub-deployment-hardening-dev`: deploy hardening baseline реализован, `PLAN.md`/`REPORT.md` оформлены
 - [x] `010-hub-architecture-docs-release-gate`: выполнена синхронизация docs/ADR/C4 и оформлен release checklist v1
 - [x] `011-infra-postgres-redis-production-readiness`: production-readiness baseline PostgreSQL/Redis реализован, runbooks и проверки оформлены
+- [x] `012-aprilhub-unified-ingress-auth-hardening`: единый Nginx ingress для `hub-shell`/`hub-bff`/Keycloak реализован, smoke-проверки через единый endpoint пройдены
 
 ## План реализации AprilHub: статусы
 
@@ -57,3 +59,4 @@
 | `009` | Deployment hardening for dev (images.env flow, backups, rollback, smoke-after-deploy) | ✅ Выполнено | [`tasks/009-hub-deployment-hardening-dev/REPORT.md`](./tasks/009-hub-deployment-hardening-dev/REPORT.md) |
 | `010` | Docs/ADR/C4 final sync and release readiness | ✅ Выполнено | [`tasks/010-hub-architecture-docs-release-gate/REPORT.md`](./tasks/010-hub-architecture-docs-release-gate/REPORT.md) |
 | `011` | Infra PostgreSQL/Redis production readiness (HA/backup/restore/ops runbooks) | ✅ Выполнено | [`tasks/011-infra-postgres-redis-production-readiness/REPORT.md`](./tasks/011-infra-postgres-redis-production-readiness/REPORT.md) |
+| `012` | Unified ingress and auth UX hardening (single Nginx entrypoint for guest/Keycloak/authorized zones) | ✅ Выполнено | [`tasks/012-aprilhub-unified-ingress-auth-hardening/REPORT.md`](./tasks/012-aprilhub-unified-ingress-auth-hardening/REPORT.md) |
