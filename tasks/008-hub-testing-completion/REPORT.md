@@ -45,6 +45,27 @@ docker run --rm -v "/home/ukituki/april-worker:/workspace" -w /workspace/hub-she
 ./scripts/run-k6-aprilhub.sh
 ```
 
+Результаты прогонов:
+- `make openapi-lint`: все спецификации (`openapi.yaml`, `mail-gateway-openapi.yaml`, `aprilhub-bff.yaml`) валидны.
+- `cd hub-bff && go test ./...`: `ok` для `internal/aggregation`, `internal/auth`, `internal/http`; падений нет.
+- `hub-shell` (в контейнере `node:20-alpine`): `npm run lint`, `npm run test`, `npm run build` — успешно; Vitest: `2` test files / `6` tests, все passed.
+- `./scripts/smoke-aprilhub.sh`: smoke-сценарий пройден, auth/RBAC и aggregation checks в статусе passed.
+- `./scripts/run-k6-aprilhub.sh`: baseline пройден, thresholds выполнены.
+  - Профиль нагрузки: `4 VUs`, `20s`, `160 iterations`, `480 http requests`, `~23.92 req/s`.
+  - Проверки сценария: `checks=100.00%` (`640/640`), все assert-ы endpoint-ов успешны.
+  - Ошибки запросов: `http_req_failed=0.00%` (`0/480`), что ниже порога `<5%`.
+  - Latency `http_req_duration`: `avg=214.77µs`, `p90=294.42µs`, `p95=327.72µs`, `max=585.24µs` (порог `p95<1200ms`, `p99<2000ms` соблюдён).
+  - Время итерации: `iteration_duration avg=501.56ms`, `p95=501.95ms`.
+  - Трафик: `data_sent=640 kB`, `data_received=215 kB`.
+
+  Мини-сводка по endpoint-ам (из сценария `k6/aprilhub-baseline.js`):
+
+  | Endpoint | Метод | Проверка в сценарии | p95 latency | Результат |
+  |----------|-------|---------------------|-------------|-----------|
+  | `/api/v1/me` | `GET` | `status === 200` | `333.5µs` | ✅ passed |
+  | `/api/v1/aggregation/dashboard` | `GET` | `status === 200`, `body.status in {ok,degraded}` | `294.87µs` | ✅ passed |
+  | `/api/v1/overview` | `GET` | `status === 200` | `343.12µs` | ✅ passed |
+
 ## 6) Деплой
 - Среда: нет
 - Согласовано с: [`docs/DEPLOYMENT_STRATEGY.md`](../../docs/DEPLOYMENT_STRATEGY.md)
