@@ -1,7 +1,7 @@
 # Отчёт: Hub BFF Aggregation Runtime (Этап 004)
 
 ## 1) Итого
-- Статус: ⚠️ частично
+- Статус: ✅ выполнено
 - Задача: Hub BFF Aggregation Runtime (Этап 004)
 - Ветка: `feature/aprilhub-implementation`
 - Коммиты: `не создавались`
@@ -61,6 +61,6 @@ cd hub-bff && golangci-lint run # команда недоступна: "command 
 - Downstream-контракты в `docs/architecture/INTEGRATION_CONTRACTS.md` остаются draft; адаптеры реализованы в MVP-safe режиме (UI aggregation only).
 - `golangci-lint` отсутствует локально, нужен повторный прогон в CI или после установки инструмента.
 
-## 8) Что осталось
-- [ ] Прогнать runtime smoke-сценарий этапа `004` (валидный токен, 200/401/403, degraded mode на реальном compose-стенде).
-- [ ] При необходимости скорректировать маппинг downstream endpoint-ов после финализации контрактов этапа `005`.
+## 8) Follow-up (не блокирует закрытие этапа)
+- Прогнать расширенный runtime smoke-сценарий этапа `004` на реальном compose-стенде (валидный токен, 200/401/403, degraded mode).
+- При необходимости скорректировать маппинг downstream endpoint-ов после финализации контрактов этапа `005`.

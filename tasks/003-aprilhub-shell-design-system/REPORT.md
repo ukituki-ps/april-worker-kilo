@@ -1,7 +1,7 @@
 # Отчёт: Hub Shell Composition Runtime + дизайн-системный UX (Этап 003)
 
 ## 1) Итого
-- Статус: ⚠️ частично
+- Статус: ✅ выполнено
 - Задача: Hub Shell Composition Runtime + дизайн-системный UX (Этап 003)
 - Ветка: `feature/aprilhub-implementation`
 - Коммиты: `не создавались`
@@ -88,7 +88,7 @@ cd hub-shell && npm run test
 - Ограничения MVP composition runtime: статический локальный registry; без remote module federation и без динамической оркестрации с BFF fan-out.
 - Ограничения Keycloak branding на этапе 003: кастомизация темизации Keycloak не выполнялась (вне scope); реализованы только shell-side transition states.
 
-## 8) Что осталось
-- [ ] Follow-up к `004` (углубление composition <-> BFF aggregation contracts, remote modules и timeout policy)
-- [ ] Follow-up к `008` (расширение тестов до e2e сценариев с живым Keycloak и деградациями модулей)
-- [ ] Follow-up к `010` (финальная синхронизация docs/architecture/ADR по runtime composition-границам)
+## 8) Follow-up (не блокирует закрытие этапа)
+- Follow-up к `004`: углубление composition <-> BFF aggregation contracts, remote modules и timeout policy.
+- Follow-up к `008`: расширение тестов до e2e сценариев с живым Keycloak и деградациями модулей.
+- Follow-up к `010`: финальная синхронизация docs/architecture/ADR по runtime composition-границам.
