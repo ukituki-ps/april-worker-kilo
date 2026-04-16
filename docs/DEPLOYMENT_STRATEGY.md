@@ -162,7 +162,7 @@ Release-gate checklist для завершения AprilHub roadmap `001-010`: [
 1. Job на runner с labels `self-hosted`, `dev`, **`RUNNER_LABEL_EXTRA`** (для april-worker: `worker`), ref = commit после merge в `develop`.
 2. Сборка и тесты (как принято в репо).
 3. Сборка образов, push в ghcr.io с тегом по **git sha**.
-4. На сервере: `cd` в **`DEPLOY_ROOT`** → **`./deploy.sh`** (внутри: preflight + `git pull`, `make openapi-lint`, `scripts/db-backup.sh`, `scripts/run-migrations.sh`, `make docs-build`, `docker compose pull` → `up -d`, health/readiness, `scripts/smoke-after-deploy.sh`, фиксация `last-good`). Либо те же шаги вручную: `git pull` → п.5–9.
+4. На сервере: `cd` в **`DEPLOY_ROOT`** → **`./deploy.sh`** (внутри: preflight + `git pull`, `make openapi-lint`, `scripts/db-backup.sh`, `scripts/run-migrations.sh`, `make docs-build`, `docker compose pull` → `up -d`, health/readiness, `scripts/smoke-after-deploy.sh`, фиксация `last-good`). Дополнительно `deploy.sh` отслеживает изменения lock-файлов фронтенда (`hub-shell/package-lock.json`, `design-system/DisignApril/pnpm-lock.yaml`) и делает `docker compose up -d --force-recreate` для соответствующего сервиса (`hub-shell` / `april-showcase`), чтобы гарантировать повторную установку зависимостей после merge. Либо те же шаги вручную: `git pull` → п.5–9.
 5. Обновить **`images.env`** / `.env` под новые SHA образов (часто делает CI перед вызовом деплоя или вручную до/после `git pull`).
 6. **Обязательно** снять дамп БД dev-стенда: **`pg_dump`** (до миграций и поднятия compose) — в скрипте деплоя: исполняемый **`scripts/db-backup.sh`**, если добавлен в репозиторий.
 7. Выполнить проверку restore-пути PostgreSQL: **`scripts/validate-postgres-restore.sh`** (на последнем backup или указанном dump-файле).
