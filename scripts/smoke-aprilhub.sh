@@ -24,7 +24,7 @@ cleanup() {
 trap cleanup EXIT
 
 echo "[smoke] starting aprilhub profile"
-compose --profile aprilhub up -d keycloak-db keycloak hub-bff hub-shell nginx-docs
+compose --profile aprilhub up -d keycloak-db keycloak hub-bff hub-shell april-showcase nginx-docs
 
 echo "[smoke] waiting for ingress health endpoint"
 for _ in {1..60}; do
@@ -58,7 +58,22 @@ expect_http_code() {
 }
 
 echo "[smoke] checking shell entrypoint"
+for _ in {1..90}; do
+  if curl -fsS "${ingress_base}/" >/dev/null; then
+    break
+  fi
+  sleep 2
+done
 expect_http_code "200" "${ingress_base}/"
+
+echo "[smoke] checking design-system showcase entrypoint"
+for _ in {1..90}; do
+  if curl -fsS "${ingress_base}/showcase/" >/dev/null; then
+    break
+  fi
+  sleep 2
+done
+expect_http_code "200" "${ingress_base}/showcase/"
 
 echo "[smoke] checking unauthenticated path"
 expect_http_code "401" "${ingress_base}/api/v1/aggregation/dashboard"

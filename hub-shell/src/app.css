@@ -1,12 +1,14 @@
+@import "@april/tokens/css";
+
 .zone-container {
   max-width: 1080px;
   margin: 32px auto;
   padding: 24px;
   display: grid;
   gap: 16px;
-  border: 1px solid #d0d7de;
+  border: 1px solid var(--april-neutral-border);
   border-radius: 12px;
-  background: #ffffff;
+  background: var(--april-neutral-bg);
 }
 
 .guest-landing {
@@ -20,7 +22,7 @@
 
 .landing-eyebrow {
   margin: 0;
-  color: #3867d6;
+  color: var(--april-accent-teal-8);
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -35,7 +37,7 @@
 }
 
 .landing-note {
-  color: #4b5563;
+  color: var(--april-neutral-text-muted);
   font-size: 0.9rem;
 }
 
@@ -51,20 +53,7 @@
 }
 
 .landing-card {
-  border: 1px solid #d0d7de;
-  border-radius: 10px;
-  padding: 14px;
-  background: #f8fafc;
-  display: grid;
-  gap: 6px;
-}
-
-.landing-card h3 {
-  margin: 0;
-}
-
-.landing-card p {
-  margin: 0;
+  background: var(--april-neutral-bg-alt);
 }
 
 .landing-scenarios {
@@ -75,12 +64,12 @@
 }
 
 .landing-meta {
-  color: #6b7280;
+  color: var(--april-neutral-text-muted);
 }
 
 .app-shell {
   min-height: 100vh;
-  background: #f6f8fa;
+  background: var(--april-neutral-bg-alt);
 }
 
 .shell-header {
@@ -88,8 +77,8 @@
   justify-content: space-between;
   align-items: center;
   padding: 12px 20px;
-  border-bottom: 1px solid #d0d7de;
-  background: #ffffff;
+  border-bottom: 1px solid var(--april-neutral-border);
+  background: var(--april-neutral-bg);
 }
 
 .shell-user {
@@ -110,16 +99,16 @@
   gap: 8px;
   align-content: start;
   padding: 16px;
-  border: 1px solid #d0d7de;
+  border: 1px solid var(--april-neutral-border);
   border-radius: 8px;
-  background: #ffffff;
+  background: var(--april-neutral-bg);
 }
 
 .shell-content {
   padding: 16px;
-  border: 1px solid #d0d7de;
+  border: 1px solid var(--april-neutral-border);
   border-radius: 8px;
-  background: #ffffff;
+  background: var(--april-neutral-bg);
 }
 
 .composition-grid {
@@ -130,22 +119,17 @@
 
 .widget-card,
 .state {
-  border: 1px solid #d0d7de;
+  border: 1px solid var(--april-neutral-border);
   border-radius: 8px;
   padding: 12px;
-  background: #fff;
+  background: var(--april-neutral-bg);
 }
 
 .state-loading {
-  background: #eff6ff;
+  background: var(--april-accent-teal-1);
 }
 
 .state-error,
 .state-forbidden {
-  background: #fff5f5;
-}
-
-button[disabled] {
-  opacity: 0.7;
-  cursor: wait;
+  background: color-mix(in srgb, var(--april-semantic-danger) 12%, var(--april-neutral-bg) 88%);
 }

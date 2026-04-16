@@ -74,6 +74,17 @@ services:
       - hub-bff
     restart: unless-stopped
 
+  april-showcase:
+    image: ${APRIL_SHOWCASE_IMAGE:-node:20-alpine}
+    profiles: ["aprilhub"]
+    working_dir: /workspace/design-system/DisignApril
+    command: sh -c "corepack enable && CI=true pnpm install --frozen-lockfile && pnpm --filter @april/showcase exec vite --host 0.0.0.0 --port ${APRIL_SHOWCASE_PORT:-4174}"
+    volumes:
+      - ./:/workspace
+    expose:
+      - "${APRIL_SHOWCASE_PORT:-4174}"
+    restart: unless-stopped
+
   keycloak:
     image: quay.io/keycloak/keycloak:26.1
     profiles: ["aprilhub"]

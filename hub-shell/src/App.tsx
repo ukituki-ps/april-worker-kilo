@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { Badge, Button, Card, Group, Stack, Text } from "@mantine/core";
 import { authConfig } from "./auth";
 import { apiRequest } from "./api";
 import { AppShell } from "./app-shell";
@@ -98,9 +99,9 @@ export default function App({ authInitError = "" }: AppProps) {
             рабочую зону через активный поток Keycloak.
           </p>
           <div className="landing-actions">
-            <button type="button" onClick={() => void startLoginFlow()} disabled={isLoginStarting}>
+            <Button type="button" onClick={() => void startLoginFlow()} disabled={isLoginStarting}>
               {isLoginStarting ? "Перенаправляем в Keycloak..." : "Открыть защищенное рабочее пространство"}
-            </button>
+            </Button>
             <span className="landing-note">Точка входа: {window.location.origin}/auth</span>
           </div>
         </section>
@@ -109,10 +110,19 @@ export default function App({ authInitError = "" }: AppProps) {
           <h2>Почему команды выбирают AprilHub</h2>
           <div className="landing-cards">
             {valueHighlights.map((highlight) => (
-              <article key={highlight.title} className="landing-card">
-                <h3>{highlight.title}</h3>
-                <p>{highlight.description}</p>
-              </article>
+              <Card key={highlight.title} className="landing-card" withBorder padding="lg" radius="md">
+                <Stack gap="xs">
+                  <Group justify="space-between">
+                    <Text fw={600}>{highlight.title}</Text>
+                    <Badge color="teal" variant="light">
+                      April DS
+                    </Badge>
+                  </Group>
+                  <Text c="dimmed" size="sm">
+                    {highlight.description}
+                  </Text>
+                </Stack>
+              </Card>
             ))}
           </div>
         </section>
@@ -149,9 +159,9 @@ export default function App({ authInitError = "" }: AppProps) {
           state="forbidden"
           message="Текущая учетная запись авторизована, но не имеет доступа к bootstrap endpoint оболочки."
           action={
-            <button type="button" onClick={() => void keycloak.logout()}>
+            <Button type="button" variant="light" color="red" onClick={() => void keycloak.logout()}>
               Выйти
-            </button>
+            </Button>
           }
         />
       </main>

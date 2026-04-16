@@ -1,5 +1,6 @@
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { MantineProvider } from "@mantine/core";
 import App from "./App";
 
 const keycloakState = vi.hoisted(() => ({
@@ -24,6 +25,13 @@ vi.mock("./api", () => ({
 }));
 
 describe("App", () => {
+  const renderApp = (): ReturnType<typeof render> =>
+    render(
+      <MantineProvider>
+        <App />
+      </MantineProvider>,
+    );
+
   afterEach(() => {
     cleanup();
   });
@@ -36,7 +44,7 @@ describe("App", () => {
   });
 
   it("renders guest landing when user is not authenticated", () => {
-    render(<App />);
+    renderApp();
     expect(screen.getByTestId("guest-landing")).toBeInTheDocument();
     expect(screen.getByText("Почему команды выбирают AprilHub")).toBeInTheDocument();
     expect(screen.getByText("Ключевые сценарии")).toBeInTheDocument();
@@ -45,7 +53,7 @@ describe("App", () => {
 
   it("starts Keycloak flow from landing CTA", async () => {
     keycloakState.loginMock.mockResolvedValue(undefined);
-    render(<App />);
+    renderApp();
 
     fireEvent.click(screen.getByRole("button", { name: "Открыть защищенное рабочее пространство" }));
 
@@ -57,7 +65,7 @@ describe("App", () => {
 
   it("shows auth error when Keycloak login start fails", async () => {
     keycloakState.loginMock.mockRejectedValue(new Error("auth endpoint unavailable"));
-    render(<App />);
+    renderApp();
 
     fireEvent.click(screen.getByRole("button", { name: "Открыть защищенное рабочее пространство" }));
 
@@ -80,7 +88,7 @@ describe("App", () => {
       }),
     });
 
-    render(<App />);
+    renderApp();
 
     await waitFor(() => {
       expect(screen.getByText("AprilHub Shell")).toBeInTheDocument();
@@ -93,7 +101,7 @@ describe("App", () => {
     keycloakState.authState = true;
     apiRequestMock.mockResolvedValue({ ok: false, status: 403 });
 
-    render(<App />);
+    renderApp();
 
     await waitFor(() => {
       expect(screen.getByText("Доступ запрещен")).toBeInTheDocument();
