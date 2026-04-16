@@ -44,7 +44,7 @@ services:
       HUB_BFF_PORT: ${HUB_BFF_PORT:-8081}
       KEYCLOAK_URL: ${KEYCLOAK_URL:-http://keycloak:8080/auth}
       KEYCLOAK_REALM: ${KEYCLOAK_REALM:-april}
-      KEYCLOAK_ISSUER: ${KEYCLOAK_ISSUER:-http://localhost/auth/realms/april}
+      KEYCLOAK_ISSUER: ${KEYCLOAK_ISSUER:-http://127.0.0.1/auth/realms/april}
       KEYCLOAK_AUDIENCE: ${KEYCLOAK_AUDIENCE:-aprilhub-shell}
       KEYCLOAK_JWKS_URL: ${KEYCLOAK_JWKS_URL:-http://keycloak:8080/auth/realms/april/protocol/openid-connect/certs}
     volumes:
