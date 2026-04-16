@@ -19,10 +19,14 @@
       "standardFlowEnabled": true,
       "directAccessGrantsEnabled": true,
       "redirectUris": [
-        "http://localhost:4173/*"
+        "http://localhost:4173/*",
+        "http://dev.april.ukituki.tech/*",
+        "https://dev.april.ukituki.tech/*"
       ],
       "webOrigins": [
-        "http://localhost:4173"
+        "http://localhost:4173",
+        "http://dev.april.ukituki.tech",
+        "https://dev.april.ukituki.tech"
       ],
       "attributes": {
         "pkce.code.challenge.method": "S256"

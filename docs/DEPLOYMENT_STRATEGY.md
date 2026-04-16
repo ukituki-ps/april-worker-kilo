@@ -107,6 +107,23 @@
 - **Keycloak** — в том же compose; redirect URI при каждом деплое **не меняются**.
 - **AprilNflow и прочие компоненты** из архитектуры разворачиваются самостоятельно (в compose / те же процедуры), чтобы стенд был полным.
 
+### TLS ingress для Keycloak (обязательно для доменов с HTTPS)
+
+Чтобы исключить mixed-content и предупреждения браузера при логине, на TLS-стендах фиксируйте схему/host для Keycloak:
+
+1. В `.env` на сервере задайте `KC_HOSTNAME=https://<ваш-домен>`.
+2. В `docker-compose.yml` для `keycloak` должны быть включены:
+   - `KC_PROXY_HEADERS=xforwarded`
+   - `KC_HOSTNAME_STRICT=false`
+   - `KC_HOSTNAME_STRICT_HTTPS=false`
+3. В ingress/reverse proxy обязательно пробрасывайте:
+   - `X-Forwarded-Proto=https`
+   - `X-Forwarded-Host=<ваш-домен>`
+   - `X-Forwarded-Port=443`
+4. После изменения переменных/конфига выполните `docker compose up -d --force-recreate keycloak nginx-docs`.
+
+Проверка: `issuer` в `/.well-known/openid-configuration` должен быть `https://<ваш-домен>/auth/realms/<realm>`.
+
 ## 9. Качество после деплоя
 
 После успешного `up`:
