@@ -1,4 +1,4 @@
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import App from "./App";
 
@@ -35,9 +35,36 @@ describe("App", () => {
     apiRequestMock.mockReset();
   });
 
-  it("renders guest zone when user is not authenticated", () => {
+  it("renders guest landing when user is not authenticated", () => {
     render(<App />);
-    expect(screen.getByText("Login with Keycloak")).toBeInTheDocument();
+    expect(screen.getByTestId("guest-landing")).toBeInTheDocument();
+    expect(screen.getByText("Why teams use AprilHub")).toBeInTheDocument();
+    expect(screen.getByText("Key scenarios")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Open secure workspace" })).toBeInTheDocument();
+  });
+
+  it("starts Keycloak flow from landing CTA", async () => {
+    keycloakState.loginMock.mockResolvedValue(undefined);
+    render(<App />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Open secure workspace" }));
+
+    await waitFor(() => {
+      expect(keycloakState.loginMock).toHaveBeenCalledTimes(1);
+      expect(screen.getByRole("button", { name: "Redirecting to Keycloak..." })).toBeDisabled();
+    });
+  });
+
+  it("shows auth error when Keycloak login start fails", async () => {
+    keycloakState.loginMock.mockRejectedValue(new Error("auth endpoint unavailable"));
+    render(<App />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Open secure workspace" }));
+
+    await waitFor(() => {
+      expect(screen.getByText("auth endpoint unavailable")).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "Open secure workspace" })).not.toBeDisabled();
+    });
   });
 
   it("renders authorized shell and composition widgets", async () => {
