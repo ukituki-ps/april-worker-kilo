@@ -143,6 +143,42 @@ run_git_pull() {
   fi
 }
 
+run_submodules() {
+  if [[ "${SKIP_SUBMODULES:-}" == "1" ]]; then
+    log "пропуск submodules (SKIP_SUBMODULES=1)"
+    return 0
+  fi
+  if ! git rev-parse --git-dir >/dev/null 2>&1; then
+    log "не git-репозиторий — пропуск submodule update"
+    return 0
+  fi
+  if [[ ! -f "${ROOT}/.gitmodules" ]]; then
+    log "нет .gitmodules — пропуск submodule update"
+    return 0
+  fi
+
+  # Этот submodule используется в hub-shell ds:prepare (pnpm --dir ../design-system/DisignApril ...).
+  # На dev-сервере иногда нет доступа к https URL, поэтому заранее выставляем SSH URL для субмодуля.
+  # Переопределение возможно переменной DISIGNAPRIL_SUBMODULE_URL.
+  local design_april_submodule="design-system/DisignApril"
+  local disignapril_ssh_default="git@github-disignapril:ukituki-ps/DisignApril.git"
+  local disignapril_ssh_fallback="git@github.com:ukituki-ps/DisignApril.git"
+  local disignapril_url="${DISIGNAPRIL_SUBMODULE_URL:-}"
+
+  if [[ -z "${disignapril_url}" ]]; then
+    if ssh -G github-disignapril >/dev/null 2>&1; then
+      disignapril_url="${disignapril_ssh_default}"
+    else
+      disignapril_url="${disignapril_ssh_fallback}"
+    fi
+  fi
+
+  git config "submodule.${design_april_submodule}.url" "${disignapril_url}" || true
+
+  log "git submodule update --init --recursive"
+  git submodule update --init --recursive "${design_april_submodule}"
+}
+
 run_openapi_lint() {
   if [[ "${SKIP_OPENAPI_LINT:-}" == "1" ]]; then
     log "пропуск openapi-lint (SKIP_OPENAPI_LINT=1)"
@@ -369,6 +405,7 @@ main() {
   preflight
   persist_images_state
   run_git_pull
+  run_submodules
   run_openapi_lint
   run_hook "scripts/db-backup.sh" "SKIP_DB_BACKUP" "db-backup"
   run_hook "scripts/run-migrations.sh" "SKIP_MIGRATIONS" "миграции"
