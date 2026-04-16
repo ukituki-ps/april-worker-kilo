@@ -39,7 +39,7 @@ describe("apiRequest", () => {
   it("calls keycloak login when session is not authenticated", async () => {
     keycloakState.authenticated = false;
 
-    await expect(apiRequest("/api/v1/me")).rejects.toThrow("Unauthenticated session");
+    await expect(apiRequest("/v1/me")).rejects.toThrow("Unauthenticated session");
     expect(keycloakState.loginMock).toHaveBeenCalledTimes(1);
     expect(globalThis.fetch).not.toHaveBeenCalled();
   });
@@ -51,7 +51,7 @@ describe("apiRequest", () => {
       .mockResolvedValueOnce(unauthorized)
       .mockResolvedValueOnce(success);
 
-    await apiRequest("/api/v1/me");
+    await apiRequest("/v1/me");
 
     expect(keycloakState.updateTokenMock).toHaveBeenCalledWith(30);
     expect(globalThis.fetch).toHaveBeenCalledTimes(2);
@@ -61,7 +61,7 @@ describe("apiRequest", () => {
     (globalThis.fetch as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(new Response(null, { status: 401 }));
     keycloakState.updateTokenMock.mockResolvedValue(false);
 
-    await expect(apiRequest("/api/v1/me")).rejects.toThrow("Token refresh failed");
+    await expect(apiRequest("/v1/me")).rejects.toThrow("Token refresh failed");
     expect(keycloakState.loginMock).toHaveBeenCalledTimes(1);
   });
 });

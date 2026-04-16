@@ -28,7 +28,7 @@ export default function App() {
       setTransitionReason("Returning from identity provider and initializing user context...");
       setError("");
 
-      const meResponse = await apiRequest("/api/v1/me");
+      const meResponse = await apiRequest("/v1/me");
       if (!meResponse.ok) {
         if (meResponse.status === 403) {
           setZone("forbidden");
