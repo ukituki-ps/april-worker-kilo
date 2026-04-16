@@ -26,6 +26,7 @@ EOF
   SKIP_OPENAPI_LINT=1  не выполнять make openapi-lint
   SKIP_DB_BACKUP=1     не вызывать scripts/db-backup.sh (если есть)
   SKIP_MIGRATIONS=1    не вызывать scripts/run-migrations.sh (если есть)
+  SKIP_FRONTEND_RECREATE=1 пропустить force-recreate frontend-сервисов при изменении lock-файлов
   SKIP_HEALTHCHECK=1   пропустить health/readiness проверки
   SKIP_SMOKE=1         пропустить scripts/smoke-after-deploy.sh
   AUTO_ROLLBACK=0      отключить авто-rollback (по умолчанию включён)
@@ -234,6 +235,61 @@ run_compose() {
   capture_compose_ps
 }
 
+is_service_running() {
+  local service="$1"
+  "${compose_files[@]}" ps --services --status running | awk '{print $1}' | grep -qx "$service"
+}
+
+sync_frontend_service_on_lock_change() {
+  local service="$1"
+  local lock_file="$2"
+  local state_file="$3"
+  local lock_hash
+  local prev_hash=""
+
+  lock_hash="$(calc_sha256 "$lock_file" || true)"
+  if [[ -z "$lock_hash" ]]; then
+    log "lock-файл ${lock_file} не найден — пропуск sync для ${service}"
+    return 0
+  fi
+
+  if [[ -f "$state_file" ]]; then
+    prev_hash="$(cat "$state_file" 2>/dev/null || true)"
+  fi
+
+  if [[ "$lock_hash" == "$prev_hash" ]]; then
+    log "lock-файл без изменений для ${service} — force-recreate не требуется"
+    return 0
+  fi
+
+  if ! is_service_running "$service"; then
+    log "${service} не запущен — hash lock-файла обновлён, force-recreate пропущен"
+    printf '%s\n' "$lock_hash" >"$state_file"
+    return 0
+  fi
+
+  log "обнаружено изменение lock-файла для ${service} — docker compose up -d --force-recreate ${service}"
+  "${compose_files[@]}" up -d --force-recreate "$service"
+  printf '%s\n' "$lock_hash" >"$state_file"
+}
+
+sync_frontend_dependencies() {
+  if [[ "${SKIP_FRONTEND_RECREATE:-}" == "1" ]]; then
+    log "пропуск frontend force-recreate (SKIP_FRONTEND_RECREATE=1)"
+    return 0
+  fi
+
+  sync_frontend_service_on_lock_change \
+    "hub-shell" \
+    "${ROOT}/hub-shell/package-lock.json" \
+    "${state_dir}/hub-shell-package-lock.sha256"
+
+  sync_frontend_service_on_lock_change \
+    "april-showcase" \
+    "${ROOT}/design-system/DisignApril/pnpm-lock.yaml" \
+    "${state_dir}/april-showcase-pnpm-lock.sha256"
+}
+
 run_health_checks() {
   if [[ "${SKIP_HEALTHCHECK:-}" == "1" ]]; then
     log "пропуск health/readiness (SKIP_HEALTHCHECK=1)"
@@ -318,6 +374,7 @@ main() {
   run_hook "scripts/run-migrations.sh" "SKIP_MIGRATIONS" "миграции"
   run_docs_build
   run_compose
+  sync_frontend_dependencies
   run_health_checks
   run_smoke
   mark_last_good
