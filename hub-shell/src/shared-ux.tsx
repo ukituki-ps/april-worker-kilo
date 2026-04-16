@@ -8,10 +8,10 @@ type SharedStateProps = {
 };
 
 const titleByState: Record<SharedViewState, string> = {
-  loading: "Loading",
-  empty: "Empty",
-  error: "Error",
-  forbidden: "Access denied",
+  loading: "Загрузка",
+  empty: "Нет данных",
+  error: "Ошибка",
+  forbidden: "Доступ запрещен",
 };
 
 export function SharedState({ state, message, action }: SharedStateProps) {

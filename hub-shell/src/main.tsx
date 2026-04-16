@@ -8,7 +8,7 @@ void (async () => {
   try {
     await initializeAuth();
   } catch (error) {
-    authInitError = error instanceof Error ? error.message : "Failed to initialize identity session.";
+    authInitError = error instanceof Error ? error.message : "Не удалось инициализировать сессию идентификации.";
   }
 
   ReactDOM.createRoot(document.getElementById("root")!).render(
