@@ -38,20 +38,20 @@ describe("App", () => {
   it("renders guest landing when user is not authenticated", () => {
     render(<App />);
     expect(screen.getByTestId("guest-landing")).toBeInTheDocument();
-    expect(screen.getByText("Why teams use AprilHub")).toBeInTheDocument();
-    expect(screen.getByText("Key scenarios")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Open secure workspace" })).toBeInTheDocument();
+    expect(screen.getByText("Почему команды выбирают AprilHub")).toBeInTheDocument();
+    expect(screen.getByText("Ключевые сценарии")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Открыть защищенное рабочее пространство" })).toBeInTheDocument();
   });
 
   it("starts Keycloak flow from landing CTA", async () => {
     keycloakState.loginMock.mockResolvedValue(undefined);
     render(<App />);
 
-    fireEvent.click(screen.getByRole("button", { name: "Open secure workspace" }));
+    fireEvent.click(screen.getByRole("button", { name: "Открыть защищенное рабочее пространство" }));
 
     await waitFor(() => {
       expect(keycloakState.loginMock).toHaveBeenCalledTimes(1);
-      expect(screen.getByRole("button", { name: "Redirecting to Keycloak..." })).toBeDisabled();
+      expect(screen.getByRole("button", { name: "Перенаправляем в Keycloak..." })).toBeDisabled();
     });
   });
 
@@ -59,11 +59,11 @@ describe("App", () => {
     keycloakState.loginMock.mockRejectedValue(new Error("auth endpoint unavailable"));
     render(<App />);
 
-    fireEvent.click(screen.getByRole("button", { name: "Open secure workspace" }));
+    fireEvent.click(screen.getByRole("button", { name: "Открыть защищенное рабочее пространство" }));
 
     await waitFor(() => {
       expect(screen.getByText("auth endpoint unavailable")).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: "Open secure workspace" })).not.toBeDisabled();
+      expect(screen.getByRole("button", { name: "Открыть защищенное рабочее пространство" })).not.toBeDisabled();
     });
   });
 
@@ -96,7 +96,7 @@ describe("App", () => {
     render(<App />);
 
     await waitFor(() => {
-      expect(screen.getByText("Access denied")).toBeInTheDocument();
+      expect(screen.getByText("Доступ запрещен")).toBeInTheDocument();
     });
   });
 });
