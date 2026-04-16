@@ -63,6 +63,22 @@ auto_rollback="${AUTO_ROLLBACK:-1}"
 require_images_env="${REQUIRE_IMAGES_ENV:-1}"
 rollback_in_progress=0
 
+run_named_docker() {
+  local container_name="$1"
+  shift
+  # deterministic name makes temporary build containers easy to track in docker ps/logs
+  docker rm -f "${container_name}" >/dev/null 2>&1 || true
+  docker run --name "${container_name}" --rm "$@"
+}
+
+calc_sha256() {
+  local path="$1"
+  if [[ ! -f "$path" ]]; then
+    return 1
+  fi
+  sha256sum "$path" | awk '{print $1}'
+}
+
 capture_compose_ps() {
   "${compose_files[@]}" ps >"${deploy_artifacts_dir}/compose-ps.txt" 2>&1 || true
 }
@@ -138,7 +154,7 @@ run_openapi_lint() {
   fi
   if command -v docker >/dev/null 2>&1; then
     log "make/npx недоступны — openapi-lint через node:22-bookworm-slim"
-    docker run --rm \
+    run_named_docker "april-openapi-lint" \
       -v "${ROOT}:/repo" \
       -w /repo \
       node:22-bookworm-slim \
@@ -181,7 +197,7 @@ run_docs_build() {
   fi
   if command -v docker >/dev/null 2>&1; then
     log "make и npm не найдены — сборка docs-site через образ node:22-bookworm-slim (как на минимальном сервере без Node в PATH)"
-    docker run --rm \
+    run_named_docker "april-docs-build" \
       -v "${ROOT}:/repo" \
       -w /repo/docs-site \
       node:22-bookworm-slim \
@@ -195,10 +211,26 @@ run_docs_build() {
 run_compose() {
   log "docker compose config (проверка)"
   "${compose_files[@]}" config >"${deploy_artifacts_dir}/compose-config.txt"
+  local nginx_conf="${ROOT}/infra/nginx/default.conf"
+  local nginx_hash_file="${state_dir}/nginx-default.sha256"
+  local nginx_hash_before=""
+  local nginx_hash_after=""
+
+  nginx_hash_before="$(calc_sha256 "$nginx_conf" || true)"
+
   log "docker compose pull"
   "${compose_files[@]}" pull
   log "docker compose up -d"
   "${compose_files[@]}" up -d
+
+  nginx_hash_after="$(calc_sha256 "$nginx_conf" || true)"
+  if [[ -n "$nginx_hash_after" ]]; then
+    if [[ "$nginx_hash_after" != "$nginx_hash_before" || ! -f "$nginx_hash_file" || "$(cat "$nginx_hash_file" 2>/dev/null || true)" != "$nginx_hash_after" ]]; then
+      log "обнаружено изменение infra/nginx/default.conf — force-recreate nginx-docs"
+      "${compose_files[@]}" up -d --force-recreate nginx-docs
+      printf '%s\n' "$nginx_hash_after" >"$nginx_hash_file"
+    fi
+  fi
   capture_compose_ps
 }
 

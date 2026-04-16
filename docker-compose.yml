@@ -65,6 +65,7 @@ services:
       VITE_KEYCLOAK_URL: ${VITE_KEYCLOAK_URL:-/auth}
       VITE_KEYCLOAK_REALM: ${VITE_KEYCLOAK_REALM:-april}
       VITE_KEYCLOAK_CLIENT_ID: ${VITE_KEYCLOAK_CLIENT_ID:-aprilhub-shell}
+      VITE_ALLOWED_HOSTS: ${VITE_ALLOWED_HOSTS:-}
     volumes:
       - ./:/workspace
     expose:
