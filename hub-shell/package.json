@@ -4,6 +4,10 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "ds:prepare": "corepack enable && CI=true pnpm --dir ../design-system/DisignApril install --frozen-lockfile && pnpm --dir ../design-system/DisignApril build",
+    "predev": "npm run ds:prepare",
+    "prebuild": "npm run ds:prepare",
+    "pretest": "npm run ds:prepare",
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "lint": "tsc --noEmit",
@@ -11,6 +15,10 @@
     "preview": "vite preview --host 0.0.0.0 --port 4173"
   },
   "dependencies": {
+    "@april/tokens": "file:../design-system/DisignApril/packages/tokens",
+    "@april/ui": "file:../design-system/DisignApril/packages/ui",
+    "@emotion/react": "^11.14.0",
+    "@mantine/core": "^7.17.8",
     "keycloak-js": "^26.2.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
