@@ -1,6 +1,6 @@
 ## 1) Итого
 - Статус: ✅ выполнено
-- Задача: Public Guest Landing and Authorized Entrypoint UX (Этап 013)
+- Задача: Public Guest Landing and Authorized Entrypoint UX (Этап 016)
 - Ветка: `develop`
 - Коммиты: `не создавались`
 - PR: не создавался
@@ -11,7 +11,7 @@
 - [frontend] Добавлена обработка ошибки `initializeAuth()` в `main.tsx`; ошибка инициализации теперь прокидывается в `App` и отображается в guest зоне.
 - [frontend] Русифицированы пользовательские тексты guest-зоны и состояний: заголовки, описания, CTA-кнопки, подписи entrypoint и сообщения `loading/error/forbidden/empty`.
 - [tests] Обновлены unit-тесты `App`: проверка структуры landing, проверка запуска login flow по CTA, проверка fallback-состояния при ошибке старта Keycloak.
-- [docs / tasks] Созданы `PLAN.md` и `REPORT.md` для этапа `013`; в `TASK.md` отмечены выполненные acceptance-критерии; в `task_list.md` этап `013` переведён в `✅ Выполнено`.
+- [docs / tasks] Созданы `PLAN.md` и `REPORT.md` для этапа `016`; в `TASK.md` отмечены выполненные acceptance-критерии; в `task_list.md` этап `016` переведён в `✅ Выполнено`.
 - [docs / tasks] После обновления требований зафиксировано обязательное правило для этапа: UI-тексты/кнопки/состояния в `hub-shell` должны быть на русском языке.
 
 ## 3) Изменённые файлы
@@ -20,9 +20,9 @@
 - `hub-shell/src/main.tsx`
 - `hub-shell/src/App.test.tsx`
 - `task_list.md`
-- `tasks/013-aprilhub-guest-landing-entrypoint/TASK.md`
-- `tasks/013-aprilhub-guest-landing-entrypoint/PLAN.md`
-- `tasks/013-aprilhub-guest-landing-entrypoint/REPORT.md`
+- `tasks/016-aprilhub-guest-landing-entrypoint/TASK.md`
+- `tasks/016-aprilhub-guest-landing-entrypoint/PLAN.md`
+- `tasks/016-aprilhub-guest-landing-entrypoint/REPORT.md`
 
 ## 4) Миграции и данные
 - Миграции Atlas: нет.

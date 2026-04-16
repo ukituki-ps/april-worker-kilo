@@ -1,11 +1,11 @@
-# План: Public Guest Landing and Authorized Entrypoint UX (Этап 013)
+# План: Public Guest Landing and Authorized Entrypoint UX (Этап 016)
 
 - **Задача:** [`TASK.md`](./TASK.md)
 - **Дата плана:** 2026-04-16
 - **Статус плана:** согласован
 
 ## Исходные допущения
-- Базовый ingress и auth-flow уже унифицированы в этапе `012`; в `013` меняем только UX guest-зоны и точку входа в login flow.
+- Базовый ingress и auth-flow уже унифицированы в этапе `012`; в `016` меняем только UX guest-зоны и точку входа в login flow.
 - IAM-модель и backend-контракты остаются неизменными; источник ролей и прав — Keycloak.
 - Пользовательские тексты интерфейса (заголовки, CTA, состояния `loading/error/forbidden`) должны быть на русском языке.
 - Проверки ограничиваются `hub-shell` build/tests и существующим smoke-скриптом платформы.
@@ -24,7 +24,7 @@
 | Frontend | `hub-shell` guest landing, CTA login flow, русскоязычные UI-тексты/состояния, тесты и стили |
 | БД / Atlas | Без изменений |
 | Инфра / Compose | Без изменений |
-| Документация / OpenAPI | Отчёт задачи `tasks/013.../REPORT.md`; OpenAPI без изменений |
+| Документация / OpenAPI | Отчёт задачи `tasks/016.../REPORT.md`; OpenAPI без изменений |
 
 ## Риски и откат
 - **Риск:** деградация UX входа при ошибке Keycloak login init → **Митигация:** явная обработка исключений и отображение error state на landing.

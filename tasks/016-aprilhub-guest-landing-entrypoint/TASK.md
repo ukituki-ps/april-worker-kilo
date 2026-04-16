@@ -1,7 +1,7 @@
-# Задача: Public Guest Landing and Authorized Entrypoint UX (Этап 013)
+# Задача: Public Guest Landing and Authorized Entrypoint UX (Этап 016)
 
 ## Мета
-- **ID / ветка:** `013-aprilhub-guest-landing-entrypoint`
+- **ID / ветка:** `016-aprilhub-guest-landing-entrypoint`
 - **Приоритет:** высокий
 - **Связанные документы:** `task_list.md`, `tasks/000-aprilhub-full-service-roadmap/TASK.md`, `tasks/003-aprilhub-shell-design-system/REPORT.md`, `tasks/012-aprilhub-unified-ingress-auth-hardening/REPORT.md`, `docs/AGENT_ARCHITECTURE_CONTEXT.md`, `docs/TESTING_STRATEGY.md`
 
@@ -12,7 +12,7 @@
 - На этапах `003` и `012` уже сделан базовый UX-контур guest/authorized и унифицирован ingress-path.
 - Текущая неавторизованная зона работает как MVP-gate и требует продуктового UX-уровня (контент + визуальная иерархия + CTA).
 - Точка входа должна оставаться совместимой с единым ingress и текущим auth-flow (без возврата к прямым портам).
-- Этап `013` является базой для последующих задач `014` и `015`.
+- Этап `016` является базой для последующих задач `014` и `015`.
 
 ## Входит в объём
 - Спроектировать и реализовать landing-страницу неавторизованной зоны в `hub-shell`:

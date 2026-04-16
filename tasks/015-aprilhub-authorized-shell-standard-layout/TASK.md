@@ -3,13 +3,13 @@
 ## Мета
 - **ID / ветка:** `015-aprilhub-authorized-shell-standard-layout`
 - **Приоритет:** высокий
-- **Связанные документы:** `task_list.md`, `tasks/003-aprilhub-shell-design-system/REPORT.md`, `tasks/013-aprilhub-guest-landing-entrypoint/TASK.md`, `tasks/014-aprilhub-keycloak-design-system-alignment/TASK.md`, `docs/AGENT_ARCHITECTURE_CONTEXT.md`, `docs/TESTING_STRATEGY.md`
+- **Связанные документы:** `task_list.md`, `tasks/003-aprilhub-shell-design-system/REPORT.md`, `tasks/013-aprilhub-design-system-integration-showcase/TASK.md`, `tasks/014-aprilhub-keycloak-design-system-alignment/TASK.md`, `tasks/016-aprilhub-guest-landing-entrypoint/TASK.md`, `docs/AGENT_ARCHITECTURE_CONTEXT.md`, `docs/TESTING_STRATEGY.md`
 
 ## Цель
 Сделать в авторизованной зоне `hub-shell` стандартный продуктовый каркас (header + sidebar + content frame), чтобы после логина пользователь попадал в устойчивый layout-скелет, совместимый с дальнейшим наращиванием виджетов и модулей.
 
 ## Контекст для агента
-- После этапов `013-014` пользовательский путь до авторизации должен стать цельным и визуально согласованным.
+- После этапов `016-014` пользовательский путь до авторизации должен стать цельным и визуально согласованным.
 - Авторизованная зона уже присутствует как MVP-контур, но требует стандартизированного layout-слоя по дизайн-системе.
 - Каркас должен поддерживать состояние загрузки, ошибки и forbidden без архитектурного разрыва существующего flow.
 
@@ -26,7 +26,7 @@
 ## Не входит в объём
 - Реализация новых бизнес-модулей внутри контентной области (только каркас и базовые заглушки/host slots).
 - Изменение backend API и контрактов `hub-bff`.
-- Глубокая переработка guest landing и Keycloak theming beyond интеграционных правок из `013-014`.
+- Глубокая переработка guest landing и Keycloak theming beyond интеграционных правок из `016-014`.
 
 ## Технические ограничения
 - Следовать зафиксированному стеку и принятым UI-библиотекам в `hub-shell`.
