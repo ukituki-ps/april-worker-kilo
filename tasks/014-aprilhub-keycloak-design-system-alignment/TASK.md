@@ -3,13 +3,13 @@
 ## Мета
 - **ID / ветка:** `014-aprilhub-keycloak-design-system-alignment`
 - **Приоритет:** высокий
-- **Связанные документы:** `task_list.md`, `tasks/013-aprilhub-guest-landing-entrypoint/TASK.md`, `tasks/012-aprilhub-unified-ingress-auth-hardening/REPORT.md`, `infra/keycloak/realm/april-realm.json`, `docs/AGENT_ARCHITECTURE_CONTEXT.md`, `docs/DEPLOYMENT_STRATEGY.md`
+- **Связанные документы:** `task_list.md`, `tasks/013-aprilhub-design-system-integration-showcase/TASK.md`, `tasks/016-aprilhub-guest-landing-entrypoint/TASK.md`, `tasks/012-aprilhub-unified-ingress-auth-hardening/REPORT.md`, `infra/keycloak/realm/april-realm.json`, `docs/AGENT_ARCHITECTURE_CONTEXT.md`, `docs/DEPLOYMENT_STRATEGY.md`
 
 ## Цель
 Привести пользовательский интерфейс Keycloak (login и связанные auth-экраны) к визуальным стандартам AprilHub, чтобы переход из guest-зоны в авторизацию выглядел как единый продуктовый сценарий без визуального разрыва.
 
 ## Контекст для агента
-- После этапа `013` вход в auth flow происходит с нового лендинга и становится центральным UX-сценарием.
+- После этапа `016` вход в auth flow происходит с нового лендинга и становится центральным UX-сценарием.
 - Базовый Keycloak theme может визуально расходиться с дизайн-системой `hub-shell`, что снижает целостность продукта.
 - Необходимо сохранить совместимость с текущим realm/client-конфигом и ingress путями, зафиксированными на `012`.
 
