@@ -10,7 +10,7 @@ services:
     volumes:
       - ./docs-site/build:/usr/share/nginx/html:ro
       - ./infra/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
-      - ./openapi:/usr/share/nginx/html/openapi:ro
+      - ./openapi:/usr/share/nginx/openapi:ro
     depends_on:
       - swagger-ui
     restart: unless-stopped
