@@ -1,12 +1,81 @@
 .zone-container {
-  max-width: 720px;
-  margin: 40px auto;
+  max-width: 1080px;
+  margin: 32px auto;
   padding: 24px;
   display: grid;
-  gap: 12px;
+  gap: 16px;
   border: 1px solid #d0d7de;
-  border-radius: 8px;
+  border-radius: 12px;
   background: #ffffff;
+}
+
+.guest-landing {
+  background: linear-gradient(180deg, #f9fbff 0%, #ffffff 32%);
+}
+
+.landing-hero {
+  display: grid;
+  gap: 12px;
+}
+
+.landing-eyebrow {
+  margin: 0;
+  color: #3867d6;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+}
+
+.landing-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.landing-note {
+  color: #4b5563;
+  font-size: 0.9rem;
+}
+
+.landing-section {
+  display: grid;
+  gap: 10px;
+}
+
+.landing-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.landing-card {
+  border: 1px solid #d0d7de;
+  border-radius: 10px;
+  padding: 14px;
+  background: #f8fafc;
+  display: grid;
+  gap: 6px;
+}
+
+.landing-card h3 {
+  margin: 0;
+}
+
+.landing-card p {
+  margin: 0;
+}
+
+.landing-scenarios {
+  margin: 0;
+  padding-left: 20px;
+  display: grid;
+  gap: 8px;
+}
+
+.landing-meta {
+  color: #6b7280;
 }
 
 .app-shell {
@@ -74,4 +143,9 @@
 .state-error,
 .state-forbidden {
   background: #fff5f5;
+}
+
+button[disabled] {
+  opacity: 0.7;
+  cursor: wait;
 }

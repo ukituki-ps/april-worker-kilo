@@ -3,10 +3,17 @@ import ReactDOM from "react-dom/client";
 import App from "./App";
 import { initializeAuth } from "./keycloak";
 
-void initializeAuth().finally(() => {
+void (async () => {
+  let authInitError = "";
+  try {
+    await initializeAuth();
+  } catch (error) {
+    authInitError = error instanceof Error ? error.message : "Failed to initialize identity session.";
+  }
+
   ReactDOM.createRoot(document.getElementById("root")!).render(
     <React.StrictMode>
-      <App />
+      <App authInitError={authInitError} />
     </React.StrictMode>,
   );
-});
+})();
