@@ -12,7 +12,14 @@ prepare_tokens_fallback() {
     return
   fi
 
-  mkdir -p "$(dirname "${TOKENS_FALLBACK_TARGET}")"
+  local tokens_dir
+  tokens_dir="$(dirname "${TOKENS_FALLBACK_TARGET}")"
+
+  if [[ -e "${tokens_dir}" && ! -d "${tokens_dir}" ]]; then
+    rm -f "${tokens_dir}"
+  fi
+
+  mkdir -p "${tokens_dir}"
   cp "${TOKENS_FALLBACK_FILE}" "${TOKENS_FALLBACK_TARGET}"
   echo "[ds:prepare] prepared fallback @april/tokens/css"
 }
