@@ -35,6 +35,7 @@
 - [x] `018`: Multi-service documentation foundation (human-first + agent-first, единый source of truth)
 - [x] `019`: Testing contour finalization (mandatory CI/local quality gate + strategy/runbook sync)
 - [x] `020`: Testing contour extensions (P1/P2: Playwright smoke, Testcontainers integration, extended k6, quality metrics)
+- [x] `021`: AprilHub documentation refactoring (полное описание платформы + системная актуализация `docs/` и `docs-site/`)
 
 ## Текущий фокус
 
@@ -57,6 +58,7 @@
 - [x] `018-aprilhub-multi-service-documentation-foundation`: подготовить документационный baseline для масштабирования комплементарных сервисов (human-first + agent-first)
 - [x] `019-hub-testing-contour-finalization`: финализировать обязательный тестовый контур (CI/local gate, docs sync, smoke/k6 triage runbook)
 - [x] `020-hub-testing-contour-extensions`: реализовать P1/P2-расширения тестового контура (Playwright, Testcontainers, extended load, quality metrics)
+- [x] `021-aprilhub-documentation-refactoring`: подготовить полноценное описание AprilHub (что это/как работает/для чего) и актуализировать `docs/` + `docs-site/` для людей и агентной разработки
 
 ## План реализации AprilHub: статусы
 
@@ -81,3 +83,4 @@
 | `018` | Multi-service documentation foundation (human-first + agent-first) | ✅ Выполнено | [`tasks/018-aprilhub-multi-service-documentation-foundation/REPORT.md`](./tasks/018-aprilhub-multi-service-documentation-foundation/REPORT.md) |
 | `019` | Testing contour finalization (mandatory CI/local quality gate + strategy/runbook sync) | ✅ Выполнено | [`tasks/019-hub-testing-contour-finalization/TASK.md`](./tasks/019-hub-testing-contour-finalization/TASK.md), [`tasks/019-hub-testing-contour-finalization/PLAN.md`](./tasks/019-hub-testing-contour-finalization/PLAN.md), [`tasks/019-hub-testing-contour-finalization/REPORT.md`](./tasks/019-hub-testing-contour-finalization/REPORT.md) |
 | `020` | Testing contour extensions (P1/P2: Playwright smoke, Testcontainers integration, extended k6, quality metrics) | ✅ Выполнено | [`tasks/020-hub-testing-contour-extensions/TASK.md`](./tasks/020-hub-testing-contour-extensions/TASK.md), [`tasks/020-hub-testing-contour-extensions/PLAN.md`](./tasks/020-hub-testing-contour-extensions/PLAN.md), [`tasks/020-hub-testing-contour-extensions/REPORT.md`](./tasks/020-hub-testing-contour-extensions/REPORT.md) |
+| `021` | AprilHub documentation refactoring (platform narrative + docs/docs-site sync) | ✅ Выполнено | [`tasks/021-aprilhub-documentation-refactoring/TASK.md`](./tasks/021-aprilhub-documentation-refactoring/TASK.md), [`tasks/021-aprilhub-documentation-refactoring/PLAN.md`](./tasks/021-aprilhub-documentation-refactoring/PLAN.md), [`tasks/021-aprilhub-documentation-refactoring/REPORT.md`](./tasks/021-aprilhub-documentation-refactoring/REPORT.md) |
