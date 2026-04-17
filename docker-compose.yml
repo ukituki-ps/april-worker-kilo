@@ -103,7 +103,7 @@ services:
       KC_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD:-keycloak}
     volumes:
       - ./infra/keycloak/realm:/opt/keycloak/data/import:ro
-      - ./infra/keycloak/themes:/opt/keycloak/themes:ro
+      - ./infra/keycloak/themes/aprilhub:/opt/keycloak/themes/aprilhub:ro
     expose:
       - "8080"
     depends_on:
