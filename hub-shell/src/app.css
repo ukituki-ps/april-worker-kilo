@@ -1,4 +1,4 @@
-@import "@april/tokens/css";
+@import "./styles/april-tokens-fallback.css";
 
 .zone-container {
   max-width: 1080px;

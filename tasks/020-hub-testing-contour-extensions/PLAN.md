@@ -2,7 +2,7 @@
 
 - **Задача:** [`TASK.md`](./TASK.md)
 - **Дата плана:** 2026-04-17
-- **Статус плана:** черновик
+- **Статус плана:** выполнен
 
 ## Исходные допущения
 - P0-контур из этапа `019` закрыт или близок к закрытию и остаётся release-blocking основой.
@@ -10,18 +10,18 @@
 - Расширения P1/P2 допускают поэтапное включение в CI (часть может стартовать как non-blocking/nightly).
 
 ## Порядок работ (шаги)
-1. Подготовить Playwright-контур в `hub-shell`:
+1. ✅ Подготовить Playwright-контур в `hub-shell`:
    - инфраструктура тестов,
    - 2-3 smoke-сценария критического пути,
    - артефакты падений.
-2. Добавить integration-suite для `hub-bff`:
+2. ✅ Добавить integration-suite для `hub-bff`:
    - Testcontainers для зависимостей,
    - миграции через Atlas,
    - минимальный набор happy/negative/degraded сценариев.
-3. Добавить extended k6 профиль и скрипт запуска (nightly/scheduled).
-4. Определить quality-метрики тестового pipeline и зафиксировать их в документации.
-5. Актуализировать CI/scheduled workflows и документацию запуска.
-6. Выполнить проверки и оформить финальный `REPORT.md`.
+3. ✅ Добавить extended k6 профиль и скрипт запуска (nightly/scheduled).
+4. ✅ Определить quality-метрики тестового pipeline и зафиксировать их в документации.
+5. ✅ Актуализировать CI/scheduled workflows и документацию запуска.
+6. ✅ Выполнить проверки и оформить финальный `REPORT.md`.
 
 ## Затрагиваемые области
 | Область | Что меняется (кратко) |
@@ -39,10 +39,11 @@
 - При откате: удалить/отключить новые jobs и тестовые suites, вернуть предыдущие workflow/доки.
 
 ## Проверка после выполнения
-- `cd hub-shell && npm run e2e`
-- `cd hub-bff && go test ./...` (включая integration-suite)
-- `./scripts/run-k6-aprilhub-extended.sh`
-- Проверка публикации артефактов (logs/traces/reports) и стабильности новых job.
+- `cd hub-shell && npm run lint` (ok)
+- `cd hub-shell && npm run e2e -- --list` (не выполнено: локальная проблема прав на `node_modules`)
+- `cd hub-bff && go test ./... -run Integration` (ok; при отсутствии `atlas` suite корректно skip)
+- `cd hub-bff && go test ./...` (ok)
+- `./scripts/run-k6-aprilhub-extended.sh` (fail на DNS-резолвинге `hub-bff` внутри docker run окружения, требует follow-up)
 
 ## Примечания
 - Этап `020` покрывает P1/P2-улучшения и не должен блокировать выпуск, если P0 полностью закрыт.

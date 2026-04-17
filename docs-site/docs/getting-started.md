@@ -56,6 +56,14 @@ make openapi-lint
 make compose-config
 ```
 
+## Дальше по AprilHub
+
+- Что это и зачем: `/guides/APRILHUB_WHAT_IS_IT`
+- Как устроены потоки и компоненты: `/guides/APRILHUB_HOW_IT_WORKS`
+- Как вносить изменения в проект: `/guides/APRILHUB_TEAM_WORKFLOW`
+- Agent-first контекст и ограничения: `/guides/APRILHUB_AGENT_DEVELOPMENT`
+- Общая карта документации: `/guides/APRILHUB_DOCUMENTATION_MAP`
+
 ## AprilHub runtime profile (Hub Shell + Hub BFF + Keycloak)
 
 1. Подготовьте env:
