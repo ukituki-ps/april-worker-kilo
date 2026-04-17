@@ -14,6 +14,18 @@
 
 **CI:** `.github/workflows/ci.yml` — проверки на PR/push; деплой на dev — `.github/workflows/dev-deploy.yml` (self-hosted runner с labels `dev`, `worker`; см. [`docs/DEPLOYMENT_STRATEGY.md`](docs/DEPLOYMENT_STRATEGY.md)).
 
+## Mandatory testing gate (AprilHub P0)
+
+Обязательные проверки для pre-merge/release кандидата:
+
+- `make openapi-lint`
+- `cd hub-bff && go test ./...`
+- `cd hub-shell && npm ci && npm run lint && npm run test && npm run build`
+- `./scripts/smoke-aprilhub.sh`
+- `./scripts/run-k6-aprilhub.sh`
+
+Политика pass/fail, CI jobs и triage-правила: [`docs/TESTING_STRATEGY.md`](docs/TESTING_STRATEGY.md), [`docs/runbooks/APRILHUB_TESTING_TRIAGE.md`](docs/runbooks/APRILHUB_TESTING_TRIAGE.md).
+
 ## Документация
 
 | Документ | Содержание |
