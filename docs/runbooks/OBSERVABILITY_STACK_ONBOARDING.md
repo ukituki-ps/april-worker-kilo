@@ -84,8 +84,8 @@ OBS_AUTO_ONBOARD=1 \
 OBS_CENTRAL_HOST=192.168.1.29 \
 OBS_CENTRAL_USER=ukituki \
 OBS_CENTRAL_OBS_PATH=/opt/april/infra/observability \
-OBS_STAND_HOST=192.169.1.42 \
-OBS_STAND_NAME=stand-192-169-1-42 \
+OBS_STAND_HOST=192.168.1.42 \
+OBS_STAND_NAME=stand-192-168-1-42 \
 OBS_SERVICE_NAME=hub-bff \
 OBS_METRICS_PORT=8081 \
 OBS_ENV_NAME=dev \
@@ -97,6 +97,7 @@ OBS_SETUP_LOCAL_PROMTAIL_AGENT=1 \
 
 - на central host создается/обновляется target file и перезапускается `prometheus`;
 - на текущем стенде создается `.env` для `agents/promtail` и запускается `promtail-agent`.
+- если `http://127.0.0.1:<OBS_METRICS_PORT>/metrics` недоступен на стенде, в логе onboarding будет warning, а target останется `DOWN`.
 
 ## Incident LogQL quick queries
 

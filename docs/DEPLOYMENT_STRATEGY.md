@@ -199,6 +199,12 @@ Release-gate checklist для завершения AprilHub roadmap `001-010`: [
 - `OBS_LOKI_PUSH_URL=<url>` — push URL Loki для `promtail-agent` (по умолчанию `http://<OBS_CENTRAL_HOST>:3100/loki/api/v1/push`).
 - `SKIP_OBSERVABILITY_ONBOARD=1` — явный пропуск шага onboarding.
 
+Важно для metrics onboarding:
+
+- `OBS_STAND_HOST:OBS_METRICS_PORT` должен быть достижим с central observability host.
+- Для `hub-bff` это обычно требует публикации порта на стенде (например `ports: - "${HUB_BFF_PORT:-8081}:8081"` в compose или эквивалентный routing/firewall path).
+- Если `/metrics` недоступен локально на стенде (`127.0.0.1:<OBS_METRICS_PORT>/metrics`), onboarding создаст target, но он будет `DOWN`.
+
 ## 13. Документация (Docusaurus, OpenAPI, Structurizr) на dev
 
 Цель — **те же команды**, что локально (`make docs-build`, `make openapi-lint`, `docker compose config`), плюс выкладка артефактов на сервер.

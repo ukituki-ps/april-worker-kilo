@@ -30,7 +30,8 @@
 Сервис обязан:
 
 1. Экспортировать `GET /metrics` (Prometheus format).
-2. Быть зарегистрирован в `infra/observability/overlays/targets/*.yml` с labels:
+2. Обеспечить сетевую доступность endpoint с central observability host (`<host>:<port>`).
+3. Быть зарегистрирован в `infra/observability/overlays/targets/*.yml` с labels:
    - `env`
    - `host`
    - `stand`
@@ -82,10 +83,11 @@ Prometheus rules:
 ## Onboarding checklist for new stand/service
 
 1. Сервис доступен по `http://<host>:<port>/metrics`.
-2. Target добавлен в `overlays/targets/`.
-3. `prometheus` перезапущен (`up -d prometheus`).
-4. На удаленном стенде запущен `promtail-agent` (если нужны логи).
-5. В Grafana видны:
+2. Endpoint достижим с central host (ports/routing/firewall).
+3. Target добавлен в `overlays/targets/`.
+4. `prometheus` перезапущен (`up -d prometheus`).
+5. На удаленном стенде запущен `promtail-agent` (если нужны логи).
+6. В Grafana видны:
    - target `UP` в Prometheus;
    - лог-поток с labels `host/stand/service`;
    - метрики в `Multi Stand Service Overview`;
