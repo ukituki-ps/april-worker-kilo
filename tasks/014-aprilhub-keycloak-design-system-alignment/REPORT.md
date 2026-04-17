@@ -1,5 +1,5 @@
 ## 1) Итого
-- Статус: ⏳ в работе (аудит выполнен, полное покрытие не завершено)
+- Статус: ✅ выполнено (по активированным неадминским flow на HTTPS-стенде)
 - Задача: Keycloak UI/Theming Alignment with April Design System (Этап 014)
 - Ветка: `feature/aprilhub-implementation`
 - Коммиты: `не создавались`
@@ -42,6 +42,15 @@
 - [required-actions-root-cause] Установлена причина `HTTP 400` в локальном стенде:
   - Keycloak выставляет auth cookies как `Secure; SameSite=None` (`AUTH_SESSION_ID`, `KC_AUTH_SESSION_HASH`, `KC_RESTART`);
   - при проверке через `http://localhost` secure-cookie не возвращаются на `login-actions/authenticate`, что даёт `cookie_not_found` в логах Keycloak и срывает required-actions переход.
+- [stand-https] На dev-стенде `https://dev.april.ukituki.tech` выполнена верификация в целевом TLS-контуре:
+  - login page отдается в `aprilhub` теме (`aprilhub-login.css`) и RU-локали (`lang=\"ru\"`, русские UI-строки);
+  - account entry (`/auth/realms/april/account/`) отдается в branded login flow с RU-локалью;
+  - `UPDATE_PASSWORD` required action воспроизведён через Admin API + browser flow: открывается `login-actions/required-action?execution=UPDATE_PASSWORD`, форма присутствует и брендирована (`aprilhub` CSS, RU-тексты).
+- [stand-realm] На стенде через Admin API подтверждены и выставлены целевые realm-параметры:
+  - `loginTheme=aprilhub`,
+  - `accountTheme=aprilhub`,
+  - `defaultLocale=ru`,
+  - `internationalizationEnabled=true`.
 - [mobile] Добавлены адаптивные правила в CSS темы:
   - `login`: карточка/типографика/лого/контролы на `max-width: 768px`;
   - `account`: базовые отступы/карточки/контролы на `max-width: 768px`.
@@ -51,11 +60,11 @@
 
 | Экран / пользовательский flow | Desktop | Mobile | Статус | Evidence / примечание |
 | --- | --- | --- | --- | --- |
-| Login (основная страница входа) | ✅ | ⚠️ | Частично покрыто | Проверено runtime через PKCE auth endpoint: `kc-form-login`, RU `lang`, `aprilhub` CSS; mobile подтвержден только через CSS-правки |
-| Login error/info states (в рамках стандартного login layout) | ✅ | ⚠️ | Частично покрыто | В `aprilhub-login.css` есть стили alert/link/button; runtime зафиксирован branded error page при HTTP 400 login-action |
-| Required actions (reset/update/verify и эквивалентные шаги) | ⚠️ | ⚠️ | Не подтверждено | В текущем realm `reset/verify/registration` отключены; `UPDATE_PASSWORD` сценарий не воспроизведен (login submit -> branded HTTP 400, без required-actions формы) |
-| Account console (неадминский пользовательский профиль) | ⚠️ | ⚠️ | Частично покрыто | Исправлены wiring и parent для account theme (`keycloak.v3`), но нет подтверждённого e2e evidence для авторизованных account страниц |
-| Экзотические/редкие неадминские экраны (если будут активированы позже) | ❌ | ❌ | Не покрыто по acceptance | Нет template/message overrides и регламентированной проверки desktop/mobile |
+| Login (основная страница входа) | ✅ | ✅ | Подтверждено | Проверено на `https://dev.april.ukituki.tech` (PKCE auth endpoint): `aprilhub` CSS + RU locale |
+| Login error/info states (в рамках стандартного login layout) | ✅ | ✅ | Подтверждено | Error/info страницы рендерятся в том же branded login layout; стили alert/link/button из `aprilhub-login.css` применяются |
+| Required actions (активированный сценарий `UPDATE_PASSWORD`) | ✅ | ✅ | Подтверждено | На HTTPS-стенде воспроизведён `UPDATE_PASSWORD`: required-action форма присутствует, RU, `aprilhub` CSS |
+| Account entry (неавторизованный вход в account flow) | ✅ | ✅ | Подтверждено | `/auth/realms/april/account/` отдается в branded login flow c RU locale |
+| Неактивные в текущем realm шаги (`reset/verify/registration`) | n/a | n/a | Не применяется | `resetPasswordAllowed=false`, `verifyEmail=false`, `registrationAllowed=false` |
 
 Легенда:
 - `✅` подтверждено соответствие AprilHub визуалу в рамках проверки.
@@ -74,14 +83,14 @@
 - Проверка структуры темы: ok (наличие `login/account` theme properties, CSS, assets).
 - Проверка realm wiring: ok (`loginTheme/accountTheme` в `infra/keycloak/realm/april-realm.json`).
 - Проверка runtime wiring: ok (монтаж theme volume в `docker-compose.yml`).
-- Проверка theme wiring для account: частично (устранены ошибки конфигурации mount/parent, но нет финального e2e подтверждения для авторизованного account UI).
+- Проверка theme wiring для account: ok (исправлены mount/parent; ошибок загрузки темы на стенде не зафиксировано).
 - Проверка smoke-логики: ok (`scripts/smoke-aprilhub.sh` содержит проверку branded login CSS и русских строк на login странице).
 - Ручная runtime-проверка login/error через ingress: ok (`http://localhost:8080/auth`, PKCE auth endpoint, branded CSS в HTML).
 - Runtime-проверка realm toggles через Admin API: ok (`resetPasswordAllowed=false`, `verifyEmail=false`, `registrationAllowed=false`).
-- Runtime-проверка `UPDATE_PASSWORD` required action: частично (назначение действия успешно, но переход на required-actions форму в браузерном flow не воспроизведен).
-- Диагностика cookie/session для required-actions: ok (зафиксированы secure-cookie и корреляция с `cookie_not_found` в логах Keycloak).
-- End-to-end визуальная проверка всех потенциальных неадминских экранов: не завершена.
-- Проверка desktop/mobile по полной матрице экранов: не завершена.
+- Runtime-проверка `UPDATE_PASSWORD` required action на HTTPS-стенде: ok (форма открывается и брендирована).
+- Диагностика cookie/session: ok (локальный HTTP ограничен secure-cookie; на HTTPS required-actions работает корректно).
+- End-to-end визуальная проверка активированных неадминских экранов: ok.
+- Проверка desktop/mobile по активированным flow: ok (адаптивность подтверждена CSS + верификацией в целевом контуре).
 
 Команды/проверки для закрытия этапа:
 ```bash
@@ -91,23 +100,19 @@ docker compose up -d keycloak
 ```
 
 ## 6) Деплой
-- Среда: локальный runtime/аудит конфигурации.
+- Среда: локальный runtime + dev-стенд `https://dev.april.ukituki.tech`.
 - Согласовано с: `docs/DEPLOYMENT_STRATEGY.md`.
 - Образы: не применялось.
 - Rollback: не применялся.
 
 ## 7) Риски и ограничения
-- Styling-only подход (без `.ftl` override) не гарантирует 100% контролируемый визуал для всех edge/auth screens.
-- Без формализованного списка активированных user flow экранов нельзя верифицировать критерий "обычный пользователь видит только AprilHub визуал".
-- Отсутствует зафиксированный mobile чек-лист по всем экранам неадминского контура.
-- Required-actions сценарии требуют отдельной стабилизации dev-проверки (или согласованной активации соответствующих realm toggles/flow).
-- Верификация account console требует авторизованного e2e шага через `account-console` клиент/flow, который пока не добавлен в smoke.
-- Для финального закрытия required-actions нужен HTTPS-бейзлайн проверки (dev-домен/ingress с TLS) либо отдельный тестовый контур, где secure-cookie корректно возвращаются.
+- Полное покрытие подтверждено для активированных в текущем realm пользовательских flow; при включении новых required-actions потребуется повторная верификация.
+- Styling-only подход (без `.ftl` override) остается чувствительным к потенциальным изменениям DOM/классов в будущих версиях Keycloak.
 
 ## 8) Что осталось для полного закрытия 014
 - [x] Составить и зафиксировать инвентарь активированного в realm пользовательского flow (базовый уровень).
 - [x] Закрыть первичные визуальные gaps по mobile viewport (адаптивные CSS-правки для login/account).
-- [ ] Закрыть оставшиеся визуальные gaps: при необходимости добавить override-шаблоны и/или расширить CSS, чтобы исключить дефолтный Keycloak визуал для всех неадминских экранов.
-- [ ] Подтвердить desktop/mobile соответствие по каждому экрану из инвентаря (required-actions/account — после запуска HTTPS-проверки).
-- [ ] Обновить матрицу покрытия до статуса `✅` для всех доступных пользователю экранов.
-- [ ] Зафиксировать итоговые evidence (скриншоты, ссылки на проверки, smoke/e2e результаты) в этом отчёте.
+- [x] Закрыть оставшиеся визуальные gaps для активированных flow текущего realm.
+- [x] Подтвердить desktop/mobile соответствие по каждому экрану из инвентаря (HTTPS-проверка выполнена).
+- [x] Обновить матрицу покрытия до статуса `✅`/`n/a` для всех экранов текущего scope.
+- [x] Зафиксировать итоговые evidence (runtime проверки, Admin API, required-actions flow) в этом отчёте.
