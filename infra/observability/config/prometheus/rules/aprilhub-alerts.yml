@@ -1,0 +1,51 @@
+groups:
+  - name: aprilhub-baseline-alerts
+    rules:
+      - alert: AprilHubTargetDown
+        expr: up{job="aprilhub_dynamic_targets"} == 0
+        for: 2m
+        labels:
+          severity: warning
+          area: availability
+        annotations:
+          summary: "AprilHub metrics target is down"
+          description: "Prometheus cannot scrape {{ $labels.instance }} for more than 2 minutes."
+
+      - alert: AprilHubHighErrorRate
+        expr: |
+          (
+            sum(rate(hub_bff_http_requests_total{status=~"5.."}[5m]))
+            /
+            clamp_min(sum(rate(hub_bff_http_requests_total[5m])), 0.001)
+          ) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+          area: api
+        annotations:
+          summary: "AprilHub 5xx error rate is high"
+          description: "5xx ratio is above 5% for the last 5 minutes."
+
+      - alert: AprilHubP95LatencyHigh
+        expr: |
+          histogram_quantile(
+            0.95,
+            sum(rate(hub_bff_http_request_duration_seconds_bucket[5m])) by (le)
+          ) > 1.5
+        for: 5m
+        labels:
+          severity: warning
+          area: performance
+        annotations:
+          summary: "AprilHub p95 latency is high"
+          description: "Global p95 request latency is above 1.5s for 5 minutes."
+
+      - alert: AprilHubAuthErrorsSpike
+        expr: sum(rate(hub_bff_auth_errors_total[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+          area: auth
+        annotations:
+          summary: "AprilHub auth errors spike"
+          description: "Auth errors rate is above 1 req/s for the last 5 minutes."

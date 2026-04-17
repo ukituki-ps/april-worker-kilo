@@ -153,6 +153,13 @@ Release-gate checklist для завершения AprilHub roadmap `001-010`: [
 
 ## 11. Операционка
 
+Для central observability контура (multi-service + multi-stand) используйте:
+
+- [`guides/OBSERVABILITY_INDEX.md`](./guides/OBSERVABILITY_INDEX.md)
+- [`guides/OBSERVABILITY_MULTI_STAND_OPERATING_MODEL.md`](./guides/OBSERVABILITY_MULTI_STAND_OPERATING_MODEL.md)
+- [`runbooks/OBSERVABILITY_STACK_DEPLOY.md`](./runbooks/OBSERVABILITY_STACK_DEPLOY.md)
+- [`runbooks/OBSERVABILITY_STACK_ONBOARDING.md`](./runbooks/OBSERVABILITY_STACK_ONBOARDING.md)
+
 - Ручной redeploy на сервере: из каталога клона (**`DEPLOY_ROOT`**, для april-worker: `/opt/april-worker`) выполнить **`./deploy.sh`** (обёртка над шагами ниже; см. `--help` и переменные `SKIP_*` / `AUTO_ROLLBACK` / `REQUIRE_IMAGES_ENV`).
 - Артефакты деплоя (`compose config`, `compose ps`, smoke/rollback логи, commit SHA) сохраняются в `.deploy-artifacts/deploy-<timestamp>` и подхватываются workflow как artifacts.
 - Уведомления (Telegram, Slack, email): не используются.
