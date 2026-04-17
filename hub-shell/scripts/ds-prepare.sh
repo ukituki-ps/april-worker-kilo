@@ -9,6 +9,11 @@ if [[ ! -d "${DS_DIR}" ]]; then
   exit 0
 fi
 
+if [[ ! -f "${DS_DIR}/package.json" ]]; then
+  echo "[ds:prepare] package.json not found in design system directory, skip"
+  exit 0
+fi
+
 # In local/docker mixed workflows node_modules/dist may be root-owned.
 # In that case we keep current installed artifacts and avoid failing hub-shell checks.
 if [[ -d "${DS_DIR}/node_modules" && ! -w "${DS_DIR}/node_modules" ]]; then
