@@ -1,0 +1,45 @@
+/* AprilHub Keycloak theme (account): reuse same brand palette as login. */
+:root {
+  --april-accent-teal-6: #12b886;
+  --april-accent-teal-8: #0ca678;
+  --april-neutral-bg: #ffffff;
+  --april-neutral-bg-alt: #f8f9fa;
+  --april-neutral-border: #dee2e6;
+  --april-neutral-text: #212529;
+}
+
+#kc-page {
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: var(--april-neutral-bg-alt);
+  color: var(--april-neutral-text);
+}
+
+#kc-page a {
+  color: var(--april-accent-teal-6);
+}
+
+#kc-page a:hover {
+  color: var(--april-accent-teal-8);
+}
+
+#kc-page .pf-c-button.pf-m-primary {
+  background-color: var(--april-accent-teal-6);
+  border-color: var(--april-accent-teal-6);
+  color: #ffffff;
+}
+
+#kc-page .pf-c-button.pf-m-primary:hover,
+#kc-page .pf-c-button.pf-m-primary:focus {
+  background-color: var(--april-accent-teal-8);
+  border-color: var(--april-accent-teal-8);
+}
+
+#kc-page .pf-c-form-control {
+  border-color: var(--april-neutral-border);
+}
+
+#kc-page .pf-c-form-control:focus {
+  border-color: var(--april-accent-teal-6);
+  box-shadow: 0 0 0 0.2rem rgba(18, 184, 134, 0.25);
+}
+

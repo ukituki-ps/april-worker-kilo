@@ -23,7 +23,7 @@ export function CompositionLoader({ module, context }: Props) {
         setLoaded(() => next.default);
       })
       .catch(() => {
-        setError(`Failed to load "${module.title}"`);
+        setError(`Не удалось загрузить модуль "${module.title}".`);
       })
       .finally(() => {
         setIsLoading(false);
@@ -31,10 +31,10 @@ export function CompositionLoader({ module, context }: Props) {
   }, [module]);
 
   if (isLoading) {
-    return <SharedState state="loading" message={`Loading ${module.title}...`} />;
+    return <SharedState state="loading" message={`Загружаем модуль "${module.title}"...`} />;
   }
   if (error || !loaded) {
-    return <SharedState state="error" message={error || "Module failed to load"} />;
+    return <SharedState state="error" message={error || "Модуль недоступен из-за ошибки загрузки."} />;
   }
   const Widget = loaded;
   return <Widget context={context} />;

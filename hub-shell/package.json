@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "ds:prepare": "corepack enable && CI=true pnpm --dir ../design-system/DisignApril install --frozen-lockfile && pnpm --dir ../design-system/DisignApril build",
+    "ds:prepare": "bash ./scripts/ds-prepare.sh",
     "predev": "npm run ds:prepare",
     "prebuild": "npm run ds:prepare",
     "pretest": "npm run ds:prepare",

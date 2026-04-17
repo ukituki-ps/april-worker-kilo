@@ -7,9 +7,9 @@ type WidgetProps = {
 export function OverviewWidget({ context }: WidgetProps) {
   return (
     <article className="widget-card">
-      <h3>Overview</h3>
-      <p>Welcome, {context.user.name || context.user.username}.</p>
-      <p>Correlation: {context.correlationId}</p>
+      <h3 id="overview">Обзор</h3>
+      <p>Добро пожаловать, {context.user.name || context.user.username}.</p>
+      <p>Корреляция запроса: {context.correlationId}</p>
     </article>
   );
 }
@@ -17,8 +17,8 @@ export function OverviewWidget({ context }: WidgetProps) {
 export function RolesWidget({ context }: WidgetProps) {
   return (
     <article className="widget-card">
-      <h3>Roles</h3>
-      <p>{context.roles.join(", ") || "No roles"}</p>
+      <h3 id="roles">Роли доступа</h3>
+      <p>{context.roles.join(", ") || "Роли отсутствуют"}</p>
     </article>
   );
 }

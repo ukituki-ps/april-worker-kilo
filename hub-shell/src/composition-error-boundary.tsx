@@ -27,7 +27,7 @@ export class CompositionErrorBoundary extends Component<Props, State> {
       return (
         <SharedState
           state="error"
-          message={`Module "${this.props.moduleName}" is temporarily unavailable.`}
+          message={`Модуль "${this.props.moduleName}" временно недоступен.`}
         />
       );
     }

@@ -17,7 +17,7 @@ export function CompositionLayer({ context }: Props) {
   });
 
   if (allowedModules.length === 0) {
-    return <SharedState state="forbidden" message="No shell modules are available for current role set." />;
+    return <SharedState state="forbidden" message="Для текущего набора ролей нет доступных модулей оболочки." />;
   }
 
   return (

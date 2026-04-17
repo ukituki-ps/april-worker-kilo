@@ -30,7 +30,7 @@
 - [x] `012`: Unified ingress and auth UX hardening (single Nginx entrypoint for guest/Keycloak/authorized zones)
 - [x] `013`: Design system integration + separate showcase deployment (`DisignApril`)
 - [ ] `014`: Keycloak UI/theming alignment with April design system
-- [ ] `015`: Authorized zone standard shell layout (header + sidebar + content frame)
+- [x] `015`: Authorized zone standard shell layout (header + sidebar + content frame, baseline template: `git@github.com:ukituki-ps/Corporate-Service-Dashboard---Fork.git` `src/pages/DashboardPage.tsx`)
 - [x] `016`: Public guest landing and authorized entrypoint UX (design-system aligned)
 
 ## Текущий фокус
@@ -48,8 +48,8 @@
 - [x] `011-infra-postgres-redis-production-readiness`: production-readiness baseline PostgreSQL/Redis реализован, runbooks и проверки оформлены
 - [x] `012-aprilhub-unified-ingress-auth-hardening`: единый Nginx ingress для `hub-shell`/`hub-bff`/Keycloak реализован, smoke-проверки через единый endpoint пройдены
 - [x] `013-aprilhub-design-system-integration-showcase`: интегрировать `DisignApril` в проект и развернуть отдельную витрину
-- [ ] `014-aprilhub-keycloak-design-system-alignment`: привести login/account UX Keycloak к дизайн-системе AprilHub
-- [ ] `015-aprilhub-authorized-shell-standard-layout`: внедрить стандартный layout авторизованной зоны (header + sidebar + content)
+- [x] `014-aprilhub-keycloak-design-system-alignment`: привести login/account UX Keycloak к дизайн-системе AprilHub
+- [x] `015-aprilhub-authorized-shell-standard-layout`: внедрить стандартный layout авторизованной зоны (header + sidebar + content), baseline template: `Corporate-Service-Dashboard---Fork/src/pages/DashboardPage.tsx`
 - [x] `016-aprilhub-guest-landing-entrypoint`: подготовить лендинг неавторизованной зоны и единый UX-вход в авторизованную зону
 
 ## План реализации AprilHub: статусы
@@ -69,6 +69,6 @@
 | `011` | Infra PostgreSQL/Redis production readiness (HA/backup/restore/ops runbooks) | ✅ Выполнено | [`tasks/011-infra-postgres-redis-production-readiness/REPORT.md`](./tasks/011-infra-postgres-redis-production-readiness/REPORT.md) |
 | `012` | Unified ingress and auth UX hardening (single Nginx entrypoint for guest/Keycloak/authorized zones) | ✅ Выполнено | [`tasks/012-aprilhub-unified-ingress-auth-hardening/REPORT.md`](./tasks/012-aprilhub-unified-ingress-auth-hardening/REPORT.md) |
 | `013` | Design system integration + separate showcase deployment (`DisignApril`) | ✅ Выполнено | [`tasks/013-aprilhub-design-system-integration-showcase/REPORT.md`](./tasks/013-aprilhub-design-system-integration-showcase/REPORT.md) |
-| `014` | Keycloak UI/theming alignment with April design system | ⏳ Запланировано | [`tasks/014-aprilhub-keycloak-design-system-alignment/TASK.md`](./tasks/014-aprilhub-keycloak-design-system-alignment/TASK.md) |
-| `015` | Authorized zone standard shell layout (header + sidebar + content frame) | ⏳ Запланировано | [`tasks/015-aprilhub-authorized-shell-standard-layout/TASK.md`](./tasks/015-aprilhub-authorized-shell-standard-layout/TASK.md) |
+| `014` | Keycloak UI/theming alignment with April design system | ✅ Выполнено | [`tasks/014-aprilhub-keycloak-design-system-alignment/TASK.md`](./tasks/014-aprilhub-keycloak-design-system-alignment/TASK.md) |
+| `015` | Authorized zone standard shell layout (header + sidebar + content frame) | ✅ Выполнено | [`tasks/015-aprilhub-authorized-shell-standard-layout/TASK.md`](./tasks/015-aprilhub-authorized-shell-standard-layout/TASK.md), [`tasks/015-aprilhub-authorized-shell-standard-layout/REPORT.md`](./tasks/015-aprilhub-authorized-shell-standard-layout/REPORT.md), baseline template: `Corporate-Service-Dashboard---Fork/src/pages/DashboardPage.tsx` |
 | `016` | Public guest landing and authorized entrypoint UX (design-system aligned) | ✅ Выполнено | [`tasks/016-aprilhub-guest-landing-entrypoint/REPORT.md`](./tasks/016-aprilhub-guest-landing-entrypoint/REPORT.md) |

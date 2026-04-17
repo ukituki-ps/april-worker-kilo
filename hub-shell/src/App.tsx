@@ -37,6 +37,12 @@ const keyScenarios = [
   "Проверять identity и role-gates через тот же ingress-путь.",
 ];
 
+const shellNavigation = [
+  { id: "overview", label: "Обзор платформы", href: "#overview" },
+  { id: "roles", label: "Роли доступа", href: "#roles" },
+  { id: "admin-control", label: "Админ-контур", href: "#admin-control" },
+];
+
 export default function App({ authInitError = "" }: AppProps) {
   const [me, setMe] = useState<UserProfile | null>(null);
   const [zone, setZone] = useState<AuthZone>(keycloak.authenticated ? "transition" : "guest");
@@ -146,15 +152,29 @@ export default function App({ authInitError = "" }: AppProps) {
 
   if (zone === "transition") {
     return (
-      <main className="zone-container">
+      <AppShell
+        context={context}
+        navigationItems={shellNavigation}
+        activeNavId="overview"
+        title="Рабочая зона AprilHub"
+        subtitle="Стандартный каркас авторизованной зоны для модульного расширения."
+        statusBadgeLabel="Идет инициализация"
+      >
         <SharedState state="loading" message={transitionReason} />
-      </main>
+      </AppShell>
     );
   }
 
   if (zone === "forbidden") {
     return (
-      <main className="zone-container">
+      <AppShell
+        context={context}
+        navigationItems={shellNavigation}
+        title="Рабочая зона AprilHub"
+        subtitle="Стандартный каркас авторизованной зоны для модульного расширения."
+        statusBadgeLabel="Доступ ограничен"
+        onLogout={() => void keycloak.logout()}
+      >
         <SharedState
           state="forbidden"
           message="Текущая учетная запись авторизована, но не имеет доступа к bootstrap endpoint оболочки."
@@ -164,16 +184,35 @@ export default function App({ authInitError = "" }: AppProps) {
             </Button>
           }
         />
-      </main>
+      </AppShell>
     );
   }
 
   if (!context) {
-    return <SharedState state="empty" message="Авторизованная сессия найдена, но пользовательский контекст не инициализирован." />;
+    return (
+      <AppShell
+        context={null}
+        navigationItems={shellNavigation}
+        title="Рабочая зона AprilHub"
+        subtitle="Стандартный каркас авторизованной зоны для модульного расширения."
+        statusBadgeLabel="Контекст отсутствует"
+      >
+        <SharedState state="empty" message="Авторизованная сессия найдена, но пользовательский контекст не инициализирован." />
+      </AppShell>
+    );
   }
 
   return (
-    <AppShell context={context} onLogout={() => void keycloak.logout()}>
+    <AppShell
+      context={context}
+      navigationItems={shellNavigation}
+      activeNavId="overview"
+      title="Рабочая зона AprilHub"
+      subtitle="Стандартный каркас авторизованной зоны для модульного расширения."
+      statusBadgeLabel="Авторизовано"
+      onProfile={() => window.location.assign(keycloak.createAccountUrl())}
+      onLogout={() => void keycloak.logout()}
+    >
       <CompositionLayer context={context} />
       {error && <SharedState state="error" message={error} />}
     </AppShell>

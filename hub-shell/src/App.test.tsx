@@ -7,6 +7,7 @@ const keycloakState = vi.hoisted(() => ({
   authState: false,
   loginMock: vi.fn(async () => undefined),
   logoutMock: vi.fn(async () => undefined),
+  createAccountUrlMock: vi.fn(() => "http://localhost/auth/realms/april/account"),
 }));
 
 vi.mock("./keycloak", () => ({
@@ -16,6 +17,7 @@ vi.mock("./keycloak", () => ({
     },
     login: keycloakState.loginMock,
     logout: keycloakState.logoutMock,
+    createAccountUrl: keycloakState.createAccountUrlMock,
   },
 }));
 
@@ -40,6 +42,7 @@ describe("App", () => {
     keycloakState.authState = false;
     keycloakState.loginMock.mockClear();
     keycloakState.logoutMock.mockClear();
+    keycloakState.createAccountUrlMock.mockClear();
     apiRequestMock.mockReset();
   });
 
@@ -91,9 +94,12 @@ describe("App", () => {
     renderApp();
 
     await waitFor(() => {
-      expect(screen.getByText("AprilHub Shell")).toBeInTheDocument();
-      expect(screen.getByText("Overview")).toBeInTheDocument();
-      expect(screen.getByText("Roles")).toBeInTheDocument();
+      expect(screen.getByText("Рабочая зона AprilHub")).toBeInTheDocument();
+      expect(screen.getByRole("navigation", { name: "Основная навигация" })).toBeInTheDocument();
+      expect(screen.getByText("Обзор платформы")).toBeInTheDocument();
+      expect(screen.getAllByText("Роли доступа").length).toBeGreaterThan(0);
+      expect(screen.getByText("Добро пожаловать, Demo User.")).toBeInTheDocument();
+      expect(screen.getByText(/Корреляция запроса:/)).toBeInTheDocument();
     });
   });
 
@@ -104,6 +110,7 @@ describe("App", () => {
     renderApp();
 
     await waitFor(() => {
+      expect(screen.getByText("Рабочая зона AprilHub")).toBeInTheDocument();
       expect(screen.getByText("Доступ запрещен")).toBeInTheDocument();
     });
   });
