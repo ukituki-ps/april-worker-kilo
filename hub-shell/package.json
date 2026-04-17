@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "ds:prepare": "bash ./scripts/ds-prepare.sh",
+    "ds:prepare": "sh ./scripts/ds-prepare.sh",
     "predev": "npm run ds:prepare",
     "prebuild": "npm run ds:prepare",
     "pretest": "npm run ds:prepare",
