@@ -33,6 +33,8 @@
 - [x] `015`: Authorized zone standard shell layout (header + sidebar + content frame, baseline template: `git@github.com:ukituki-ps/Corporate-Service-Dashboard---Fork.git` `src/pages/DashboardPage.tsx`)
 - [x] `016`: Public guest landing and authorized entrypoint UX (design-system aligned)
 - [x] `018`: Multi-service documentation foundation (human-first + agent-first, единый source of truth)
+- [x] `019`: Testing contour finalization (mandatory CI/local quality gate + strategy/runbook sync)
+- [ ] `020`: Testing contour extensions (P1/P2: Playwright smoke, Testcontainers integration, extended k6, quality metrics)
 
 ## Текущий фокус
 
@@ -53,6 +55,8 @@
 - [x] `015-aprilhub-authorized-shell-standard-layout`: внедрить стандартный layout авторизованной зоны (header + sidebar + content), baseline template: `Corporate-Service-Dashboard---Fork/src/pages/DashboardPage.tsx`
 - [x] `016-aprilhub-guest-landing-entrypoint`: подготовить лендинг неавторизованной зоны и единый UX-вход в авторизованную зону
 - [x] `018-aprilhub-multi-service-documentation-foundation`: подготовить документационный baseline для масштабирования комплементарных сервисов (human-first + agent-first)
+- [x] `019-hub-testing-contour-finalization`: финализировать обязательный тестовый контур (CI/local gate, docs sync, smoke/k6 triage runbook)
+- [ ] `020-hub-testing-contour-extensions`: реализовать P1/P2-расширения тестового контура (Playwright, Testcontainers, extended load, quality metrics)
 
 ## План реализации AprilHub: статусы
 
@@ -75,3 +79,5 @@
 | `015` | Authorized zone standard shell layout (header + sidebar + content frame) | ✅ Выполнено | [`tasks/015-aprilhub-authorized-shell-standard-layout/TASK.md`](./tasks/015-aprilhub-authorized-shell-standard-layout/TASK.md), [`tasks/015-aprilhub-authorized-shell-standard-layout/REPORT.md`](./tasks/015-aprilhub-authorized-shell-standard-layout/REPORT.md), baseline template: `Corporate-Service-Dashboard---Fork/src/pages/DashboardPage.tsx` |
 | `016` | Public guest landing and authorized entrypoint UX (design-system aligned) | ✅ Выполнено | [`tasks/016-aprilhub-guest-landing-entrypoint/REPORT.md`](./tasks/016-aprilhub-guest-landing-entrypoint/REPORT.md) |
 | `018` | Multi-service documentation foundation (human-first + agent-first) | ✅ Выполнено | [`tasks/018-aprilhub-multi-service-documentation-foundation/REPORT.md`](./tasks/018-aprilhub-multi-service-documentation-foundation/REPORT.md) |
+| `019` | Testing contour finalization (mandatory CI/local quality gate + strategy/runbook sync) | ✅ Выполнено | [`tasks/019-hub-testing-contour-finalization/TASK.md`](./tasks/019-hub-testing-contour-finalization/TASK.md), [`tasks/019-hub-testing-contour-finalization/PLAN.md`](./tasks/019-hub-testing-contour-finalization/PLAN.md), [`tasks/019-hub-testing-contour-finalization/REPORT.md`](./tasks/019-hub-testing-contour-finalization/REPORT.md) |
+| `020` | Testing contour extensions (P1/P2: Playwright smoke, Testcontainers integration, extended k6, quality metrics) | ⏳ Не начато | [`tasks/020-hub-testing-contour-extensions/TASK.md`](./tasks/020-hub-testing-contour-extensions/TASK.md), [`tasks/020-hub-testing-contour-extensions/PLAN.md`](./tasks/020-hub-testing-contour-extensions/PLAN.md), [`tasks/020-hub-testing-contour-extensions/REPORT.md`](./tasks/020-hub-testing-contour-extensions/REPORT.md) |

@@ -1,4 +1,4 @@
-# Проверки на PR и push: OpenAPI + сборка Docusaurus. Расширяйте при появлении Go/фронтенда приложения.
+# Обязательный quality gate AprilHub (P0): openapi, hub-bff, hub-shell, smoke, k6.
 name: CI
 
 on:
@@ -112,8 +112,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Prepare smoke artifacts directory
+        run: mkdir -p artifacts/smoke
+
       - name: Run AprilHub smoke checks
-        run: ./scripts/smoke-aprilhub.sh
+        run: ./scripts/smoke-aprilhub.sh | tee artifacts/smoke/smoke.log
+
+      - name: Upload smoke artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: aprilhub-smoke-artifacts
+          path: artifacts/smoke
 
   aprilhub-k6-baseline:
     name: AprilHub k6 baseline
@@ -123,5 +133,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Prepare k6 artifacts directory
+        run: mkdir -p artifacts/k6
+
       - name: Run AprilHub k6 baseline
-        run: ./scripts/run-k6-aprilhub.sh
+        env:
+          K6_SUMMARY_EXPORT: artifacts/k6/summary.json
+        run: ./scripts/run-k6-aprilhub.sh | tee artifacts/k6/k6.log
+
+      - name: Upload k6 artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: aprilhub-k6-artifacts
+          path: artifacts/k6

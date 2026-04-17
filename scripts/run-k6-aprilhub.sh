@@ -9,6 +9,7 @@ HUB_BFF_PORT="${HUB_BFF_PORT:-8081}"
 KEYCLOAK_HTTP_PORT="${KEYCLOAK_HTTP_PORT:-8080}"
 K6_VUS="${K6_VUS:-4}"
 K6_DURATION="${K6_DURATION:-20s}"
+K6_SUMMARY_EXPORT="${K6_SUMMARY_EXPORT:-}"
 KC_HOSTNAME="${KC_HOSTNAME:-http://keycloak:${KEYCLOAK_HTTP_PORT}/auth}"
 KEYCLOAK_ISSUER="${KEYCLOAK_ISSUER:-${KC_HOSTNAME}/realms/april}"
 export HUB_BFF_PORT KEYCLOAK_HTTP_PORT KC_HOSTNAME KEYCLOAK_ISSUER K6_VUS K6_DURATION
@@ -83,12 +84,21 @@ if [[ "$code" != "200" ]]; then
 fi
 
 echo "[k6] running baseline load test"
+K6_ARGS=()
+DOCKER_VOLUME_ARGS=()
+if [[ -n "$K6_SUMMARY_EXPORT" ]]; then
+  mkdir -p "$(dirname "$K6_SUMMARY_EXPORT")"
+  K6_ARGS+=(--summary-export "/scripts-artifacts/summary.json")
+  DOCKER_VOLUME_ARGS+=(-v "$(dirname "$K6_SUMMARY_EXPORT"):/scripts-artifacts")
+fi
+
 docker run --rm --network "${COMPOSE_PROJECT_NAME}_default" \
   -e BASE_URL="http://hub-bff:${HUB_BFF_PORT}" \
   -e AUTH_TOKEN="$TOKEN" \
   -e K6_VUS="$K6_VUS" \
   -e K6_DURATION="$K6_DURATION" \
   -v "$ROOT_DIR/k6:/scripts:ro" \
-  grafana/k6:0.53.0 run /scripts/aprilhub-baseline.js
+  "${DOCKER_VOLUME_ARGS[@]}" \
+  grafana/k6:0.53.0 run "${K6_ARGS[@]}" /scripts/aprilhub-baseline.js
 
 echo "[k6] baseline completed"
