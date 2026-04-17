@@ -104,6 +104,22 @@ jobs:
         working-directory: hub-shell
         run: npm run build
 
+  hub-shell-alpine-runtime:
+    name: Hub Shell alpine runtime preflight
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run Hub Shell startup preflight in node:20-alpine
+        run: |
+          docker run --rm \
+            -v "$PWD:/workspace" \
+            -w /workspace/hub-shell \
+            node:20-alpine \
+            sh -lc "npm ci && npm run ds:prepare && npm run build"
+
   aprilhub-smoke:
     name: AprilHub runtime smoke
     runs-on: ubuntu-latest

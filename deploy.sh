@@ -30,6 +30,9 @@ EOF
   SKIP_KEYCLOAK_RECREATE=1 пропустить force-recreate keycloak при изменении theme/realm/compose
   SKIP_OBSERVABILITY_ONBOARD=1 пропустить авто-onboarding стенда в central observability
   SKIP_HEALTHCHECK=1   пропустить health/readiness проверки
+  INGRESS_BASE_URL     базовый URL ingress-check (по умолчанию http://127.0.0.1:${DOCS_HTTP_PORT:-8080})
+  DEPLOY_INGRESS_RETRIES количество попыток ingress-check (по умолчанию 20)
+  DEPLOY_INGRESS_SLEEP_SEC задержка между попытками ingress-check (по умолчанию 2)
   SKIP_SMOKE=1         пропустить scripts/smoke-after-deploy.sh
   AUTO_ROLLBACK=0      отключить авто-rollback (по умолчанию включён)
   REQUIRE_IMAGES_ENV=0 не требовать images.env (по умолчанию REQUIRE_IMAGES_ENV=1)
@@ -407,6 +410,35 @@ run_health_checks() {
   fail "health/readiness проверки не прошли"
 }
 
+run_ingress_checks() {
+  if [[ "${SKIP_HEALTHCHECK:-}" == "1" ]]; then
+    log "пропуск ingress-check (SKIP_HEALTHCHECK=1)"
+    return 0
+  fi
+  if ! "${compose_files[@]}" ps --services --status running | awk '{print $1}' | grep -qx "nginx-docs"; then
+    log "nginx-docs не запущен — пропуск ingress-check"
+    return 0
+  fi
+
+  local ingress_base="${INGRESS_BASE_URL:-http://127.0.0.1:${DOCS_HTTP_PORT:-8080}}"
+  local retries="${DEPLOY_INGRESS_RETRIES:-20}"
+  local sleep_s="${DEPLOY_INGRESS_SLEEP_SEC:-2}"
+  local code=""
+
+  log "ingress-check ${ingress_base}/ (ожидается не 5xx)"
+  for _ in $(seq 1 "$retries"); do
+    code="$(curl -sS -o /tmp/deploy-ingress.out -w "%{http_code}" "${ingress_base}/" || true)"
+    if [[ "$code" =~ ^[1234][0-9][0-9]$ ]]; then
+      return 0
+    fi
+    sleep "$sleep_s"
+  done
+
+  log "ingress-check не прошёл: HTTP ${code:-n/a} для ${ingress_base}/"
+  [[ -f /tmp/deploy-ingress.out ]] && cat /tmp/deploy-ingress.out >&2 || true
+  fail "ingress-check не прошёл"
+}
+
 run_smoke() {
   if [[ "${SKIP_SMOKE:-}" == "1" ]]; then
     log "пропуск smoke-after-deploy (SKIP_SMOKE=1)"
@@ -492,6 +524,7 @@ main() {
   sync_frontend_dependencies
   run_observability_onboarding
   run_health_checks
+  run_ingress_checks
   run_smoke
   mark_last_good
   capture_compose_ps
