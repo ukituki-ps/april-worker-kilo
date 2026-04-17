@@ -15,7 +15,7 @@ prepare_tokens_fallback() {
   local tokens_dir
   tokens_dir="$(dirname "${TOKENS_FALLBACK_TARGET}")"
 
-  if [[ -e "${tokens_dir}" && ! -d "${tokens_dir}" ]]; then
+  if [[ ( -e "${tokens_dir}" || -L "${tokens_dir}" ) && ! -d "${tokens_dir}" ]]; then
     rm -f "${tokens_dir}"
   fi
 
