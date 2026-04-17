@@ -180,6 +180,25 @@ Release-gate checklist для завершения AprilHub roadmap `001-010`: [
 12. Успех: обновить **images.env** как зафиксированный good (если ещё не записан), поставить/сдвинуть **git tag** успешного деплоя, загрузить артефакты (логи, `docker compose ps`, commit).
 13. Провал: auto-rollback (`images.env.last-good` + `scripts/rollback-migrations.sh` при наличии) + повторные health/smoke; fail job при повторном провале.
 
+### Auto-observability onboarding (multi-stand)
+
+`deploy.sh` поддерживает post-deploy onboarding стенда в central observability через `scripts/observability-onboard-stand.sh`.
+
+Основные переменные:
+
+- `OBS_AUTO_ONBOARD=1` — включить авто-onboarding.
+- `OBS_CENTRAL_HOST=<ip|dns>` — central observability host (обязательно при включении).
+- `OBS_CENTRAL_USER=<user>` — SSH-пользователь central host (по умолчанию текущий пользователь).
+- `OBS_CENTRAL_OBS_PATH=<path>` — путь к `infra/observability` на central host (по умолчанию `/opt/april/infra/observability`).
+- `OBS_STAND_HOST=<ip|dns>` — адрес текущего стенда (по умолчанию `hostname -I`).
+- `OBS_STAND_NAME=<name>` — идентификатор стенда (по умолчанию `stand-<OBS_STAND_HOST>`).
+- `OBS_SERVICE_NAME=<service>` — service label для metrics target (по умолчанию `hub-bff`).
+- `OBS_METRICS_PORT=<port>` — порт `/metrics` (по умолчанию `HUB_BFF_PORT` или `8081`).
+- `OBS_ENV_NAME=<env>` — env label (по умолчанию `dev`).
+- `OBS_SETUP_LOCAL_PROMTAIL_AGENT=1` — развернуть/обновить локальный `promtail-agent` на текущем стенде.
+- `OBS_LOKI_PUSH_URL=<url>` — push URL Loki для `promtail-agent` (по умолчанию `http://<OBS_CENTRAL_HOST>:3100/loki/api/v1/push`).
+- `SKIP_OBSERVABILITY_ONBOARD=1` — явный пропуск шага onboarding.
+
 ## 13. Документация (Docusaurus, OpenAPI, Structurizr) на dev
 
 Цель — **те же команды**, что локально (`make docs-build`, `make openapi-lint`, `docker compose config`), плюс выкладка артефактов на сервер.

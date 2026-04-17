@@ -28,12 +28,24 @@ EOF
   SKIP_MIGRATIONS=1    не вызывать scripts/run-migrations.sh (если есть)
   SKIP_FRONTEND_RECREATE=1 пропустить force-recreate frontend-сервисов при изменении lock-файлов
   SKIP_KEYCLOAK_RECREATE=1 пропустить force-recreate keycloak при изменении theme/realm/compose
+  SKIP_OBSERVABILITY_ONBOARD=1 пропустить авто-onboarding стенда в central observability
   SKIP_HEALTHCHECK=1   пропустить health/readiness проверки
   SKIP_SMOKE=1         пропустить scripts/smoke-after-deploy.sh
   AUTO_ROLLBACK=0      отключить авто-rollback (по умолчанию включён)
   REQUIRE_IMAGES_ENV=0 не требовать images.env (по умолчанию REQUIRE_IMAGES_ENV=1)
   DEPLOY_ARTIFACTS_DIR каталог артефактов (по умолчанию .deploy-artifacts)
   HUB_BFF_BASE_URL     базовый URL для health/readiness (по умолчанию http://127.0.0.1:${DOCS_HTTP_PORT:-8080})
+  OBS_AUTO_ONBOARD=1   включить авто-регистрацию стенда в central observability
+  OBS_CENTRAL_HOST     host/IP центрального observability (обязательно для OBS_AUTO_ONBOARD=1)
+  OBS_CENTRAL_USER     SSH-пользователь центрального observability (по умолчанию текущий)
+  OBS_CENTRAL_OBS_PATH путь до infra/observability на central host (по умолчанию /opt/april/infra/observability)
+  OBS_STAND_HOST       адрес текущего стенда (по умолчанию hostname -I | awk '{print $1}')
+  OBS_STAND_NAME       идентификатор стенда (по умолчанию stand-<OBS_STAND_HOST с дефисами>)
+  OBS_SERVICE_NAME     сервис для metrics target (по умолчанию hub-bff)
+  OBS_METRICS_PORT     порт /metrics сервиса (по умолчанию HUB_BFF_PORT или 8081)
+  OBS_ENV_NAME         env label для target (по умолчанию dev)
+  OBS_SETUP_LOCAL_PROMTAIL_AGENT=1 включить авто-setup promtail-agent на текущем стенде
+  OBS_LOKI_PUSH_URL    URL push endpoint Loki для promtail-agent (по умолчанию http://<OBS_CENTRAL_HOST>:3100/loki/api/v1/push)
 
 Опциональные хуки (если исполняемы):
   scripts/db-backup.sh      дамп БД до миграций/up (см. DEPLOYMENT_STRATEGY.md)
@@ -412,6 +424,24 @@ run_smoke() {
   "${ROOT}/scripts/smoke-after-deploy.sh" >"${deploy_artifacts_dir}/smoke.log" 2>&1
 }
 
+run_observability_onboarding() {
+  if [[ "${SKIP_OBSERVABILITY_ONBOARD:-}" == "1" ]]; then
+    log "пропуск observability onboarding (SKIP_OBSERVABILITY_ONBOARD=1)"
+    return 0
+  fi
+  if [[ "${OBS_AUTO_ONBOARD:-0}" != "1" ]]; then
+    log "observability onboarding отключен (OBS_AUTO_ONBOARD!=1)"
+    return 0
+  fi
+  if [[ ! -x "${ROOT}/scripts/observability-onboard-stand.sh" ]]; then
+    log "observability onboarding script не найден или не исполняемый — пропуск"
+    return 0
+  fi
+
+  log "запуск observability onboarding"
+  "${ROOT}/scripts/observability-onboard-stand.sh" >"${deploy_artifacts_dir}/observability-onboard.log" 2>&1
+}
+
 run_rollback() {
   if [[ "$rollback_in_progress" == "1" ]]; then
     return 0
@@ -460,6 +490,7 @@ main() {
   run_compose
   sync_keycloak_on_theme_or_realm_change
   sync_frontend_dependencies
+  run_observability_onboarding
   run_health_checks
   run_smoke
   mark_last_good
