@@ -73,7 +73,64 @@ cd hub-shell && npm ci && npm run lint && npm run test && npm run build
 2. Включить в CI как отдельный job.
 3. Зафиксировать однозначный pass/fail и артефакты.
 
-## 4. Связь с release gate
+## 5. Этап `020`: P1/P2-расширения контура
+
+### 5.1 Playwright smoke E2E (`hub-shell`, P1)
+
+- Команда локального запуска: `cd hub-shell && npm run e2e`.
+- Скрипт полного прогрева окружения: `./scripts/run-playwright-aprilhub.sh`.
+- Базовый smoke-набор:
+  1. Гостевой лендинг и CTA входа.
+  2. Редирект на страницу логина Keycloak.
+  3. Логин тестовым пользователем и вход в авторизованную рабочую зону.
+- Артефакты при падениях: trace/screenshot/video (Playwright `retain-on-failure`), HTML report (`hub-shell/playwright-report`).
+
+### 5.2 Integration suite (`hub-bff`, P1)
+
+- Команда: `cd hub-bff && go test ./... -run Integration`.
+- Техническая база:
+  - Testcontainers поднимает PostgreSQL для изолированного теста.
+  - Миграция применяется через Atlas CLI (`atlas migrate hash/apply`) к временной БД в контейнере.
+  - Тест подтверждает фактическое создание schema-объекта после применения миграций.
+- Ограничения:
+  - Нужны Docker daemon и установленный `atlas` CLI.
+  - При отсутствии `atlas` тест помечается `skip` (suite требует явной подготовки окружения).
+
+### 5.3 Extended k6 профиль (`P2`)
+
+- Команда: `./scripts/run-k6-aprilhub-extended.sh`.
+- Сценарий: `k6/aprilhub-extended.js`.
+- Отличия от baseline:
+  - ramping-vus профиль с более длинным окном нагрузки;
+  - дополнительный endpoint mix (`/api/v1/aggregation/summary`);
+  - отдельная метрика `auth_failures`.
+- Артефакты: `k6-extended.log`, `summary.json`.
+
+### 5.4 Nightly/Scheduled прогон (`P2`)
+
+- Workflow: `.github/workflows/testing-extensions-nightly.yml`.
+- Триггеры: `schedule` + `workflow_dispatch`.
+- Джобы:
+  1. `hub-shell-playwright-smoke`
+  2. `hub-bff-integration`
+  3. `aprilhub-k6-extended`
+- Все джобы публикуют artifacts даже при падениях (`if: always()`), чтобы ускорить triage.
+
+### 5.5 Минимальные quality-метрики pipeline
+
+На уровне `020` фиксируются минимальные операционные метрики:
+
+- `duration_seconds` — длительность job (для отслеживания деградаций времени).
+- `run_attempt` / `is_retry` — признак ретрая workflow-run.
+- `status` и журнал артефактов (`playwright`, `integration`, `k6-extended`) для диагностики flaky-поведений.
+
+Правила наблюдения:
+
+1. При росте `duration_seconds` > 20% к медиане последних 7 запусков — расследование в runbook.
+2. Любой `run_attempt > 1` фиксируется как flaky-сигнал, требует triage на ближайшем QA/Platform sync.
+3. Два и более падения одного и того же nightly job подряд — приоритетный action item в backlog этапов качества.
+
+## 6. Связь с release gate
 
 - Для release-ready кандидата этапа `019` обязательны все пункты mandatory-слоя.
 - Planned-слой не блокирует merge в `feature/*`/`fix/*` и дальнейший PR в `develop`, пока явно не переведён в mandatory отдельным решением команды.
