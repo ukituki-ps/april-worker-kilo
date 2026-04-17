@@ -86,7 +86,19 @@ EOF
   )
 }
 
+verify_local_metrics_endpoint() {
+  local url="http://127.0.0.1:${metrics_port}/metrics"
+  if curl -fsS --max-time 3 "${url}" >/dev/null 2>&1; then
+    log "local metrics endpoint is reachable: ${url}"
+    return 0
+  fi
+  log "warn: local metrics endpoint is not reachable: ${url}"
+  log "warn: central Prometheus target may stay DOWN until service/port is exposed"
+  return 0
+}
+
 register_target
 setup_local_promtail_agent
+verify_local_metrics_endpoint
 
 log "done: stand=${stand_name} host=${stand_host} service=${service_name} metrics_port=${metrics_port}"
