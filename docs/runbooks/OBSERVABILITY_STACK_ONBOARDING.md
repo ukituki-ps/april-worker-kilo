@@ -75,6 +75,29 @@ docker compose --env-file .env up -d
 - на dashboard видны метрики request/error/latency для подключенного стенда;
 - при ошибке (`4xx/5xx`) событие наблюдается в логах и метриках.
 
+## Auto-onboarding via deploy.sh
+
+Если стенд разворачивается через `deploy.sh`, onboarding можно автоматизировать без ручного создания target/agent:
+
+```bash
+OBS_AUTO_ONBOARD=1 \
+OBS_CENTRAL_HOST=192.168.1.29 \
+OBS_CENTRAL_USER=ukituki \
+OBS_CENTRAL_OBS_PATH=/opt/april/infra/observability \
+OBS_STAND_HOST=192.169.1.42 \
+OBS_STAND_NAME=stand-192-169-1-42 \
+OBS_SERVICE_NAME=hub-bff \
+OBS_METRICS_PORT=8081 \
+OBS_ENV_NAME=dev \
+OBS_SETUP_LOCAL_PROMTAIL_AGENT=1 \
+./deploy.sh
+```
+
+Результат шага:
+
+- на central host создается/обновляется target file и перезапускается `prometheus`;
+- на текущем стенде создается `.env` для `agents/promtail` и запускается `promtail-agent`.
+
 ## Incident LogQL quick queries
 
 Используйте в Grafana Explore (Loki), подставляя значения `host/stand/service`:

@@ -46,6 +46,28 @@ docker compose --env-file env/.env up -d prometheus
 - Prometheus `/targets` -> target `UP`
 - labels присутствуют: `env`, `host`, `stand`, `service`
 
+### 2a) Auto-onboarding from deploy
+
+Если стенд деплоится через `deploy.sh`, агент должен предпочитать автоматический путь:
+
+```bash
+OBS_AUTO_ONBOARD=1 \
+OBS_CENTRAL_HOST=<central-host> \
+OBS_CENTRAL_USER=<central-user> \
+OBS_CENTRAL_OBS_PATH=/opt/april/infra/observability \
+OBS_STAND_HOST=<stand-host> \
+OBS_STAND_NAME=<stand-name> \
+OBS_SERVICE_NAME=<service-name> \
+OBS_METRICS_PORT=<metrics-port> \
+OBS_ENV_NAME=<env> \
+OBS_SETUP_LOCAL_PROMTAIL_AGENT=1 \
+./deploy.sh
+```
+
+После деплоя проверить артефакт:
+
+- `.deploy-artifacts/deploy-*/observability-onboard.log`
+
 ### 3) Register remote logs
 
 На удаленном стенде:
