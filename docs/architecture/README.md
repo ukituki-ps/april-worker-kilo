@@ -12,6 +12,8 @@
 - `docs/architecture/APRILWORKER_C3_C4.md`
 - `docs/architecture/C4_RUNTIME_SEQUENCES.md`
 - `structurizr/workspace.dsl`
+- `docs/guides/OBSERVABILITY_INDEX.md` (central observability navigation)
+- `docs/guides/OBSERVABILITY_MULTI_STAND_OPERATING_MODEL.md` (multi-stand operating model)
 
 ## Назначение файлов
 
