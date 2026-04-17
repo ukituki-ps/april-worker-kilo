@@ -3,14 +3,29 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DS_DIR="${SCRIPT_DIR}/../../design-system/DisignApril"
+TOKENS_FALLBACK_FILE="${SCRIPT_DIR}/../src/styles/april-tokens-fallback.css"
+TOKENS_FALLBACK_TARGET="${SCRIPT_DIR}/../node_modules/@april/tokens/css"
+
+prepare_tokens_fallback() {
+  if [[ ! -f "${TOKENS_FALLBACK_FILE}" ]]; then
+    echo "[ds:prepare] fallback tokens file not found, skip"
+    return
+  fi
+
+  mkdir -p "$(dirname "${TOKENS_FALLBACK_TARGET}")"
+  cp "${TOKENS_FALLBACK_FILE}" "${TOKENS_FALLBACK_TARGET}"
+  echo "[ds:prepare] prepared fallback @april/tokens/css"
+}
 
 if [[ ! -d "${DS_DIR}" ]]; then
   echo "[ds:prepare] design system directory not found, skip"
+  prepare_tokens_fallback
   exit 0
 fi
 
 if [[ ! -f "${DS_DIR}/package.json" ]]; then
   echo "[ds:prepare] package.json not found in design system directory, skip"
+  prepare_tokens_fallback
   exit 0
 fi
 
