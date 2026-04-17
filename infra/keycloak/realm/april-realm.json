@@ -2,6 +2,11 @@
   "realm": "april",
   "enabled": true,
   "displayName": "April Dev Realm",
+  "loginTheme": "aprilhub",
+  "accountTheme": "aprilhub",
+  "internationalizationEnabled": true,
+  "supportedLocales": ["ru", "en"],
+  "defaultLocale": "ru",
   "roles": {
     "realm": [
       { "name": "user" },
@@ -20,11 +25,15 @@
       "directAccessGrantsEnabled": true,
       "redirectUris": [
         "http://localhost:4173/*",
+        "http://localhost:8080/*",
+        "http://localhost:18080/*",
         "http://dev.april.ukituki.tech/*",
         "https://dev.april.ukituki.tech/*"
       ],
       "webOrigins": [
         "http://localhost:4173",
+        "http://localhost:8080",
+        "http://localhost:18080",
         "http://dev.april.ukituki.tech",
         "https://dev.april.ukituki.tech"
       ],

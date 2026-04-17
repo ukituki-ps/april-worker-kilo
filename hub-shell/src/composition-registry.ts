@@ -16,17 +16,17 @@ const staticLoad = (component: WidgetComponent) => async () => ({ default: compo
 export const shellRegistry: CompositionModule[] = [
   {
     id: "overview",
-    title: "Overview",
+    title: "Обзор",
     loader: staticLoad(OverviewWidget),
   },
   {
     id: "roles",
-    title: "Roles",
+    title: "Роли",
     loader: staticLoad(RolesWidget),
   },
   {
     id: "admin-control",
-    title: "Admin control",
+    title: "Админ-контур",
     requiresRole: "admin",
     loader: staticLoad(BrokenWidget),
   },

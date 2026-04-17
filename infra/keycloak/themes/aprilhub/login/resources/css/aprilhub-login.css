@@ -1,0 +1,147 @@
+/* AprilHub Keycloak login theme aligned with Design System LoginSection. */
+:root {
+  --april-accent-teal-6: #12b886;
+  --april-accent-teal-7: #0ca678;
+  --april-accent-teal-8: #099268;
+
+  --april-neutral-bg: #ffffff;
+  --april-neutral-bg-alt: #f8f9fa;
+  --april-neutral-border: #dee2e6;
+  --april-neutral-text: #212529;
+  --april-neutral-text-muted: #495057;
+
+  --april-shadow-sm: 0 8px 24px rgba(33, 37, 41, 0.08);
+  --april-focus-ring: 0 0 0 3px rgba(18, 184, 134, 0.2);
+}
+
+#kc-page,
+.login-pf body,
+body {
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: linear-gradient(160deg, #f8f9fa 0%, #eef3f1 100%);
+  color: var(--april-neutral-text);
+}
+
+.login-pf-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 40px 16px;
+}
+
+#kc-header {
+  margin-bottom: 14px;
+}
+
+#kc-header-wrapper {
+  width: 248px;
+  height: 48px;
+  margin: 0 auto;
+  background: url("../img/aprilhub-full-logo.svg") center/contain no-repeat;
+  text-indent: -9999px;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.login-pf .card-pf {
+  background: var(--april-neutral-bg);
+  border: 1px solid var(--april-neutral-border);
+  border-radius: 16px;
+  box-shadow: var(--april-shadow-sm);
+  max-width: 460px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 28px 28px 22px;
+}
+
+.login-pf-header {
+  margin-bottom: 20px;
+}
+
+#kc-page-title {
+  margin: 8px 0 0;
+  font-size: 28px;
+  line-height: 1.2;
+  font-weight: 700;
+  color: var(--april-neutral-text);
+}
+
+#kc-locale {
+  display: none !important;
+}
+
+.pf-c-form__label {
+  color: var(--april-neutral-text);
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.pf-c-form-control {
+  border: 1px solid var(--april-neutral-border);
+  border-radius: 10px;
+  height: 42px;
+  font-size: 15px;
+  color: var(--april-neutral-text);
+  background-color: #fff;
+}
+
+.pf-c-form-control:focus {
+  border-color: var(--april-accent-teal-6);
+  box-shadow: var(--april-focus-ring);
+  outline: none;
+}
+
+.pf-c-button.pf-m-control {
+  border-color: var(--april-neutral-border);
+  border-radius: 10px;
+}
+
+#kc-form-buttons {
+  margin-top: 16px;
+}
+
+#kc-login.pf-c-button.pf-m-primary,
+#kc-page .pf-c-button.pf-m-primary {
+  background-color: var(--april-accent-teal-6);
+  border-color: var(--april-accent-teal-6);
+  color: #ffffff;
+  border-radius: 10px;
+  min-height: 42px;
+  font-weight: 600;
+  transition: background-color 120ms ease, border-color 120ms ease;
+}
+
+#kc-login.pf-c-button.pf-m-primary:hover,
+#kc-login.pf-c-button.pf-m-primary:focus,
+#kc-page .pf-c-button.pf-m-primary:hover,
+#kc-page .pf-c-button.pf-m-primary:focus {
+  background-color: var(--april-accent-teal-7);
+  border-color: var(--april-accent-teal-7);
+}
+
+#kc-page a {
+  color: var(--april-accent-teal-8);
+}
+
+#kc-page a:hover {
+  color: var(--april-accent-teal-7);
+}
+
+/* Explicitly remove SSO / social provider section from login screen. */
+#kc-social-providers,
+#kc-social-providers hr,
+#kc-social-providers ul,
+#kc-social-providers .kc-social-provider-logo,
+#kc-form-social-account,
+#kc-social-providers + .kc-login-provider,
+.kc-social-section {
+  display: none !important;
+}
+
+.pf-c-alert.pf-m-danger,
+.pf-c-alert.pf-m-error {
+  border-color: rgba(250, 82, 82, 0.45);
+  border-radius: 10px;
+}
+
