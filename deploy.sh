@@ -27,6 +27,7 @@ EOF
   SKIP_DB_BACKUP=1     не вызывать scripts/db-backup.sh (если есть)
   SKIP_MIGRATIONS=1    не вызывать scripts/run-migrations.sh (если есть)
   SKIP_FRONTEND_RECREATE=1 пропустить force-recreate frontend-сервисов при изменении lock-файлов
+  SKIP_KEYCLOAK_RECREATE=1 пропустить force-recreate keycloak при изменении theme/realm/compose
   SKIP_HEALTHCHECK=1   пропустить health/readiness проверки
   SKIP_SMOKE=1         пропустить scripts/smoke-after-deploy.sh
   AUTO_ROLLBACK=0      отключить авто-rollback (по умолчанию включён)
@@ -326,6 +327,52 @@ sync_frontend_dependencies() {
     "${state_dir}/april-showcase-pnpm-lock.sha256"
 }
 
+sync_keycloak_on_theme_or_realm_change() {
+  if [[ "${SKIP_KEYCLOAK_RECREATE:-}" == "1" ]]; then
+    log "пропуск keycloak force-recreate (SKIP_KEYCLOAK_RECREATE=1)"
+    return 0
+  fi
+
+  if ! is_service_running "keycloak"; then
+    log "keycloak не запущен — пропуск keycloak force-recreate sync"
+    return 0
+  fi
+
+  local state_file="${state_dir}/keycloak-theme-realm.sha256"
+  local compose_hash_file="${ROOT}/docker-compose.yml"
+  local realm_hash_file="${ROOT}/infra/keycloak/realm/april-realm.json"
+  local login_theme_file="${ROOT}/infra/keycloak/themes/aprilhub/login/theme.properties"
+  local login_css_file="${ROOT}/infra/keycloak/themes/aprilhub/login/resources/css/aprilhub-login.css"
+  local account_theme_file="${ROOT}/infra/keycloak/themes/aprilhub/account/theme.properties"
+  local account_css_file="${ROOT}/infra/keycloak/themes/aprilhub/account/resources/css/aprilhub-account.css"
+  local merged_hash
+  local prev_hash=""
+
+  merged_hash="$(
+    sha256sum \
+      "$compose_hash_file" \
+      "$realm_hash_file" \
+      "$login_theme_file" \
+      "$login_css_file" \
+      "$account_theme_file" \
+      "$account_css_file" \
+    | sha256sum | awk '{print $1}'
+  )"
+
+  if [[ -f "$state_file" ]]; then
+    prev_hash="$(cat "$state_file" 2>/dev/null || true)"
+  fi
+
+  if [[ "$merged_hash" == "$prev_hash" ]]; then
+    log "keycloak theme/realm/compose без изменений — force-recreate не требуется"
+    return 0
+  fi
+
+  log "обнаружены изменения keycloak theme/realm/compose — docker compose up -d --force-recreate keycloak"
+  "${compose_files[@]}" up -d --force-recreate keycloak
+  printf '%s\n' "$merged_hash" >"$state_file"
+}
+
 run_health_checks() {
   if [[ "${SKIP_HEALTHCHECK:-}" == "1" ]]; then
     log "пропуск health/readiness (SKIP_HEALTHCHECK=1)"
@@ -411,6 +458,7 @@ main() {
   run_hook "scripts/run-migrations.sh" "SKIP_MIGRATIONS" "миграции"
   run_docs_build
   run_compose
+  sync_keycloak_on_theme_or_realm_change
   sync_frontend_dependencies
   run_health_checks
   run_smoke
