@@ -145,3 +145,34 @@ body {
   border-radius: 10px;
 }
 
+@media (max-width: 768px) {
+  .login-pf-page {
+    padding: 24px 12px;
+  }
+
+  #kc-header-wrapper {
+    width: 208px;
+    height: 40px;
+  }
+
+  .login-pf .card-pf {
+    max-width: 100%;
+    border-radius: 12px;
+    padding: 20px 16px 18px;
+  }
+
+  #kc-page-title {
+    font-size: 24px;
+  }
+
+  .pf-c-form-control {
+    height: 40px;
+    font-size: 14px;
+  }
+
+  #kc-login.pf-c-button.pf-m-primary,
+  #kc-page .pf-c-button.pf-m-primary {
+    min-height: 40px;
+  }
+}
+
