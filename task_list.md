@@ -20,7 +20,7 @@
 - [x] `002`: Auth + RBAC через Keycloak (OIDC flow, JWT validation, `/me`, role gates)
 - [x] `003`: Hub Shell composition + дизайн-системный UX (guest/Keycloak/authorized)
 - [x] `004`: Hub BFF aggregation MVP (fan-out adapters, partial response, timeout/retry policy)
-- [ ] `005`: Integration contracts finalization (sync/async contract hardening, OpenAPI alignment)
+- [x] `005`: Integration contracts finalization (sync/async contract hardening, OpenAPI alignment)
 - [x] `006`: Observability + trace propagation (`correlationId/requestId`, metrics/logging)
 - [x] `007`: Data/runtime dependencies and migrations readiness (если требуется persistence в Hub BFF)
 - [x] `008`: Testing completion (unit/integration/smoke E2E + k6 baseline)
@@ -29,9 +29,10 @@
 - [x] `011`: Infra PostgreSQL/Redis production readiness (HA/backup/restore/ops runbooks)
 - [x] `012`: Unified ingress and auth UX hardening (single Nginx entrypoint for guest/Keycloak/authorized zones)
 - [x] `013`: Design system integration + separate showcase deployment (`DisignApril`)
-- [ ] `014`: Keycloak UI/theming alignment with April design system
+- [x] `014`: Keycloak UI/theming alignment with April design system
 - [x] `015`: Authorized zone standard shell layout (header + sidebar + content frame, baseline template: `git@github.com:ukituki-ps/Corporate-Service-Dashboard---Fork.git` `src/pages/DashboardPage.tsx`)
 - [x] `016`: Public guest landing and authorized entrypoint UX (design-system aligned)
+- [x] `018`: Multi-service documentation foundation (human-first + agent-first, единый source of truth)
 
 ## Текущий фокус
 
@@ -51,6 +52,7 @@
 - [x] `014-aprilhub-keycloak-design-system-alignment`: привести login/account UX Keycloak к дизайн-системе AprilHub
 - [x] `015-aprilhub-authorized-shell-standard-layout`: внедрить стандартный layout авторизованной зоны (header + sidebar + content), baseline template: `Corporate-Service-Dashboard---Fork/src/pages/DashboardPage.tsx`
 - [x] `016-aprilhub-guest-landing-entrypoint`: подготовить лендинг неавторизованной зоны и единый UX-вход в авторизованную зону
+- [x] `018-aprilhub-multi-service-documentation-foundation`: подготовить документационный baseline для масштабирования комплементарных сервисов (human-first + agent-first)
 
 ## План реализации AprilHub: статусы
 
@@ -72,3 +74,4 @@
 | `014` | Keycloak UI/theming alignment with April design system | ✅ Выполнено | [`tasks/014-aprilhub-keycloak-design-system-alignment/TASK.md`](./tasks/014-aprilhub-keycloak-design-system-alignment/TASK.md) |
 | `015` | Authorized zone standard shell layout (header + sidebar + content frame) | ✅ Выполнено | [`tasks/015-aprilhub-authorized-shell-standard-layout/TASK.md`](./tasks/015-aprilhub-authorized-shell-standard-layout/TASK.md), [`tasks/015-aprilhub-authorized-shell-standard-layout/REPORT.md`](./tasks/015-aprilhub-authorized-shell-standard-layout/REPORT.md), baseline template: `Corporate-Service-Dashboard---Fork/src/pages/DashboardPage.tsx` |
 | `016` | Public guest landing and authorized entrypoint UX (design-system aligned) | ✅ Выполнено | [`tasks/016-aprilhub-guest-landing-entrypoint/REPORT.md`](./tasks/016-aprilhub-guest-landing-entrypoint/REPORT.md) |
+| `018` | Multi-service documentation foundation (human-first + agent-first) | ✅ Выполнено | [`tasks/018-aprilhub-multi-service-documentation-foundation/REPORT.md`](./tasks/018-aprilhub-multi-service-documentation-foundation/REPORT.md) |
