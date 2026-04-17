@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-DS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../design-system/DisignApril" && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DS_DIR="${SCRIPT_DIR}/../../design-system/DisignApril"
 
 if [[ ! -d "${DS_DIR}" ]]; then
   echo "[ds:prepare] design system directory not found, skip"
