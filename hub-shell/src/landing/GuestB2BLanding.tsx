@@ -75,27 +75,30 @@ export function GuestB2BLanding({ onStartLogin, isLoginStarting, error = "", aut
   };
 
   return (
-    <main className="zone-container guest-landing" data-testid="guest-landing">
-      <AprilProductHeader
-        sticky
-        data-testid="landing-sticky-nav"
-        productName="AprilHub"
-        center={
-          <nav aria-label="Разделы лендинга" className="guest-landing-nav-links">
-            {c.nav.map((item) => (
-              <a key={item.id} className="guest-landing-nav-link" href={item.href}>
-                {item.label}
-              </a>
-            ))}
-          </nav>
-        }
-        right={
-          <Button type="button" data-testid="guest-landing-login-nav" onClick={() => void onStartLogin()} disabled={isLoginStarting}>
-            {c.navLogin}
-          </Button>
-        }
-      />
+    <div className="guest-landing-page" data-testid="guest-landing">
+      <div className="guest-landing-header-band">
+        <AprilProductHeader
+          sticky
+          data-testid="landing-sticky-nav"
+          productName="AprilHub"
+          center={
+            <nav aria-label="Разделы лендинга" className="guest-landing-nav-links">
+              {c.nav.map((item) => (
+                <a key={item.id} className="guest-landing-nav-link" href={item.href}>
+                  {item.label}
+                </a>
+              ))}
+            </nav>
+          }
+          right={
+            <Button type="button" data-testid="guest-landing-login-nav" onClick={() => void onStartLogin()} disabled={isLoginStarting}>
+              {c.navLogin}
+            </Button>
+          }
+        />
+      </div>
 
+      <main className="guest-landing-main">
       <section className="landing-hero" aria-labelledby="landing-hero-title">
         <p className="landing-eyebrow">{c.heroEyebrow}</p>
         <Title order={1} id="landing-hero-title">
@@ -380,6 +383,7 @@ export function GuestB2BLanding({ onStartLogin, isLoginStarting, error = "", aut
       </footer>
 
       {error && <SharedState state="error" message={error} />}
-    </main>
+      </main>
+    </div>
   );
 }
