@@ -49,20 +49,22 @@ describe("App", () => {
   it("renders guest landing when user is not authenticated", () => {
     renderApp();
     expect(screen.getByTestId("guest-landing")).toBeInTheDocument();
-    expect(screen.getByText("Почему команды выбирают AprilHub")).toBeInTheDocument();
-    expect(screen.getByText("Ключевые сценарии")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Открыть защищенное рабочее пространство" })).toBeInTheDocument();
+    expect(screen.getByTestId("landing-sticky-nav")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Единая платформа для бизнеса, ИТ и комплаенса" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Карта возможностей платформы" })).toBeInTheDocument();
+    expect(screen.getByTestId("landing-faq")).toBeInTheDocument();
+    expect(screen.getByTestId("guest-landing-login-primary")).toBeInTheDocument();
   });
 
   it("starts Keycloak flow from landing CTA", async () => {
     keycloakState.loginMock.mockResolvedValue(undefined);
     renderApp();
 
-    fireEvent.click(screen.getByRole("button", { name: "Открыть защищенное рабочее пространство" }));
+    fireEvent.click(screen.getByTestId("guest-landing-login-primary"));
 
     await waitFor(() => {
       expect(keycloakState.loginMock).toHaveBeenCalledTimes(1);
-      expect(screen.getByRole("button", { name: "Перенаправляем в Keycloak..." })).toBeDisabled();
+      expect(screen.getByTestId("guest-landing-login-primary")).toBeDisabled();
     });
   });
 
@@ -70,11 +72,11 @@ describe("App", () => {
     keycloakState.loginMock.mockRejectedValue(new Error("auth endpoint unavailable"));
     renderApp();
 
-    fireEvent.click(screen.getByRole("button", { name: "Открыть защищенное рабочее пространство" }));
+    fireEvent.click(screen.getByTestId("guest-landing-login-primary"));
 
     await waitFor(() => {
       expect(screen.getByText("auth endpoint unavailable")).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: "Открыть защищенное рабочее пространство" })).not.toBeDisabled();
+      expect(screen.getByTestId("guest-landing-login-primary")).not.toBeDisabled();
     });
   });
 

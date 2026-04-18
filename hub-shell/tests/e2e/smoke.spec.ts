@@ -5,13 +5,13 @@ test.describe("AprilHub smoke e2e", () => {
     await page.goto("/");
 
     await expect(page.getByTestId("guest-landing")).toBeVisible();
-    await expect(page.getByRole("heading", { name: "AprilHub Shell" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Открыть защищенное рабочее пространство" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Единая платформа для бизнеса, ИТ и комплаенса" })).toBeVisible();
+    await expect(page.getByTestId("guest-landing-login-primary")).toBeVisible();
   });
 
   test("переводит пользователя на Keycloak login", async ({ page }) => {
     await page.goto("/");
-    await page.getByRole("button", { name: "Открыть защищенное рабочее пространство" }).click();
+    await page.getByTestId("guest-landing-login-primary").click();
 
     await page.waitForURL(/\/auth\/realms\/april\/protocol\/openid-connect\/auth/);
     await expect(page.locator("form")).toBeVisible();
@@ -19,7 +19,7 @@ test.describe("AprilHub smoke e2e", () => {
 
   test("позволяет пройти вход и открыть авторизованную рабочую зону", async ({ page }) => {
     await page.goto("/");
-    await page.getByRole("button", { name: "Открыть защищенное рабочее пространство" }).click();
+    await page.getByTestId("guest-landing-login-primary").click();
 
     await page.locator("#username").fill(process.env.PLAYWRIGHT_USER ?? "april-dev");
     await page.locator("#password").fill(process.env.PLAYWRIGHT_PASSWORD ?? "april-dev-pass");

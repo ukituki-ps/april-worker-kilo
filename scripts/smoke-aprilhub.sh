@@ -125,7 +125,7 @@ curl -fsS "${ingress_base}/" -o /tmp/shell-entrypoint.html
 python3 - <<'PY'
 from pathlib import Path
 html = Path("/tmp/shell-entrypoint.html").read_text(errors="ignore")
-assert "<title>AprilHub Shell</title>" in html, "expected AprilHub shell title marker not found on entrypoint"
+assert "<title>April — платформа для операций, ИТ и комплаенса</title>" in html, "expected AprilHub shell title marker not found on entrypoint"
 PY
 
 echo "[smoke] checking design-system showcase entrypoint"
