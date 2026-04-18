@@ -1,34 +1,43 @@
 # Задача: Authorized Zone Standard Shell Layout (Этап 015)
 
 ## Мета
+
 - **ID / ветка:** `015-aprilhub-authorized-shell-standard-layout`
 - **Приоритет:** высокий
 - **Связанные документы:** `task_list.md`, `tasks/003-aprilhub-shell-design-system/REPORT.md`, `tasks/013-aprilhub-design-system-integration-showcase/TASK.md`, `tasks/014-aprilhub-keycloak-design-system-alignment/TASK.md`, `tasks/016-aprilhub-guest-landing-entrypoint/TASK.md`, `docs/AGENT_ARCHITECTURE_CONTEXT.md`, `docs/TESTING_STRATEGY.md`
+- **Источник темплейта страницы:** `git@github.com:ukituki-ps/Corporate-Service-Dashboard---Fork.git` (`src/APP.tsx`)
 
 ## Цель
-Сделать в авторизованной зоне `hub-shell` стандартный продуктовый каркас (header + sidebar + content frame), чтобы после логина пользователь попадал в устойчивый layout-скелет, совместимый с дальнейшим наращиванием виджетов и модулей.
+
+Сделать в авторизованной зоне `hub-shell` стандартный продуктовый каркас (header + sidebar + content frame) из `git@github.com:ukituki-ps/Corporate-Service-Dashboard---Fork.git` (`src/APP.tsx`), чтобы после логина пользователь попадал в устойчивый layout-скелет, совместимый с дальнейшим наращиванием виджетов и модулей.
 
 ## Контекст для агента
+
 - После этапов `016-014` пользовательский путь до авторизации должен стать цельным и визуально согласованным.
 - Авторизованная зона уже присутствует как MVP-контур, но требует стандартизированного layout-слоя по дизайн-системе.
 - Каркас должен поддерживать состояние загрузки, ошибки и forbidden без архитектурного разрыва существующего flow.
+- В качестве референсного UI-baseline использовать темплейт `src/APP.tsx` из репозитория `git@github.com:ukituki-ps/Corporate-Service-Dashboard---Fork.git` с адаптацией под архитектуру и маршрутизацию `hub-shell`.
 
 ## Входит в объём
+
 - Спроектировать и внедрить стандартный layout авторизованной зоны:
   - header (branding/context/actions),
   - sidebar (основная навигация и активные состояния),
   - content frame (рабочая область для контента/виджетов).
+- При реализации опираться на структуру и визуальные паттерны темплейта `src/APP.tsx` из `git@github.com:ukituki-ps/Corporate-Service-Dashboard---Fork.git`, адаптируя его под текущие ограничения проекта.
 - Привести ключевые layout-компоненты к дизайн-системе (типографика, spacing, responsive baseline, состояния).
 - Интегрировать layout с текущим auth/user-context (logout/profile entrypoints, role-aware navigation при необходимости).
 - Обновить маршрутизацию и базовые state-handlers (`loading`, `error`, `forbidden`) в пределах layout-каркаса.
 - Обновить smoke/UI-проверки авторизованной зоны и оформить `PLAN.md`/`REPORT.md`.
 
 ## Не входит в объём
+
 - Реализация новых бизнес-модулей внутри контентной области (только каркас и базовые заглушки/host slots).
 - Изменение backend API и контрактов `hub-bff`.
 - Глубокая переработка guest landing и Keycloak theming beyond интеграционных правок из `016-014`.
 
 ## Технические ограничения
+
 - Следовать зафиксированному стеку и принятым UI-библиотекам в `hub-shell`.
 - Не ломать текущий login/logout flow и role guard поведение.
 - Не коммитить секреты и временные debug-конфиги.
@@ -36,13 +45,15 @@
 - Пользовательский интерфейс авторизованной зоны (навигация, заголовки, действия и сообщения состояний) реализовывать на русском языке.
 
 ## Критерии готовности (acceptance)
-- [ ] В авторизованной зоне реализован стабильный layout `header + sidebar + content frame`.
-- [ ] Layout соответствует дизайн-системным принципам и корректно работает на целевых разрешениях.
-- [ ] Сценарии `authorized`, `forbidden`, `loading`, `error` отображаются в рамках единого каркаса без UX-разрывов.
-- [ ] Базовые smoke/UI-проверки авторизованной зоны проходят.
-- [ ] В `REPORT.md` зафиксированы структура layout, изменения маршрутов/компонентов и дальнейшие точки расширения.
+
+- В авторизованной зоне реализован стабильный layout `header + sidebar + content frame`.
+- Layout соответствует дизайн-системным принципам и корректно работает на целевых разрешениях.
+- Сценарии `authorized`, `forbidden`, `loading`, `error` отображаются в рамках единого каркаса без UX-разрывов.
+- Базовые smoke/UI-проверки авторизованной зоны проходят.
+- В `REPORT.md` зафиксированы структура layout, изменения маршрутов/компонентов и дальнейшие точки расширения.
 
 ## Проверка (команды)
+
 ```bash
 npm --prefix hub-shell run build
 npm --prefix hub-shell run test
@@ -50,4 +61,5 @@ npm --prefix hub-shell run test
 ```
 
 ## Результат в отчёте
+
 После выполнения оформить `REPORT.md`: какие layout-компоненты добавлены/изменены, как подтверждена работоспособность авторизованной зоны и какие follow-up нужны для наполнения контентных модулей.
