@@ -1,6 +1,6 @@
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { MantineProvider } from "@mantine/core";
+import { AprilProviders } from "@april/ui";
 import App from "./App";
 
 const keycloakState = vi.hoisted(() => ({
@@ -29,9 +29,9 @@ vi.mock("./api", () => ({
 describe("App", () => {
   const renderApp = (): ReturnType<typeof render> =>
     render(
-      <MantineProvider>
+      <AprilProviders>
         <App />
-      </MantineProvider>,
+      </AprilProviders>,
     );
 
   afterEach(() => {

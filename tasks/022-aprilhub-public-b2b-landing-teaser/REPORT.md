@@ -13,6 +13,7 @@
 - [frontend] Контент вынесен в `hub-shell/src/landing/content.ts`; форма — клиентская валидация + **`mailto:`** (`hub-shell/src/landing/mailto-lead.ts`), опциональный получатель `VITE_LANDING_INQUIRY_EMAIL` (см. `hub-shell/src/vite-env.d.ts`).
 - [frontend] `hub-shell/index.html`: `lang="ru"`, `<title>` и meta description для публичного лендинга.
 - [frontend] Полифилл **ResizeObserver** в `hub-shell/src/test/setup.ts` для Mantine в Vitest/jsdom.
+- [frontend] Корень приложения: **`AprilProviders`** из `@april/ui` вместо голого `MantineProvider` — тема Mantine через **`createAprilTheme()`** (дизайн-система April). В **`hub-shell/vite.config.ts`**: `resolve.dedupe` для `react`/`react-dom` и **alias** на `@mantine/core` и `@mantine/hooks` из `hub-shell/node_modules`, чтобы Vitest не тянул второй React/Mantine из pnpm внутри submodule `DisignApril`.
 - [infra / smoke] `scripts/smoke-aprilhub.sh`: обновлён маркер `<title>` под новый лендинг.
 
 ## 3) Изменённые файлы
@@ -26,6 +27,8 @@
 - `hub-shell/src/landing/mailto-lead.ts`
 - `hub-shell/src/landing/GuestB2BLanding.tsx`
 - `hub-shell/src/App.test.tsx`
+- `hub-shell/src/main.tsx`
+- `hub-shell/vite.config.ts`
 - `hub-shell/tests/e2e/smoke.spec.ts`
 - `scripts/smoke-aprilhub.sh`
 - `tasks/022-aprilhub-public-b2b-landing-teaser/PLAN.md`

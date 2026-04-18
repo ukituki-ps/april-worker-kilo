@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "@mantine/core/styles.css";
-import { MantineProvider } from "@mantine/core";
+import { AprilProviders } from "@april/ui";
 import App from "./App";
 import { initializeAuth } from "./keycloak";
 
@@ -15,9 +15,9 @@ void (async () => {
 
   ReactDOM.createRoot(document.getElementById("root")!).render(
     <React.StrictMode>
-      <MantineProvider>
+      <AprilProviders>
         <App authInitError={authInitError} />
-      </MantineProvider>
+      </AprilProviders>
     </React.StrictMode>,
   );
 })();
