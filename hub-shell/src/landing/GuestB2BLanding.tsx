@@ -78,8 +78,7 @@ export function GuestB2BLanding({ onStartLogin, isLoginStarting, error = "", aut
     <div className="guest-landing-page" data-testid="guest-landing">
       <div className="guest-landing-header-band">
         <AprilProductHeader
-          sticky
-          data-testid="landing-sticky-nav"
+          data-testid="landing-header"
           productName="AprilHub"
           center={
             <nav aria-label="Разделы лендинга" className="guest-landing-nav-links">
