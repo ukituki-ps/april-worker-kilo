@@ -15,18 +15,6 @@
   background: linear-gradient(180deg, #f9fbff 0%, #ffffff 32%);
 }
 
-.guest-landing-sticky {
-  position: sticky;
-  top: 0;
-  z-index: 20;
-  margin: -8px -8px 8px;
-  padding: 12px 8px;
-  border-radius: 10px;
-  background: color-mix(in srgb, var(--april-neutral-bg) 92%, white 8%);
-  border: 1px solid var(--april-neutral-border);
-  backdrop-filter: blur(8px);
-}
-
 .guest-landing-nav-links {
   display: flex;
   flex-wrap: wrap;

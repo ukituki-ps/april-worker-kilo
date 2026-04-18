@@ -4,7 +4,6 @@ import {
   Button,
   Card,
   Checkbox,
-  Container,
   Divider,
   Group,
   Select,
@@ -16,6 +15,7 @@ import {
   TextInput,
   Title,
 } from "@mantine/core";
+import { AprilProductHeader } from "@april/ui";
 import { useMemo, useState, type FormEvent } from "react";
 import type { ProductStatus } from "./content";
 import { landingContent } from "./content";
@@ -76,22 +76,25 @@ export function GuestB2BLanding({ onStartLogin, isLoginStarting, error = "", aut
 
   return (
     <main className="zone-container guest-landing" data-testid="guest-landing">
-      <header className="guest-landing-sticky" data-testid="landing-sticky-nav">
-        <Container size="lg" px={0}>
-          <Group justify="space-between" align="flex-start" gap="md" wrap="wrap">
-            <nav aria-label="Разделы лендинга" className="guest-landing-nav-links">
-              {c.nav.map((item) => (
-                <a key={item.id} className="guest-landing-nav-link" href={item.href}>
-                  {item.label}
-                </a>
-              ))}
-            </nav>
-            <Button type="button" data-testid="guest-landing-login-nav" onClick={() => void onStartLogin()} disabled={isLoginStarting}>
-              {c.navLogin}
-            </Button>
-          </Group>
-        </Container>
-      </header>
+      <AprilProductHeader
+        sticky
+        data-testid="landing-sticky-nav"
+        productName="AprilHub"
+        center={
+          <nav aria-label="Разделы лендинга" className="guest-landing-nav-links">
+            {c.nav.map((item) => (
+              <a key={item.id} className="guest-landing-nav-link" href={item.href}>
+                {item.label}
+              </a>
+            ))}
+          </nav>
+        }
+        right={
+          <Button type="button" data-testid="guest-landing-login-nav" onClick={() => void onStartLogin()} disabled={isLoginStarting}>
+            {c.navLogin}
+          </Button>
+        }
+      />
 
       <section className="landing-hero" aria-labelledby="landing-hero-title">
         <p className="landing-eyebrow">{c.heroEyebrow}</p>
