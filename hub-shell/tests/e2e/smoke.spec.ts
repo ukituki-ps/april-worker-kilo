@@ -5,6 +5,7 @@ test.describe("AprilHub smoke e2e", () => {
     await page.goto("/");
 
     await expect(page.getByTestId("guest-landing")).toBeVisible();
+    await expect(page.getByTestId("landing-ecosystem-cards")).toBeVisible();
     await expect(page.getByRole("heading", { name: "Единая платформа для бизнеса, ИТ и комплаенса" })).toBeVisible();
     await expect(page.getByTestId("guest-landing-login-primary")).toBeVisible();
   });
@@ -28,6 +29,7 @@ test.describe("AprilHub smoke e2e", () => {
     await page.waitForURL("/");
     await expect(page.getByRole("heading", { name: "Рабочая зона AprilHub" })).toBeVisible();
     await expect(page.getByText("Авторизовано")).toBeVisible();
-    await expect(page.getByRole("button", { name: "Выйти" })).toBeVisible();
+    await page.getByLabel("Меню профиля и настроек").click();
+    await expect(page.getByRole("menuitem", { name: "Выйти" })).toBeVisible();
   });
 });

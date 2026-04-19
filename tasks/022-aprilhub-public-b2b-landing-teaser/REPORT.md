@@ -1,7 +1,7 @@
 ## 1) Итого
 
 - Статус: ✅ выполнено
-- Задача: Публичный B2B-лендинг-тизер (022) + тёмная тема и переключатель темы в шапке (светлая / тёмная / системная)
+- Задача: Публичный B2B-лендинг-тизер (022) + UX шапки + блок «Экосистема April» (6 карточек Simple Info Card)
 - Ветка: `feature/022-aprilhub-public-b2b-landing-teaser`
 - Коммиты: `854c37c` (submodule `design-system/DisignApril`: `AprilProviders`); в родительском репозитории — последний коммит на `feature/022-aprilhub-public-b2b-landing-teaser` с сообщением `feat(hub-shell): theme switcher and dark mode for guest and shell`
 - PR: не создавался
@@ -9,21 +9,22 @@
 ## 2) Что сделано
 
 - [frontend] **Задача 022 (базовая поставка):** Guest-зона — B2B-тизер (Hero, ICP, карта контуров + AprilEDC, этапы, статус, внедрение, безопасность, FAQ, форма, footer); sticky-навигация; единый `onStartLogin` → `keycloak.login()`; контент в `landing/content.ts`; лид-форма — `mailto:`; `AprilProductHeader` + `AprilProviders` / `createAprilTheme()`; SEO в `index.html`.
-- [frontend] **Тема:** компонент `ThemeSchemeControl` (`SegmentedControl`: Светлая / Тёмная / Системная) в шапке гостевого лендинга (`GuestB2BLanding`) и в `AppShell` для авторизованной зоны; предпочтение сохраняется стандартным менеджером Mantine (localStorage).
+- [frontend] **Тема и аккаунт:** меню профиля (`ProfileAccountMenu`, паттерн как в витрине DS): аватар + выпадающее меню с темой (светлая / тёмная / системная), входом или профилем/выходом; предпочтение темы — Mantine + localStorage.
+- [design-system + hub-shell] **Блок «Экосистема April»:** из `@april/ui` экспортирован компонент **`AprilEcosystemSimpleCards`** (сетка Simple Info Card: верх teal, буквы W/N/O/P/I/R, заголовок ru, имя продукта, описание; `useComputedColorScheme` для корректного teal в режиме `auto`). Витринный **`CardsSection`** переведён на этот компонент (без дублирования разметки). Данные лендинга — **`hub-shell/src/landing/content.ts`** (`ecosystemSectionTitle`, `ecosystemSectionLead`, `ecosystemSimpleCards`), секция `#ecosystem`, `data-testid="landing-ecosystem-cards"`, пункт навигации «Экосистема».
 - [design-system] `AprilProviders`: значение по умолчанию **`defaultColorScheme = 'auto'`** (системная тема до явного выбора пользователя).
 - [frontend] Тёмный режим для legacy-классов: переопределение `--april-*` в `april-tokens-fallback.css` под `[data-mantine-color-scheme="dark"]`; градиенты фона guest/authorized shell в `app.css` для тёмной схемы.
 - [frontend] Тесты: `App.test.tsx` проверяет наличие `theme-scheme-control` на лендинге и в авторизованной зоне.
 
 ## 3) Изменённые файлы
 
-- `design-system/DisignApril/packages/ui/src/providers.tsx` (submodule)
-- `hub-shell/src/theme/ThemeSchemeControl.tsx`
-- `hub-shell/src/landing/GuestB2BLanding.tsx`
-- `hub-shell/src/app-shell.tsx`
-- `hub-shell/src/app.css`
-- `hub-shell/src/styles/april-tokens-fallback.css`
-- `hub-shell/src/App.test.tsx`
+- `design-system/DisignApril/packages/ui/src/index.ts` — экспорт `AprilEcosystemSimpleCards`, типы
+- `design-system/DisignApril/packages/ui/src/components/AprilEcosystemSimpleCards.tsx` — новый
+- `design-system/DisignApril/packages/ui/src/components/CardsSection.tsx` — использует `AprilEcosystemSimpleCards`
+- `hub-shell/src/landing/content.ts` — блок экосистемы + навигация
+- `hub-shell/src/landing/GuestB2BLanding.tsx` — секция `#ecosystem`
+- `hub-shell/src/App.test.tsx`, `hub-shell/tests/e2e/smoke.spec.ts`
 - `tasks/022-aprilhub-public-b2b-landing-teaser/REPORT.md`
+- (ранее по 022) `providers.tsx`, `ProfileAccountMenu`, `app-shell`, `app.css`, `april-tokens-fallback.css` и др.
 
 ## 4) Миграции и данные
 
@@ -34,10 +35,10 @@
 ## 5) Проверка качества
 
 - Линтер: ok (`npm --prefix hub-shell run lint`)
-- Сборка: не прогонялся полный `vite build` в этой сессии (при проблемах прав на `dist/` см. DEPLOYMENT/ранее отчёт)
+- Сборка: `vite build` на данной машине — **EACCES** при очистке `hub-shell/dist/` (права на артефакты); `tsc` и тесты проходят
 - Unit tests: ok (`npm --prefix hub-shell run test`)
 - Integration tests: не применялось
-- E2E / smoke: не перезапускались в этой сессии
+- E2E / smoke: unit-тесты обновлены; e2e сценарий входа: открытие меню профиля перед проверкой «Выйти»
 
 Команды (фактически выполненные):
 

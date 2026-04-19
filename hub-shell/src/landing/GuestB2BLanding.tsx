@@ -15,7 +15,7 @@ import {
   TextInput,
   Title,
 } from "@mantine/core";
-import { AprilProductHeader } from "@april/ui";
+import { AprilEcosystemSimpleCards, AprilProductHeader } from "@april/ui";
 import { ProfileAccountMenu } from "../shell-header/ProfileAccountMenu";
 import { useMemo, useState, type FormEvent } from "react";
 import type { ProductStatus } from "./content";
@@ -156,6 +156,21 @@ export function GuestB2BLanding({ onStartLogin, isLoginStarting, error = "", aut
           ))}
         </Stack>
         <Text mt="md">{c.marketBridge}</Text>
+      </section>
+
+      <section
+        id="ecosystem"
+        className="landing-section"
+        data-testid="landing-ecosystem-cards"
+        aria-labelledby="ecosystem-title"
+      >
+        <Title order={2} id="ecosystem-title">
+          {c.ecosystemSectionTitle}
+        </Title>
+        <Text c="dimmed">{c.ecosystemSectionLead}</Text>
+        <Box mt="md">
+          <AprilEcosystemSimpleCards cards={c.ecosystemSimpleCards} />
+        </Box>
       </section>
 
       <section id="map" className="landing-section" aria-labelledby="map-title">

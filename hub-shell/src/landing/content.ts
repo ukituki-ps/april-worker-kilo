@@ -64,6 +64,14 @@ export type FaqItem = {
   answer: string;
 };
 
+/** Карточки блока «Экосистема April» (Simple Info Card); поля совместимы с `AprilEcosystemSimpleCards` из @april/ui */
+export type EcosystemSimpleCard = {
+  letter: string;
+  title: string;
+  product: string;
+  description: string;
+};
+
 export type ContactFormCopy = {
   title: string;
   lead: string;
@@ -104,6 +112,9 @@ export type LandingContent = {
   marketProblemTitle: string;
   marketPains: string[];
   marketBridge: string;
+  ecosystemSectionTitle: string;
+  ecosystemSectionLead: string;
+  ecosystemSimpleCards: EcosystemSimpleCard[];
   mapTitle: string;
   mapLead: string;
   contours: CapabilityContour[];
@@ -142,6 +153,7 @@ export const landingContent: LandingContent = {
   navLogin: "Вход",
   nav: [
     { id: "why", label: "Зачем", href: "#why" },
+    { id: "ecosystem", label: "Экосистема", href: "#ecosystem" },
     { id: "map", label: "Карта", href: "#map" },
     { id: "phases", label: "Этапы", href: "#phases" },
     { id: "status", label: "Статус", href: "#status" },
@@ -193,6 +205,47 @@ export const landingContent: LandingContent = {
   ],
   marketBridge:
     "April собирает опыт пользователя вокруг согласованных контуров и единого входа — без обхода IAM и без «отдельного портала на каждый сервис».",
+  ecosystemSectionTitle: "Экосистема April",
+  ecosystemSectionLead:
+    "Шесть продуктовых контуров с кратким назначением; буква на карточке — мнемоника латиницей (не заменяет заголовок для чтения).",
+  ecosystemSimpleCards: [
+    {
+      letter: "W",
+      title: "Процессы",
+      product: "AprilWorkFlow",
+      description: "Моделирование и исполнение бизнес-процессов.",
+    },
+    {
+      letter: "N",
+      title: "Коммуникации",
+      product: "AprilNFlow",
+      description: "Каналы уведомлений и согласований.",
+    },
+    {
+      letter: "O",
+      title: "Структура",
+      product: "AprilOrgFlow",
+      description: "Оргструктура и иерархия под задачи компании.",
+    },
+    {
+      letter: "P",
+      title: "Профиль",
+      product: "AprilProfile",
+      description: "Профили людей, роли и контекст доступа.",
+    },
+    {
+      letter: "I",
+      title: "Интеграции",
+      product: "AprilEDC",
+      description: "Внешний контур данных и обмен с системами.",
+    },
+    {
+      letter: "R",
+      title: "Отчётность",
+      product: "AprilReport",
+      description: "Регулярная и ad-hoc отчётность по процессам и данным.",
+    },
+  ],
   mapTitle: "Карта возможностей платформы",
   mapLead:
     "Пять пользовательских контуров опыта и отдельный блок данных/внешнего контура. Продуктовые имена — вторая строка карточки.",
