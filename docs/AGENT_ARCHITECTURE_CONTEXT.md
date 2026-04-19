@@ -16,6 +16,8 @@
 - **Documentation**: Structurizr (C4 Model) + Docusaurus + ADR + OpenAPI
 - **Infra**: Debian 13, Docker Compose, Nginx reverse proxy
 
+**AprilHub как инфраструктурная база экосистемы:** этот репозиторий (AprilHub / april-worker) — **источник правды** для **общей** инфраструктуры, которой пользуются **остальные микросервисы April**: наблюдаемость, onboarding стендов, связанные runbook'и (`infra/observability/`, [`guides/OBSERVABILITY_INDEX.md`](./guides/OBSERVABILITY_INDEX.md)). Они **интегрируются** в контур по документам и артефактам здесь и **не копируют** полный observability-стек в свой репозиторий без отдельного решения.
+
 Граница: **один репозиторий = один сервис**; внутри репозитория допустим **модульный монолит** (не путать с «микросервисом на каждый модуль»).
 
 Версии инструментов и образов — в [`guides/VERSIONS.md`](./guides/VERSIONS.md). Форк репозитория под новый сервис — [`guides/FORK_AND_CUSTOMIZE.md`](./guides/FORK_AND_CUSTOMIZE.md).

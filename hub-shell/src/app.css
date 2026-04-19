@@ -1,7 +1,7 @@
 @import "./styles/april-tokens-fallback.css";
 
 .zone-container {
-  max-width: 1080px;
+  max-width: 1120px;
   margin: 32px auto;
   padding: 24px;
   display: grid;
@@ -11,8 +11,76 @@
   background: var(--april-neutral-bg);
 }
 
-.guest-landing {
+/* Публичный лендинг: шапка на всю ширину viewport, контент — по центру без «карточной» рамки */
+.guest-landing-page {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
   background: linear-gradient(180deg, #f9fbff 0%, #ffffff 32%);
+}
+
+[data-mantine-color-scheme="dark"] .guest-landing-page {
+  background: linear-gradient(180deg, #141517 0%, #1a1b1e 36%);
+}
+
+.guest-landing-header-band {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 300;
+  width: 100%;
+  flex-shrink: 0;
+  /* подложка на всю ширину, чтобы при скролле не просвечивал контент */
+  background: var(--mantine-color-body, var(--april-neutral-bg, #fff));
+}
+
+.guest-landing-main {
+  width: 100%;
+  max-width: 1120px;
+  margin-inline: auto;
+  /* отступ под фиксированную шапку (56px comfortable / до 48 compact в DS + боковые паддинги) */
+  padding: clamp(16px, 4vw, 24px);
+  padding-top: calc(56px + clamp(16px, 4vw, 24px));
+  padding-bottom: 32px;
+  display: grid;
+  gap: 16px;
+  box-sizing: border-box;
+}
+
+.guest-landing-nav-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  align-items: center;
+}
+
+.guest-landing-nav-link {
+  font-size: 0.88rem;
+  color: var(--april-accent-teal-10);
+  text-decoration: none;
+  padding: 4px 6px;
+  border-radius: 6px;
+}
+
+.guest-landing-nav-link:hover {
+  background: var(--april-accent-teal-1);
+}
+
+.landing-table-wrap {
+  width: 100%;
+}
+
+.landing-footer {
+  display: grid;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--april-neutral-border);
+}
+
+.landing-contact-form {
+  max-width: 560px;
 }
 
 .landing-hero {
@@ -70,6 +138,10 @@
 .app-shell {
   min-height: 100vh;
   background: linear-gradient(180deg, #f5f8ff 0%, #ffffff 40%);
+}
+
+[data-mantine-color-scheme="dark"] .app-shell {
+  background: linear-gradient(180deg, #141517 0%, #1a1b1e 42%);
 }
 
 .shell-header {

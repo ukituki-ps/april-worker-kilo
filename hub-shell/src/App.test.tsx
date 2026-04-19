@@ -1,6 +1,6 @@
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { MantineProvider } from "@mantine/core";
+import { AprilProviders } from "@april/ui";
 import App from "./App";
 
 const keycloakState = vi.hoisted(() => ({
@@ -26,12 +26,16 @@ vi.mock("./api", () => ({
   apiRequest: (...args: unknown[]) => apiRequestMock(...args),
 }));
 
+function openGuestProfileMenu(): void {
+  fireEvent.click(screen.getByLabelText("Меню профиля и настроек"));
+}
+
 describe("App", () => {
   const renderApp = (): ReturnType<typeof render> =>
     render(
-      <MantineProvider>
+      <AprilProviders>
         <App />
-      </MantineProvider>,
+      </AprilProviders>,
     );
 
   afterEach(() => {
@@ -46,23 +50,31 @@ describe("App", () => {
     apiRequestMock.mockReset();
   });
 
-  it("renders guest landing when user is not authenticated", () => {
+  it("renders guest landing when user is not authenticated", async () => {
     renderApp();
     expect(screen.getByTestId("guest-landing")).toBeInTheDocument();
-    expect(screen.getByText("Почему команды выбирают AprilHub")).toBeInTheDocument();
-    expect(screen.getByText("Ключевые сценарии")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Открыть защищенное рабочее пространство" })).toBeInTheDocument();
+    expect(screen.getByTestId("landing-header")).toBeInTheDocument();
+    expect(screen.getByTestId("theme-scheme-control")).toBeInTheDocument();
+    expect(screen.getByTestId("landing-ecosystem-cards")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Экосистема April" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Экосистема инструментов управления компанией:" })).toBeInTheDocument();
+    expect(screen.getAllByText("Plan").length).toBe(5);
+    expect(screen.getByText("In Progress")).toBeInTheDocument();
+    expect(screen.getByTestId("landing-faq")).toBeInTheDocument();
+    openGuestProfileMenu();
+    expect(await screen.findByTestId("guest-landing-login-nav")).toBeInTheDocument();
   });
 
-  it("starts Keycloak flow from landing CTA", async () => {
+  it("starts Keycloak flow from header profile menu", async () => {
     keycloakState.loginMock.mockResolvedValue(undefined);
     renderApp();
 
-    fireEvent.click(screen.getByRole("button", { name: "Открыть защищенное рабочее пространство" }));
+    openGuestProfileMenu();
+    fireEvent.click(await screen.findByTestId("guest-landing-login-nav"));
 
     await waitFor(() => {
       expect(keycloakState.loginMock).toHaveBeenCalledTimes(1);
-      expect(screen.getByRole("button", { name: "Перенаправляем в Keycloak..." })).toBeDisabled();
+      expect(screen.getByTestId("guest-landing-login-nav")).toBeDisabled();
     });
   });
 
@@ -70,11 +82,15 @@ describe("App", () => {
     keycloakState.loginMock.mockRejectedValue(new Error("auth endpoint unavailable"));
     renderApp();
 
-    fireEvent.click(screen.getByRole("button", { name: "Открыть защищенное рабочее пространство" }));
+    openGuestProfileMenu();
+    fireEvent.click(await screen.findByTestId("guest-landing-login-nav"));
 
     await waitFor(() => {
       expect(screen.getByText("auth endpoint unavailable")).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: "Открыть защищенное рабочее пространство" })).not.toBeDisabled();
+    });
+    openGuestProfileMenu();
+    await waitFor(() => {
+      expect(screen.getByTestId("guest-landing-login-nav")).not.toBeDisabled();
     });
   });
 
@@ -95,6 +111,7 @@ describe("App", () => {
 
     await waitFor(() => {
       expect(screen.getByText("Рабочая зона AprilHub")).toBeInTheDocument();
+      expect(screen.getByTestId("theme-scheme-control")).toBeInTheDocument();
       expect(screen.getByRole("navigation", { name: "Основная навигация" })).toBeInTheDocument();
       expect(screen.getByText("Обзор платформы")).toBeInTheDocument();
       expect(screen.getAllByText("Роли доступа").length).toBeGreaterThan(0);

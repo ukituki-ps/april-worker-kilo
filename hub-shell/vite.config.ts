@@ -1,5 +1,9 @@
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
+
+const hubShellDir = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig(({ mode }) => {
   const localEnv = loadEnv(mode, ".", "");
@@ -23,6 +27,14 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [react()],
+    resolve: {
+      // @april/ui из submodule тянет @mantine/* из pnpm внутри DS → второй React и invalid hook call в Vitest.
+      dedupe: ["react", "react-dom"],
+      alias: {
+        "@mantine/core": path.join(hubShellDir, "node_modules/@mantine/core"),
+        "@mantine/hooks": path.join(hubShellDir, "node_modules/@mantine/hooks"),
+      },
+    },
     server: {
       host: "0.0.0.0",
       port: 4173,

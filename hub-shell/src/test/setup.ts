@@ -1,5 +1,15 @@
 import "@testing-library/jest-dom/vitest";
 
+class ResizeObserverMock {
+  observe(): void {}
+  unobserve(): void {}
+  disconnect(): void {}
+}
+
+if (typeof globalThis.ResizeObserver === "undefined") {
+  globalThis.ResizeObserver = ResizeObserverMock;
+}
+
 if (!window.matchMedia) {
   window.matchMedia = (query: string): MediaQueryList =>
     ({
