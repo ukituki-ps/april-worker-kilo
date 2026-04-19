@@ -3,7 +3,7 @@
 - Статус: ✅ выполнено
 - Задача: Публичный B2B-лендинг-тизер (022) + тёмная тема и переключатель темы в шапке (светлая / тёмная / системная)
 - Ветка: `feature/022-aprilhub-public-b2b-landing-teaser`
-- Коммиты: `6541a2e` (родительский репозиторий), `854c37c` (submodule `design-system/DisignApril`: `AprilProviders`)
+- Коммиты: `854c37c` (submodule `design-system/DisignApril`: `AprilProviders`); в родительском репозитории — последний коммит на `feature/022-aprilhub-public-b2b-landing-teaser` с сообщением `feat(hub-shell): theme switcher and dark mode for guest and shell`
 - PR: не создавался
 
 ## 2) Что сделано
