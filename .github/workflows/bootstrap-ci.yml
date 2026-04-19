@@ -40,7 +40,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          submodules: recursive
+          submodules: false
+
+      - name: Init git submodules (public DisignApril; avoid GITHUB_TOKEN 404)
+        run: ./scripts/ci-init-git-submodules.sh
 
       - name: Enable Corepack (pnpm for design-system build)
         run: corepack enable
