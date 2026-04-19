@@ -190,10 +190,6 @@
   justify-content: flex-end;
 }
 
-.shell-theme-control {
-  flex-shrink: 0;
-}
-
 .shell-status {
   padding: 4px 10px;
   border-radius: 999px;

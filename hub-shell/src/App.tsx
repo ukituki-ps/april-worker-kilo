@@ -92,12 +92,16 @@ export default function App({ authInitError = "" }: AppProps) {
   if (zone === "transition") {
     return (
       <AppShell
-        context={context}
         navigationItems={shellNavigation}
         activeNavId="overview"
         title="Рабочая зона AprilHub"
         subtitle="Стандартный каркас авторизованной зоны для модульного расширения."
         statusBadgeLabel="Идет инициализация"
+        accountMenu={{
+          variant: "limited",
+          caption: "Инициализация",
+          subtitle: "Загрузка профиля…",
+        }}
       >
         <SharedState state="loading" message={transitionReason} />
       </AppShell>
@@ -107,12 +111,16 @@ export default function App({ authInitError = "" }: AppProps) {
   if (zone === "forbidden") {
     return (
       <AppShell
-        context={context}
         navigationItems={shellNavigation}
         title="Рабочая зона AprilHub"
         subtitle="Стандартный каркас авторизованной зоны для модульного расширения."
         statusBadgeLabel="Доступ ограничен"
-        onLogout={() => void keycloak.logout()}
+        accountMenu={{
+          variant: "limited",
+          caption: "Доступ ограничен",
+          subtitle: "Нет прав на оболочку",
+          onLogout: () => void keycloak.logout(),
+        }}
       >
         <SharedState
           state="forbidden"
@@ -130,11 +138,16 @@ export default function App({ authInitError = "" }: AppProps) {
   if (!context) {
     return (
       <AppShell
-        context={null}
         navigationItems={shellNavigation}
         title="Рабочая зона AprilHub"
         subtitle="Стандартный каркас авторизованной зоны для модульного расширения."
         statusBadgeLabel="Контекст отсутствует"
+        accountMenu={{
+          variant: "limited",
+          caption: "Сессия без контекста",
+          subtitle: "Профиль не загружен",
+          onLogout: () => void keycloak.logout(),
+        }}
       >
         <SharedState state="empty" message="Авторизованная сессия найдена, но пользовательский контекст не инициализирован." />
       </AppShell>
@@ -143,14 +156,18 @@ export default function App({ authInitError = "" }: AppProps) {
 
   return (
     <AppShell
-      context={context}
       navigationItems={shellNavigation}
       activeNavId="overview"
       title="Рабочая зона AprilHub"
       subtitle="Стандартный каркас авторизованной зоны для модульного расширения."
       statusBadgeLabel="Авторизовано"
-      onProfile={() => window.location.assign(keycloak.createAccountUrl())}
-      onLogout={() => void keycloak.logout()}
+      accountMenu={{
+        variant: "user",
+        userName: context.user.name,
+        userEmail: context.user.email,
+        onProfile: () => window.location.assign(keycloak.createAccountUrl()),
+        onLogout: () => void keycloak.logout(),
+      }}
     >
       <CompositionLayer context={context} />
       {error && <SharedState state="error" message={error} />}

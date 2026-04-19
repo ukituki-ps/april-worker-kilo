@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
-import { ThemeSchemeControl } from "./theme/ThemeSchemeControl";
-import type { ShellUserContext } from "./types";
+import { ProfileAccountMenu, type ProfileAccountMenuProps } from "./shell-header/ProfileAccountMenu";
 
 type ShellNavigationItem = {
   id: string;
@@ -9,26 +8,22 @@ type ShellNavigationItem = {
 };
 
 type Props = {
-  context: ShellUserContext | null;
   navigationItems: ShellNavigationItem[];
   activeNavId?: string;
   title: string;
   subtitle: string;
   statusBadgeLabel: string;
-  onProfile?: () => void;
-  onLogout?: () => void;
+  accountMenu: ProfileAccountMenuProps;
   children: ReactNode;
 };
 
 export function AppShell({
-  context,
   navigationItems,
   activeNavId,
   title,
   subtitle,
   statusBadgeLabel,
-  onProfile,
-  onLogout,
+  accountMenu,
   children,
 }: Props) {
   return (
@@ -40,21 +35,8 @@ export function AppShell({
           <p className="shell-subtitle">{subtitle}</p>
         </div>
         <div className="shell-header-actions">
-          <div className="shell-theme-control">
-            <ThemeSchemeControl />
-          </div>
           <span className="shell-status">{statusBadgeLabel}</span>
-          {context && <span className="shell-user-email">{context.user.email}</span>}
-          {onProfile && (
-            <button type="button" className="shell-action shell-action-secondary" onClick={onProfile}>
-              Профиль
-            </button>
-          )}
-          {onLogout && (
-            <button type="button" className="shell-action shell-action-danger" onClick={onLogout}>
-              Выйти
-            </button>
-          )}
+          <ProfileAccountMenu {...accountMenu} />
         </div>
       </header>
       <div className="shell-layout">
