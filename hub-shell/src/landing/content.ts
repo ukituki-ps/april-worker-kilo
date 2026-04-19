@@ -14,49 +14,8 @@ export type IcpColumn = {
   bullets: string[];
 };
 
-export type CapabilityContour = {
-  userMeaning: string;
-  productName: string;
-  description: string;
-};
-
-export type EdcBlock = {
-  title: string;
-  productName: string;
-  description: string;
-};
-
-export type PhaseRow = {
-  phase: string;
-  summary: string;
-};
-
-export type ProductStatus = "available" | "pilot" | "in_development" | "roadmap";
-
-export type StatusLegendItem = {
-  key: ProductStatus;
-  label: string;
-};
-
-export type ProductStatusRow = {
-  product: string;
-  status: ProductStatus;
-  note: string;
-};
-
-export type DeliveryStage = {
-  title: string;
-  description: string;
-  customerRoles: string[];
-};
-
 export type SecurityBullet = {
   text: string;
-};
-
-export type TransparencyBlock = {
-  title: string;
-  body: string;
 };
 
 export type FaqItem = {
@@ -64,28 +23,17 @@ export type FaqItem = {
   answer: string;
 };
 
-/** Карточки блока «Экосистема April» (Simple Info Card); поля совместимы с `AprilEcosystemSimpleCards` из @april/ui */
+/** Цвет бейджа статуса на карточке — как в витрине DS (Semantic Colors: gray / blue). */
+export type EcosystemStatusBadgeColor = "gray" | "blue";
+
+/** Карточки блока «Экосистема April» (Simple Info Card + Badge). */
 export type EcosystemSimpleCard = {
   letter: string;
   title: string;
   product: string;
   description: string;
-};
-
-export type ContactFormCopy = {
-  title: string;
-  lead: string;
-  fields: {
-    company: string;
-    country: string;
-    role: string;
-    scale: string;
-    scaleOptions: { value: string; label: string }[];
-    comment: string;
-    consent: string;
-  };
-  submit: string;
-  validationRequired: string;
+  statusBadgeLabel: string;
+  statusBadgeColor: EcosystemStatusBadgeColor;
 };
 
 export type FooterCopy = {
@@ -102,6 +50,7 @@ export type LandingContent = {
   primaryCta: string;
   primaryCtaLoading: string;
   secondaryCta: string;
+  secondaryCtaHref: string;
   navLogin: string;
   nav: NavItem[];
   heroEyebrow: string;
@@ -115,29 +64,11 @@ export type LandingContent = {
   ecosystemSectionTitle: string;
   ecosystemSectionLead: string;
   ecosystemSimpleCards: EcosystemSimpleCard[];
-  mapTitle: string;
-  mapLead: string;
-  contours: CapabilityContour[];
-  edc: EdcBlock;
-  phasesTitle: string;
-  phasesLead: string;
-  phases: PhaseRow[];
-  statusTitle: string;
-  statusLegend: StatusLegendItem[];
-  productStatuses: ProductStatusRow[];
-  deliveryTitle: string;
-  deliveryLead: string;
-  deliveryStages: DeliveryStage[];
   securityTitle: string;
   securityBullets: SecurityBullet[];
   securityPoliciesNote: string;
-  transparencyTitle: string;
-  transparencyBlocks: TransparencyBlock[];
   faqTitle: string;
   faqItems: FaqItem[];
-  finalCtaTitle: string;
-  finalCtaLead: string;
-  contact: ContactFormCopy;
   footer: FooterCopy;
   metaLineTemplate: string;
 };
@@ -145,22 +76,18 @@ export type LandingContent = {
 export const landingContent: LandingContent = {
   seoTitle: "April — платформа для операций, ИТ и комплаенса",
   seoDescription:
-    "Публичный обзор экосистемы April: единая точка входа AprilHub, процессы AprilWorkFlow, коммуникации AprilNFlow, мастер-данные AprilOrgFlow и AprilProfile, отчёты AprilReport, внешний контур AprilEDC. Этапы внедрения, статус продуктов и вход в рабочую зону через Keycloak.",
+    "Публичный обзор экосистемы April: AprilHub, контуры AprilWorkFlow, AprilNFlow, AprilOrgFlow, AprilProfile, AprilReport, AprilEDC. Вход в рабочую зону через Keycloak.",
   trustLine: "Единый ingress · Keycloak OIDC · дизайн-система April (Mantine + токены)",
   primaryCta: "Открыть рабочее пространство",
   primaryCtaLoading: "Перенаправляем в Keycloak...",
-  secondaryCta: "Запросить контакт",
+  secondaryCta: "FAQ",
+  secondaryCtaHref: "#faq",
   navLogin: "Вход",
   nav: [
     { id: "why", label: "Зачем", href: "#why" },
     { id: "ecosystem", label: "Экосистема", href: "#ecosystem" },
-    { id: "map", label: "Карта", href: "#map" },
-    { id: "phases", label: "Этапы", href: "#phases" },
-    { id: "status", label: "Статус", href: "#status" },
-    { id: "delivery", label: "Внедрение", href: "#delivery" },
     { id: "security", label: "Безопасность", href: "#security" },
     { id: "faq", label: "FAQ", href: "#faq" },
-    { id: "contact", label: "Контакты", href: "#contact" },
   ],
   heroEyebrow: "Экосистема April",
   heroTitle: "Единая платформа для бизнеса, ИТ и комплаенса",
@@ -207,130 +134,55 @@ export const landingContent: LandingContent = {
     "April собирает опыт пользователя вокруг согласованных контуров и единого входа — без обхода IAM и без «отдельного портала на каждый сервис».",
   ecosystemSectionTitle: "Экосистема April",
   ecosystemSectionLead:
-    "Шесть продуктовых контуров с кратким назначением; буква на карточке — мнемоника латиницей (не заменяет заголовок для чтения).",
+    "Шесть продуктовых контуров; справа от названия — статус в формате бейджей дизайн-системы (Plan / In Progress).",
   ecosystemSimpleCards: [
     {
       letter: "W",
       title: "Процессы",
       product: "AprilWorkFlow",
       description: "Моделирование и исполнение бизнес-процессов.",
+      statusBadgeLabel: "Plan",
+      statusBadgeColor: "gray",
     },
     {
       letter: "N",
       title: "Коммуникации",
       product: "AprilNFlow",
       description: "Каналы уведомлений и согласований.",
+      statusBadgeLabel: "Plan",
+      statusBadgeColor: "gray",
     },
     {
       letter: "O",
       title: "Структура",
       product: "AprilOrgFlow",
       description: "Оргструктура и иерархия под задачи компании.",
+      statusBadgeLabel: "Plan",
+      statusBadgeColor: "gray",
     },
     {
       letter: "P",
       title: "Профиль",
       product: "AprilProfile",
       description: "Профили людей, роли и контекст доступа.",
+      statusBadgeLabel: "In Progress",
+      statusBadgeColor: "blue",
     },
     {
       letter: "I",
       title: "Интеграции",
       product: "AprilEDC",
       description: "Внешний контур данных и обмен с системами.",
+      statusBadgeLabel: "Plan",
+      statusBadgeColor: "gray",
     },
     {
       letter: "R",
       title: "Отчётность",
       product: "AprilReport",
       description: "Регулярная и ad-hoc отчётность по процессам и данным.",
-    },
-  ],
-  mapTitle: "Карта возможностей платформы",
-  mapLead:
-    "Пять пользовательских контуров опыта и отдельный блок данных/внешнего контура. Продуктовые имена — вторая строка карточки.",
-  contours: [
-    {
-      userMeaning: "Единая точка входа",
-      productName: "AprilHub",
-      description: "Гостевой лендинг и переход в авторизованную зону через тот же Keycloak OIDC flow.",
-    },
-    {
-      userMeaning: "Процессы",
-      productName: "AprilWorkFlow",
-      description: "Исполнимые сценарии и согласования поверх согласованной модели сервисов.",
-    },
-    {
-      userMeaning: "Коммуникации",
-      productName: "AprilNFlow",
-      description: "Каналы уведомлений и сопровождения процессов в экосистеме April.",
-    },
-    {
-      userMeaning: "Мастер-данные (оргструктура и профили)",
-      productName: "AprilOrgFlow · AprilProfile",
-      description:
-        "Два согласованных контура: оргструктура/иерархии и профили субъектов — чтобы не смешивать модель организации и карточку участника.",
-    },
-    {
-      userMeaning: "Отчёты",
-      productName: "AprilReport",
-      description: "Сводка и аналитика по данным платформы в едином пользовательском опыте.",
-    },
-  ],
-  edc: {
-    title: "Данные и внешний контур",
-    productName: "AprilEDC",
-    description:
-      "Обмен и сопряжение с внешними системами и данными — отдельно от пяти «опытных» контуров, чтобы не смешивать UX‑фокус и интеграционный периметр.",
-  },
-  phasesTitle: "Этапы развития",
-  phasesLead:
-    "Фазы согласованы с картой возможностей: сначала архитектура и фундамент, затем вертикальный срез, пилот и масштабирование.",
-  phases: [
-    { phase: "Architecture & design", summary: "Границы сервисов, интеграции, модель IAM и данных." },
-    { phase: "Platform foundation", summary: "Ingress, наблюдаемость, базовые контуры AprilHub и BFF." },
-    { phase: "Vertical slice", summary: "Сквозной сценарий с измеримым результатом для пилотной группы." },
-    { phase: "Pilot", summary: "Ограниченный контур пользователей, обратная связь, стабилизация." },
-    { phase: "Scale-out", summary: "Расширение доменов, операционные регламенты, контроль изменений." },
-  ],
-  statusTitle: "Текущий статус",
-  statusLegend: [
-    { key: "available", label: "Доступно" },
-    { key: "pilot", label: "Пилот" },
-    { key: "in_development", label: "В разработке" },
-    { key: "roadmap", label: "По дорожной карте" },
-  ],
-  productStatuses: [
-    { product: "AprilHub", status: "available", note: "Гостевой лендинг и вход в shell." },
-    { product: "AprilWorkFlow", status: "in_development", note: "Контур процессов — по плану релизов." },
-    { product: "AprilNFlow", status: "pilot", note: "Пилотные сценарии уведомлений." },
-    { product: "AprilOrgFlow", status: "in_development", note: "Модель оргструктуры." },
-    { product: "AprilProfile", status: "in_development", note: "Профили субъектов." },
-    { product: "AprilReport", status: "roadmap", note: "Отчётность — по дорожной карте." },
-    { product: "AprilEDC", status: "pilot", note: "Внешний контур данных — пилот интеграций." },
-  ],
-  deliveryTitle: "Как проходит проект с заказчиком",
-  deliveryLead: "Этапы сопровождения и типовые роли на стороне заказчика (плейсхолдеры для уточнения в контракте).",
-  deliveryStages: [
-    {
-      title: "Старт и границы",
-      description: "Уточнение домена пилота, интеграций и критериев успеха.",
-      customerRoles: ["Спонсор", "Владелец продукта", "Архитектор"],
-    },
-    {
-      title: "Проектирование и доступы",
-      description: "Модель ролей в Keycloak, среды, политики публикации.",
-      customerRoles: ["ИБ", "ИТ‑лид", "Администратор домена"],
-    },
-    {
-      title: "Пилот и приёмка",
-      description: "Ограниченная группа пользователей, метрики, список доработок.",
-      customerRoles: ["Бизнес‑владелец", "Операции", "Поддержка"],
-    },
-    {
-      title: "Масштабирование",
-      description: "Регламенты релизов, сопровождение, контроль изменений.",
-      customerRoles: ["Сервисный менеджер", "ИТ", "ИБ"],
+      statusBadgeLabel: "Plan",
+      statusBadgeColor: "gray",
     },
   ],
   securityTitle: "Безопасность и данные",
@@ -347,21 +199,6 @@ export const landingContent: LandingContent = {
   ],
   securityPoliciesNote:
     "Ссылки на юридические документы добавим, когда они будут опубликованы в репозитории; сейчас раздел без мёртвых внешних URL.",
-  transparencyTitle: "Прозрачность развития",
-  transparencyBlocks: [
-    {
-      title: "Тестирование",
-      body: "Стратегия уровней и smoke/e2e описаны в документации репозитория; детали релизов — в changelog по мере публикации.",
-    },
-    {
-      title: "Релизы",
-      body: "Порядок поставки на dev и обновления образов — по DEPLOYMENT_STRATEGY; конкретные номера релизов — плейсхолдер до публикации changelog.",
-    },
-    {
-      title: "Changelog",
-      body: "История изменений для внешних потребителей будет опубликована отдельно; текущий лендинг не утверждает даты релизов как обязательство.",
-    },
-  ],
   faqTitle: "FAQ",
   faqItems: [
     {
@@ -395,33 +232,11 @@ export const landingContent: LandingContent = {
         "Публичный лендинг не утверждает SLA, сертификаты и список клиентов без подтверждения в документации репозитория; коммерческие условия — в переговорах.",
     },
   ],
-  finalCtaTitle: "Готовы продолжить в продукте",
-  finalCtaLead: "Войдите в рабочую зону с тем же Keycloak flow или отправьте заявку — ответим по корпоративной почте.",
-  contact: {
-    title: "Заявка на контакт",
-    lead: "Заполните форму — откроется почтовый клиент с подготовленным текстом (MVP без backend для лидов).",
-    fields: {
-      company: "Компания",
-      country: "Страна",
-      role: "Роль",
-      scale: "Масштаб",
-      scaleOptions: [
-        { value: "pilot", label: "Пилот (один домен)" },
-        { value: "division", label: "Подразделение" },
-        { value: "enterprise", label: "Предприятие / холдинг" },
-        { value: "other", label: "Другое (уточню в комментарии)" },
-      ],
-      comment: "Комментарий",
-      consent: "Согласен(на) на обработку персональных данных для ответа по заявке (опционально)",
-    },
-    submit: "Открыть письмо",
-    validationRequired: "Укажите компанию и страну — так мы поймём контекст запроса.",
-  },
   footer: {
     contactsPlaceholder: "Контакты: уточняются для публичной страницы",
     legalPlaceholder: "Юридические реквизиты: плейсхолдер",
     lastUpdatedLabel: "Последнее обновление страницы:",
-    lastUpdatedValue: "2026-04-18",
+    lastUpdatedValue: "2026-04-19",
   },
   metaLineTemplate: "{realm} · {clientId} · {apiBaseUrl}",
 };

@@ -54,7 +54,8 @@ describe("App", () => {
     expect(screen.getByTestId("landing-ecosystem-cards")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Экосистема April" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Единая платформа для бизнеса, ИТ и комплаенса" })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Карта возможностей платформы" })).toBeInTheDocument();
+    expect(screen.getAllByText("Plan").length).toBe(5);
+    expect(screen.getByText("In Progress")).toBeInTheDocument();
     expect(screen.getByTestId("landing-faq")).toBeInTheDocument();
     expect(screen.getByTestId("guest-landing-login-primary")).toBeInTheDocument();
   });
