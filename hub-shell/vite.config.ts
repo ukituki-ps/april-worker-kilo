@@ -25,6 +25,13 @@ export default defineConfig(({ mode }) => {
         .filter(Boolean)
     : undefined;
 
+  const hmrHost =
+    localEnv.VITE_DEV_HMR_HOST?.trim() || rootEnv.VITE_DEV_HMR_HOST?.trim() || "";
+  const hmrProtocolRaw =
+    localEnv.VITE_DEV_HMR_PROTOCOL?.trim() || rootEnv.VITE_DEV_HMR_PROTOCOL?.trim() || "wss";
+  const hmrClientPortRaw =
+    localEnv.VITE_DEV_HMR_CLIENT_PORT?.trim() || rootEnv.VITE_DEV_HMR_CLIENT_PORT?.trim() || "443";
+
   return {
     envPrefix: ["VITE_", "SENTRY_"],
     plugins: [react()],
@@ -47,6 +54,15 @@ export default defineConfig(({ mode }) => {
     server: {
       host: "0.0.0.0",
       port: 4173,
+      ...(hmrHost
+        ? {
+            hmr: {
+              protocol: hmrProtocolRaw.toLowerCase() === "ws" ? "ws" : "wss",
+              host: hmrHost,
+              clientPort: Number(hmrClientPortRaw) || 443,
+            },
+          }
+        : {}),
       ...(allowedHosts ? { allowedHosts } : {}),
     },
     test: {

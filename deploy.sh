@@ -26,8 +26,9 @@ EOF
   SKIP_OPENAPI_LINT=1  не выполнять make openapi-lint
   SKIP_DB_BACKUP=1     не вызывать scripts/db-backup.sh (если есть)
   SKIP_MIGRATIONS=1    не вызывать scripts/run-migrations.sh (если есть)
-  SKIP_FRONTEND_RECREATE=1 пропустить force-recreate frontend-сервисов при изменении lock-файлов
+  SKIP_FRONTEND_RECREATE=1 пропустить force-recreate frontend-сервисов при изменении lock-файлов / submodule DisignApril
   SKIP_HUB_BFF_RECREATE=1 пропустить force-recreate hub-bff при изменениях в Go-коде hub-bff/
+  SKIP_HUB_SHELL_DS_PREPARE=1 пропустить npm run ds:prepare в hub-shell (сборка @april/ui из DisignApril)
   SKIP_KEYCLOAK_RECREATE=1 пропустить force-recreate keycloak при изменении theme/realm/compose
   SKIP_KEYCLOAK_THEME_ENSURE=1 пропустить принудительную проверку login/account theme в realm
   SKIP_OBSERVABILITY_ONBOARD=1 пропустить авто-onboarding стенда в central observability
@@ -159,6 +160,37 @@ run_git_pull() {
     fi
     log "git pull не выполнен — продолжаем без обновления кода (REQUIRE_GIT_PULL=0)"
   fi
+}
+
+run_hub_shell_ds_prepare() {
+  if [[ "${SKIP_HUB_SHELL_DS_PREPARE:-}" == "1" ]]; then
+    log "пропуск hub-shell ds:prepare (SKIP_HUB_SHELL_DS_PREPARE=1)"
+    return 0
+  fi
+  if [[ ! -f "${ROOT}/hub-shell/package.json" ]]; then
+    log "нет hub-shell/package.json — пропуск ds:prepare"
+    return 0
+  fi
+  if [[ ! -f "${ROOT}/design-system/DisignApril/package.json" ]]; then
+    log "DisignApril не развёрнут (нет design-system/DisignApril/package.json) — пропуск ds:prepare"
+    return 0
+  fi
+  if command -v npm >/dev/null 2>&1; then
+    log "hub-shell: npm ci && npm run ds:prepare (хост)"
+    (cd "${ROOT}/hub-shell" && npm ci && npm run ds:prepare)
+    return 0
+  fi
+  if command -v docker >/dev/null 2>&1; then
+    log "hub-shell: npm ci && npm run ds:prepare (docker node:20-bookworm-slim)"
+    run_named_docker "april-hub-shell-ds-prepare" \
+      -v "${ROOT}:/repo" \
+      -w /repo/hub-shell \
+      node:20-bookworm-slim \
+      sh -lc "corepack enable && npm ci && npm run ds:prepare"
+    return 0
+  fi
+  log "ошибка: нужны npm или docker для hub-shell ds:prepare"
+  exit 1
 }
 
 run_submodules() {
@@ -439,6 +471,42 @@ repair_bind_mount_permissions() {
         /workspace/design-system/DisignApril/packages/tokens/dist >/dev/null 2>&1 || true"
 }
 
+sync_hub_shell_on_design_submodule_gitlink() {
+  # Если в родительском репо обновили только указатель submodule DisignApril (без изменения hub-shell/package-lock.json),
+  # контейнер hub-shell не пересоздавался → predev/ds:prepare не выполнялся → устаревший dist @april/ui (белый экран в браузере).
+  if [[ "${SKIP_FRONTEND_RECREATE:-}" == "1" ]]; then
+    return 0
+  fi
+  local state_file="${state_dir}/hub-shell-design-submodule-gitlink.sha256"
+  local current_hash=""
+  local prev_hash=""
+
+  if git rev-parse --git-dir >/dev/null 2>&1; then
+    current_hash="$(git rev-parse HEAD:design-system/DisignApril 2>/dev/null || echo missing)"
+  else
+    current_hash="not-a-git-repo"
+  fi
+
+  if [[ -f "$state_file" ]]; then
+    prev_hash="$(cat "$state_file" 2>/dev/null || true)"
+  fi
+
+  if [[ "$current_hash" == "$prev_hash" ]]; then
+    log "указатель submodule design-system/DisignApril без изменений — force-recreate hub-shell не требуется"
+    return 0
+  fi
+
+  if ! is_service_running "hub-shell"; then
+    log "hub-shell не запущен — обновлён state submodule, force-recreate пропущен"
+    printf '%s\n' "$current_hash" >"$state_file"
+    return 0
+  fi
+
+  log "обнаружено изменение указателя submodule DisignApril — docker compose up -d --force-recreate hub-shell"
+  "${compose_files[@]}" up -d --force-recreate hub-shell
+  printf '%s\n' "$current_hash" >"$state_file"
+}
+
 sync_frontend_dependencies() {
   if [[ "${SKIP_FRONTEND_RECREATE:-}" == "1" ]]; then
     log "пропуск frontend force-recreate (SKIP_FRONTEND_RECREATE=1)"
@@ -449,6 +517,8 @@ sync_frontend_dependencies() {
     "hub-shell" \
     "${ROOT}/hub-shell/package-lock.json" \
     "${state_dir}/hub-shell-package-lock.sha256"
+
+  sync_hub_shell_on_design_submodule_gitlink
 
   sync_frontend_service_on_lock_change \
     "april-showcase" \
@@ -689,6 +759,7 @@ main() {
   run_git_pull
   run_submodules
   repair_bind_mount_permissions
+  run_hub_shell_ds_prepare
   run_openapi_lint
   run_hook "scripts/db-backup.sh" "SKIP_DB_BACKUP" "db-backup"
   run_hook "scripts/run-migrations.sh" "SKIP_MIGRATIONS" "миграции"

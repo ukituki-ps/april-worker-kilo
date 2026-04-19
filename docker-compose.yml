@@ -106,6 +106,10 @@ services:
       VITE_PROFILE_MERGE_SOURCE_ENTITY_ID: ${VITE_PROFILE_MERGE_SOURCE_ENTITY_ID:-}
       VITE_PROFILE_MERGE_TARGET_ENTITY_ID: ${VITE_PROFILE_MERGE_TARGET_ENTITY_ID:-}
       VITE_ALLOWED_HOSTS: ${VITE_ALLOWED_HOSTS:-}
+      # За HTTPS-прокси: иначе HMR WebSocket бьётся о localhost:4173 (см. Vite server.hmr).
+      VITE_DEV_HMR_HOST: ${VITE_DEV_HMR_HOST:-}
+      VITE_DEV_HMR_PROTOCOL: ${VITE_DEV_HMR_PROTOCOL:-wss}
+      VITE_DEV_HMR_CLIENT_PORT: ${VITE_DEV_HMR_CLIENT_PORT:-443}
     volumes:
       - ./:/workspace
     expose:
