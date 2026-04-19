@@ -80,6 +80,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          submodules: false
+
+      - name: Init git submodules (public DisignApril; avoid GITHUB_TOKEN 404)
+        run: ./scripts/ci-init-git-submodules.sh
+
+      - name: Enable Corepack (pnpm for design-system build)
+        run: corepack enable
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -91,6 +99,10 @@ jobs:
       - name: Install Hub Shell dependencies
         working-directory: hub-shell
         run: npm ci
+
+      - name: Build design system (DisignApril → @april/ui)
+        working-directory: hub-shell
+        run: npm run ds:prepare
 
       - name: Hub Shell lint
         working-directory: hub-shell
@@ -111,6 +123,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          submodules: false
+
+      - name: Init git submodules (public DisignApril; avoid GITHUB_TOKEN 404)
+        run: ./scripts/ci-init-git-submodules.sh
 
       - name: Run Hub Shell startup preflight in node:20-alpine
         run: |
@@ -118,7 +135,7 @@ jobs:
             -v "$PWD:/workspace" \
             -w /workspace/hub-shell \
             node:20-alpine \
-            sh -lc "npm ci && npm run ds:prepare && npm run build"
+            sh -lc "corepack enable && npm ci && npm run ds:prepare && npm run build"
 
   aprilhub-smoke:
     name: AprilHub runtime smoke
@@ -127,6 +144,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          submodules: false
+
+      - name: Init git submodules (public DisignApril; avoid GITHUB_TOKEN 404)
+        run: ./scripts/ci-init-git-submodules.sh
 
       - name: Prepare smoke artifacts directory
         run: mkdir -p artifacts/smoke
@@ -148,6 +170,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          submodules: false
+
+      - name: Init git submodules (public DisignApril; avoid GITHUB_TOKEN 404)
+        run: ./scripts/ci-init-git-submodules.sh
 
       - name: Prepare k6 artifacts directory
         run: mkdir -p artifacts/k6
