@@ -1,60 +1,49 @@
 ## 1) Итого
 
 - Статус: ✅ выполнено
-- Задача: Публичный B2B-лендинг-тизер платформы April (неавторизованная зона `hub-shell`)
-- Ветка: `feature/022-aprilhub-public-b2b-landing-teaser` (рекомендуется создать локально при merge)
-- Коммиты: см. `git log` на ветке `feature/022-aprilhub-public-b2b-landing-teaser` (основной коммит реализации)
+- Задача: Публичный B2B-лендинг-тизер (022) + тёмная тема и переключатель темы в шапке (светлая / тёмная / системная)
+- Ветка: `feature/022-aprilhub-public-b2b-landing-teaser`
+- Коммиты: `6541a2e` (родительский репозиторий), `854c37c` (submodule `design-system/DisignApril`: `AprilProviders`)
 - PR: не создавался
 
 ## 2) Что сделано
 
-- [frontend] Guest-зона заменена на полноценный B2B-тизер: Hero, ICP (3 колонки), проблема рынка, карта из **5 контуров** + отдельный блок **AprilEDC**, этапы (таблица), статус (легенда + таблица плейсхолдеров), внедрение с ролями заказчика, безопасность (без мёртвых внешних ссылок), прозрачность развития, FAQ (6+ пунктов), финальный CTA + форма, footer с датой обновления.
-- [frontend] Sticky якорное меню (Зачем · Карта · … · Контакты) и отдельная кнопка **«Вход»**; все сценарии входа вызывают **один** колбэк `onStartLogin` → `keycloak.login()` из `App.tsx`.
-- [frontend] Контент вынесен в `hub-shell/src/landing/content.ts`; форма — клиентская валидация + **`mailto:`** (`hub-shell/src/landing/mailto-lead.ts`), опциональный получатель `VITE_LANDING_INQUIRY_EMAIL` (см. `hub-shell/src/vite-env.d.ts`).
-- [frontend] `hub-shell/index.html`: `lang="ru"`, `<title>` и meta description для публичного лендинга.
-- [frontend] Полифилл **ResizeObserver** в `hub-shell/src/test/setup.ts` для Mantine в Vitest/jsdom.
-- [frontend] Корень приложения: **`AprilProviders`** из `@april/ui` вместо голого `MantineProvider` — тема Mantine через **`createAprilTheme()`** (дизайн-система April). В **`hub-shell/vite.config.ts`**: `resolve.dedupe` для `react`/`react-dom` и **alias** на `@mantine/core` и `@mantine/hooks` из `hub-shell/node_modules`, чтобы Vitest не тянул второй React/Mantine из pnpm внутри submodule `DisignApril`.
-- [frontend] Верхняя панель гостевого лендинга: **`AprilProductHeader`** из `@april/ui` (паттерн Product Header из DS: высота 48/56 по density, логотип + название, центр — якорная навигация, справа — «Вход»). В репозитории DS добавлен экспорт компонента; **`hub-shell/public/logo-icon.svg`** — копия иконки из витрины.
-- [infra / smoke] `scripts/smoke-aprilhub.sh`: обновлён маркер `<title>` под новый лендинг.
+- [frontend] **Задача 022 (базовая поставка):** Guest-зона — B2B-тизер (Hero, ICP, карта контуров + AprilEDC, этапы, статус, внедрение, безопасность, FAQ, форма, footer); sticky-навигация; единый `onStartLogin` → `keycloak.login()`; контент в `landing/content.ts`; лид-форма — `mailto:`; `AprilProductHeader` + `AprilProviders` / `createAprilTheme()`; SEO в `index.html`.
+- [frontend] **Тема:** компонент `ThemeSchemeControl` (`SegmentedControl`: Светлая / Тёмная / Системная) в шапке гостевого лендинга (`GuestB2BLanding`) и в `AppShell` для авторизованной зоны; предпочтение сохраняется стандартным менеджером Mantine (localStorage).
+- [design-system] `AprilProviders`: значение по умолчанию **`defaultColorScheme = 'auto'`** (системная тема до явного выбора пользователя).
+- [frontend] Тёмный режим для legacy-классов: переопределение `--april-*` в `april-tokens-fallback.css` под `[data-mantine-color-scheme="dark"]`; градиенты фона guest/authorized shell в `app.css` для тёмной схемы.
+- [frontend] Тесты: `App.test.tsx` проверяет наличие `theme-scheme-control` на лендинге и в авторизованной зоне.
 
 ## 3) Изменённые файлы
 
-- `hub-shell/index.html`
-- `hub-shell/src/App.tsx`
-- `hub-shell/src/app.css`
-- `hub-shell/src/vite-env.d.ts`
-- `hub-shell/src/test/setup.ts`
-- `hub-shell/src/landing/content.ts`
-- `hub-shell/src/landing/mailto-lead.ts`
+- `design-system/DisignApril/packages/ui/src/providers.tsx` (submodule)
+- `hub-shell/src/theme/ThemeSchemeControl.tsx`
 - `hub-shell/src/landing/GuestB2BLanding.tsx`
+- `hub-shell/src/app-shell.tsx`
+- `hub-shell/src/app.css`
+- `hub-shell/src/styles/april-tokens-fallback.css`
 - `hub-shell/src/App.test.tsx`
-- `hub-shell/src/main.tsx`
-- `hub-shell/vite.config.ts`
-- `hub-shell/public/logo-icon.svg`
-- `design-system/DisignApril/packages/ui` (компонент `AprilProductHeader`, см. submodule)
-- `hub-shell/tests/e2e/smoke.spec.ts`
-- `scripts/smoke-aprilhub.sh`
-- `tasks/022-aprilhub-public-b2b-landing-teaser/PLAN.md`
 - `tasks/022-aprilhub-public-b2b-landing-teaser/REPORT.md`
 
 ## 4) Миграции и данные
 
 - Миграции Atlas: нет
 - Какие таблицы/индексы изменены: не применялось
-- Обратимость: да (revert коммита)
+- Обратимость: да (revert коммитов; сброс темы — очистка ключа Mantine в localStorage при необходимости)
 
 ## 5) Проверка качества
 
-- Линтер: ok (`tsc --noEmit`)
-- Сборка: частично — `tsc` проходит; `vite build` на данной машине завершился с **EACCES** при очистке/записи `hub-shell/dist/` (локальные права на каталог). Рекомендуется прогнать `npm --prefix hub-shell run build` в чистом окружении/после `chown` на `dist`.
+- Линтер: ok (`npm --prefix hub-shell run lint`)
+- Сборка: не прогонялся полный `vite build` в этой сессии (при проблемах прав на `dist/` см. DEPLOYMENT/ранее отчёт)
 - Unit tests: ok (`npm --prefix hub-shell run test`)
 - Integration tests: не применялось
-- E2E / smoke: unit и сценарии обновлены; полный `npm --prefix hub-shell run e2e` не запускался (нужен Keycloak/стенд)
+- E2E / smoke: не перезапускались в этой сессии
 
 Команды (фактически выполненные):
 
 ```bash
-cd hub-shell && npx tsc --noEmit && npm run test
+cd /home/ukituki/april-worker/design-system/DisignApril/packages/ui && npm run build
+cd /home/ukituki/april-worker/hub-shell && npm run lint && npm run test
 ```
 
 ## 6) Деплой
@@ -67,13 +56,12 @@ cd hub-shell && npx tsc --noEmit && npm run test
 
 ## 7) Риски и ограничения
 
-- **Форма лидов:** без backend; поведение — открытие почтового клиента через `mailto:`. Для продакшена нужен согласованный endpoint в `hub-bff` + политика ПДн.
-- **Дублирование SEO:** строки в `index.html` и `content.ts` должны оставаться согласованными при ручных правках (отдельная задача — единый источник или inject при сборке).
-- **Сборка Vite:** при ошибках прав на `dist/` — исправить владельца каталога или удалить `dist` с подходящими правами.
+- **Submodule:** изменение `DisignApril` требует согласованного push submodule + ссылки в родительском репозитории.
+- **Узкая ширина экрана:** трёхсегментный переключатель в шапке может переноситься (`Group`/`wrap`); при необходимости — отдельная компактная раскладка (иконки / меню).
+- **Сборка DS в CI:** `ds:prepare` собирает витрину; при read-only `node_modules` в DS убедиться, что образы CI собирают `@april/ui` после изменений исходников.
 
 ## 8) Что осталось
 
-- [ ] Backend для приёма лидов (приоритет продукта) и хранение согласий
-- [ ] Юридические страницы/политики — публикация в репо или docs-site, затем ссылки с лендинга
-- [ ] Подставить реальные контакты в footer вместо плейсхолдеров
-- [ ] Прогнать `npm --prefix hub-shell run build` и e2e на CI/стенде
+- [ ] Backend для приёма лидов (приоритет продукта)
+- [ ] Прогнать `npm --prefix hub-shell run build` и e2e на стенде/CI
+- [ ] При необходимости — донастройка контрастов/токенов тёмной темы по ревью дизайна

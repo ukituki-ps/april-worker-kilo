@@ -50,6 +50,7 @@ describe("App", () => {
     renderApp();
     expect(screen.getByTestId("guest-landing")).toBeInTheDocument();
     expect(screen.getByTestId("landing-header")).toBeInTheDocument();
+    expect(screen.getByTestId("theme-scheme-control")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Единая платформа для бизнеса, ИТ и комплаенса" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Карта возможностей платформы" })).toBeInTheDocument();
     expect(screen.getByTestId("landing-faq")).toBeInTheDocument();
@@ -97,6 +98,7 @@ describe("App", () => {
 
     await waitFor(() => {
       expect(screen.getByText("Рабочая зона AprilHub")).toBeInTheDocument();
+      expect(screen.getByTestId("theme-scheme-control")).toBeInTheDocument();
       expect(screen.getByRole("navigation", { name: "Основная навигация" })).toBeInTheDocument();
       expect(screen.getByText("Обзор платформы")).toBeInTheDocument();
       expect(screen.getAllByText("Роли доступа").length).toBeGreaterThan(0);

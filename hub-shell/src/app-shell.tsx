@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { ThemeSchemeControl } from "./theme/ThemeSchemeControl";
 import type { ShellUserContext } from "./types";
 
 type ShellNavigationItem = {
@@ -39,6 +40,9 @@ export function AppShell({
           <p className="shell-subtitle">{subtitle}</p>
         </div>
         <div className="shell-header-actions">
+          <div className="shell-theme-control">
+            <ThemeSchemeControl />
+          </div>
           <span className="shell-status">{statusBadgeLabel}</span>
           {context && <span className="shell-user-email">{context.user.email}</span>}
           {onProfile && (

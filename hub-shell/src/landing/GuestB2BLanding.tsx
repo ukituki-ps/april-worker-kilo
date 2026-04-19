@@ -15,6 +15,7 @@ import {
   TextInput,
   Title,
 } from "@mantine/core";
+import { ThemeSchemeControl } from "../theme/ThemeSchemeControl";
 import { AprilProductHeader } from "@april/ui";
 import { useMemo, useState, type FormEvent } from "react";
 import type { ProductStatus } from "./content";
@@ -90,9 +91,12 @@ export function GuestB2BLanding({ onStartLogin, isLoginStarting, error = "", aut
             </nav>
           }
           right={
-            <Button type="button" data-testid="guest-landing-login-nav" onClick={() => void onStartLogin()} disabled={isLoginStarting}>
-              {c.navLogin}
-            </Button>
+            <Group gap="xs" wrap="wrap" justify="flex-end">
+              <ThemeSchemeControl />
+              <Button type="button" data-testid="guest-landing-login-nav" onClick={() => void onStartLogin()} disabled={isLoginStarting}>
+                {c.navLogin}
+              </Button>
+            </Group>
           }
         />
       </div>

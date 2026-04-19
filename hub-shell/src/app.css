@@ -20,6 +20,10 @@
   background: linear-gradient(180deg, #f9fbff 0%, #ffffff 32%);
 }
 
+[data-mantine-color-scheme="dark"] .guest-landing-page {
+  background: linear-gradient(180deg, #141517 0%, #1a1b1e 36%);
+}
+
 .guest-landing-header-band {
   position: fixed;
   top: 0;
@@ -136,6 +140,10 @@
   background: linear-gradient(180deg, #f5f8ff 0%, #ffffff 40%);
 }
 
+[data-mantine-color-scheme="dark"] .app-shell {
+  background: linear-gradient(180deg, #141517 0%, #1a1b1e 42%);
+}
+
 .shell-header {
   position: sticky;
   top: 0;
@@ -180,6 +188,10 @@
   gap: 10px;
   align-items: center;
   justify-content: flex-end;
+}
+
+.shell-theme-control {
+  flex-shrink: 0;
 }
 
 .shell-status {

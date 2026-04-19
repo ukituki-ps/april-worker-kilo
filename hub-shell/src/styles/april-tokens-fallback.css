@@ -11,3 +11,18 @@
 
   --april-semantic-danger: #d92d20;
 }
+
+/* Кастомные utility-токены для legacy-классов shell/лендинга — синхронизированы с тёмной темой Mantine */
+[data-mantine-color-scheme="dark"] {
+  --april-neutral-border: #373a40;
+  --april-neutral-bg: #1a1b1e;
+  --april-neutral-bg-alt: #25262b;
+  --april-neutral-text-primary: #f1f3f5;
+  --april-neutral-text-muted: #adb5bd;
+
+  --april-accent-teal-1: #0d2a28;
+  --april-accent-teal-8: #5fd4c8;
+  --april-accent-teal-10: #b2f7ef;
+
+  --april-semantic-danger: #fa5252;
+}
