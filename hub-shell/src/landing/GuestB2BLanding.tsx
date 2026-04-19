@@ -1,4 +1,4 @@
-import { Accordion, Box, Card, SimpleGrid, Stack, Text, Title } from "@mantine/core";
+import { Accordion, Badge, Box, Card, SimpleGrid, Stack, Text, Title } from "@mantine/core";
 import { AprilEcosystemSimpleCards, AprilProductHeader } from "@april/ui";
 import { ProfileAccountMenu } from "../shell-header/ProfileAccountMenu";
 import { useMemo } from "react";
@@ -58,9 +58,7 @@ export function GuestB2BLanding({ onStartLogin, isLoginStarting, error = "", aut
             {c.icpColumns.map((col) => (
               <Card key={col.title} withBorder padding="lg" radius="md" className="landing-card">
                 <Stack gap="xs">
-                  <Text size="xs" c="dimmed" tt="uppercase" fw={600}>
-                    {col.audience}
-                  </Text>
+                  <Badge color={col.audienceBadgeColor}>{col.audience}</Badge>
                   <Title order={3}>{col.title}</Title>
                   <Stack component="ul" gap={6} style={{ margin: 0, paddingLeft: 18 }}>
                     {col.bullets.map((b) => (
@@ -96,7 +94,6 @@ export function GuestB2BLanding({ onStartLogin, isLoginStarting, error = "", aut
           <Title order={2} id="ecosystem-title">
             {c.ecosystemSectionTitle}
           </Title>
-          <Text c="dimmed">{c.ecosystemSectionLead}</Text>
           <Box mt="md">
             <AprilEcosystemSimpleCards cards={c.ecosystemSimpleCards} />
           </Box>
@@ -113,9 +110,6 @@ export function GuestB2BLanding({ onStartLogin, isLoginStarting, error = "", aut
               </Text>
             ))}
           </Stack>
-          <Text size="sm" c="dimmed" mt="sm">
-            {c.securityPoliciesNote}
-          </Text>
         </section>
 
         <section id="faq" className="landing-section" aria-labelledby="faq-title">

@@ -2,8 +2,12 @@
  * Тексты публичного B2B-лендинга (ru). Правки контента — здесь, без правок разметки.
  */
 
+/** Цвет бейджа аудитории — как в витрине Badges & Tags → Semantic Colors */
+export type IcpAudienceBadgeColor = "teal" | "blue" | "gray" | "orange" | "red";
+
 export type IcpColumn = {
   audience: string;
+  audienceBadgeColor: IcpAudienceBadgeColor;
   title: string;
   bullets: string[];
 };
@@ -50,11 +54,9 @@ export type LandingContent = {
   marketPains: string[];
   marketBridge: string;
   ecosystemSectionTitle: string;
-  ecosystemSectionLead: string;
   ecosystemSimpleCards: EcosystemSimpleCard[];
   securityTitle: string;
   securityBullets: SecurityBullet[];
-  securityPoliciesNote: string;
   faqTitle: string;
   faqItems: FaqItem[];
   footer: FooterCopy;
@@ -74,6 +76,7 @@ export const landingContent: LandingContent = {
   icpColumns: [
     {
       audience: "Бизнес и операции",
+      audienceBadgeColor: "teal",
       title: "Сквозные процессы и прозрачность",
       bullets: [
         "Единая картина статусов и handoff между подразделениями",
@@ -83,6 +86,7 @@ export const landingContent: LandingContent = {
     },
     {
       audience: "ИТ",
+      audienceBadgeColor: "blue",
       title: "Интеграции без распада архитектуры",
       bullets: [
         "Согласованный ingress и сервисные границы экосистемы",
@@ -92,6 +96,7 @@ export const landingContent: LandingContent = {
     },
     {
       audience: "ИБ и комплаенс",
+      audienceBadgeColor: "gray",
       title: "Контроль доступа и данных",
       bullets: [
         "RBAC из Keycloak как источник ролей",
@@ -110,8 +115,6 @@ export const landingContent: LandingContent = {
   marketBridge:
     "April собирает опыт пользователя вокруг согласованных контуров и единого входа — без обхода IAM и без «отдельного портала на каждый сервис».",
   ecosystemSectionTitle: "Экосистема April",
-  ecosystemSectionLead:
-    "Шесть продуктовых контуров; справа от названия — статус в формате бейджей дизайн-системы (Plan / In Progress).",
   ecosystemSimpleCards: [
     {
       letter: "W",
@@ -174,8 +177,6 @@ export const landingContent: LandingContent = {
       text: "Персональные и чувствительные данные обрабатываются согласно политикам организации; публичные документы политик появятся позже в репозитории/сайте проекта.",
     },
   ],
-  securityPoliciesNote:
-    "Ссылки на юридические документы добавим, когда они будут опубликованы в репозитории; сейчас раздел без мёртвых внешних URL.",
   faqTitle: "FAQ",
   faqItems: [
     {
