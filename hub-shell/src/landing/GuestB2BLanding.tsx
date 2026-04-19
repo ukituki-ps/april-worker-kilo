@@ -1,4 +1,4 @@
-import { Accordion, Box, Button, Card, SimpleGrid, Stack, Text, Title } from "@mantine/core";
+import { Accordion, Box, Card, SimpleGrid, Stack, Text, Title } from "@mantine/core";
 import { AprilEcosystemSimpleCards, AprilProductHeader } from "@april/ui";
 import { ProfileAccountMenu } from "../shell-header/ProfileAccountMenu";
 import { useMemo } from "react";
@@ -24,23 +24,12 @@ export function GuestB2BLanding({ onStartLogin, isLoginStarting, error = "", aut
     [authMeta.apiBaseUrl, authMeta.clientId, authMeta.realm, c.metaLineTemplate],
   );
 
-  const primaryLabel = isLoginStarting ? c.primaryCtaLoading : c.primaryCta;
-
   return (
     <div className="guest-landing-page" data-testid="guest-landing">
       <div className="guest-landing-header-band">
         <AprilProductHeader
           data-testid="landing-header"
           productName="AprilHub"
-          center={
-            <nav aria-label="Разделы лендинга" className="guest-landing-nav-links">
-              {c.nav.map((item) => (
-                <a key={item.id} className="guest-landing-nav-link" href={item.href}>
-                  {item.label}
-                </a>
-              ))}
-            </nav>
-          }
           right={
             <ProfileAccountMenu
               variant="guest"
@@ -59,17 +48,6 @@ export function GuestB2BLanding({ onStartLogin, isLoginStarting, error = "", aut
             {c.heroTitle}
           </Title>
           <Text>{c.heroSubtitle}</Text>
-          <Text size="sm" c="dimmed">
-            {c.trustLine}
-          </Text>
-          <div className="landing-actions">
-            <Button type="button" data-testid="guest-landing-login-primary" onClick={() => void onStartLogin()} disabled={isLoginStarting}>
-              {primaryLabel}
-            </Button>
-            <Button type="button" variant="light" component="a" href={c.secondaryCtaHref}>
-              {c.secondaryCta}
-            </Button>
-          </div>
         </section>
 
         <section id="why" className="landing-section" aria-labelledby="why-title">

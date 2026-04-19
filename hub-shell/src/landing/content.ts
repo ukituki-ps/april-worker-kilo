@@ -2,12 +2,6 @@
  * Тексты публичного B2B-лендинга (ru). Правки контента — здесь, без правок разметки.
  */
 
-export type NavItem = {
-  id: string;
-  label: string;
-  href: string;
-};
-
 export type IcpColumn = {
   audience: string;
   title: string;
@@ -46,13 +40,7 @@ export type FooterCopy = {
 export type LandingContent = {
   seoTitle: string;
   seoDescription: string;
-  trustLine: string;
-  primaryCta: string;
-  primaryCtaLoading: string;
-  secondaryCta: string;
-  secondaryCtaHref: string;
   navLogin: string;
-  nav: NavItem[];
   heroEyebrow: string;
   heroTitle: string;
   heroSubtitle: string;
@@ -74,25 +62,14 @@ export type LandingContent = {
 };
 
 export const landingContent: LandingContent = {
-  seoTitle: "April — платформа для операций, ИТ и комплаенса",
+  seoTitle: "April — экосистема инструментов управления компанией",
   seoDescription:
     "Публичный обзор экосистемы April: AprilHub, контуры AprilWorkFlow, AprilNFlow, AprilOrgFlow, AprilProfile, AprilReport, AprilEDC. Вход в рабочую зону через Keycloak.",
-  trustLine: "Единый ingress · Keycloak OIDC · дизайн-система April (Mantine + токены)",
-  primaryCta: "Открыть рабочее пространство",
-  primaryCtaLoading: "Перенаправляем в Keycloak...",
-  secondaryCta: "FAQ",
-  secondaryCtaHref: "#faq",
   navLogin: "Вход",
-  nav: [
-    { id: "why", label: "Зачем", href: "#why" },
-    { id: "ecosystem", label: "Экосистема", href: "#ecosystem" },
-    { id: "security", label: "Безопасность", href: "#security" },
-    { id: "faq", label: "FAQ", href: "#faq" },
-  ],
   heroEyebrow: "Экосистема April",
-  heroTitle: "Единая платформа для бизнеса, ИТ и комплаенса",
+  heroTitle: "Экосистема инструментов управления компанией:",
   heroSubtitle:
-    "AprilHub — точка входа в продуктовую среду: процессы, коммуникации, мастер-данные и отчётность с согласованной моделью доступа через Keycloak.",
+    "процессы, коммуникации, структура, люди и документы, интеграции, отчётность.",
   icpTitle: "Для кого",
   icpColumns: [
     {

@@ -26,6 +26,10 @@ vi.mock("./api", () => ({
   apiRequest: (...args: unknown[]) => apiRequestMock(...args),
 }));
 
+function openGuestProfileMenu(): void {
+  fireEvent.click(screen.getByLabelText("Меню профиля и настроек"));
+}
+
 describe("App", () => {
   const renderApp = (): ReturnType<typeof render> =>
     render(
@@ -46,29 +50,31 @@ describe("App", () => {
     apiRequestMock.mockReset();
   });
 
-  it("renders guest landing when user is not authenticated", () => {
+  it("renders guest landing when user is not authenticated", async () => {
     renderApp();
     expect(screen.getByTestId("guest-landing")).toBeInTheDocument();
     expect(screen.getByTestId("landing-header")).toBeInTheDocument();
     expect(screen.getByTestId("theme-scheme-control")).toBeInTheDocument();
     expect(screen.getByTestId("landing-ecosystem-cards")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Экосистема April" })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Единая платформа для бизнеса, ИТ и комплаенса" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Экосистема инструментов управления компанией:" })).toBeInTheDocument();
     expect(screen.getAllByText("Plan").length).toBe(5);
     expect(screen.getByText("In Progress")).toBeInTheDocument();
     expect(screen.getByTestId("landing-faq")).toBeInTheDocument();
-    expect(screen.getByTestId("guest-landing-login-primary")).toBeInTheDocument();
+    openGuestProfileMenu();
+    expect(await screen.findByTestId("guest-landing-login-nav")).toBeInTheDocument();
   });
 
-  it("starts Keycloak flow from landing CTA", async () => {
+  it("starts Keycloak flow from header profile menu", async () => {
     keycloakState.loginMock.mockResolvedValue(undefined);
     renderApp();
 
-    fireEvent.click(screen.getByTestId("guest-landing-login-primary"));
+    openGuestProfileMenu();
+    fireEvent.click(await screen.findByTestId("guest-landing-login-nav"));
 
     await waitFor(() => {
       expect(keycloakState.loginMock).toHaveBeenCalledTimes(1);
-      expect(screen.getByTestId("guest-landing-login-primary")).toBeDisabled();
+      expect(screen.getByTestId("guest-landing-login-nav")).toBeDisabled();
     });
   });
 
@@ -76,11 +82,15 @@ describe("App", () => {
     keycloakState.loginMock.mockRejectedValue(new Error("auth endpoint unavailable"));
     renderApp();
 
-    fireEvent.click(screen.getByTestId("guest-landing-login-primary"));
+    openGuestProfileMenu();
+    fireEvent.click(await screen.findByTestId("guest-landing-login-nav"));
 
     await waitFor(() => {
       expect(screen.getByText("auth endpoint unavailable")).toBeInTheDocument();
-      expect(screen.getByTestId("guest-landing-login-primary")).not.toBeDisabled();
+    });
+    openGuestProfileMenu();
+    await waitFor(() => {
+      expect(screen.getByTestId("guest-landing-login-nav")).not.toBeDisabled();
     });
   });
 
