@@ -52,6 +52,32 @@
       "attributes": {
         "access.token.lifespan": "300"
       }
+    },
+    {
+      "clientId": "april-profile-api",
+      "name": "AprilProfile API",
+      "enabled": true,
+      "publicClient": true,
+      "protocol": "openid-connect",
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": false,
+      "protocolMappers": [
+        {
+          "name": "tenant_id",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "userinfo.token.claim": "true",
+            "user.attribute": "tenant_id",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "tenant_id",
+            "jsonType.label": "String"
+          }
+        }
+      ]
     }
   ],
   "users": [
@@ -69,6 +95,9 @@
           "temporary": false
         }
       ],
+      "attributes": {
+        "tenant_id": ["tenant-dev"]
+      },
       "realmRoles": ["user"]
     }
   ]
