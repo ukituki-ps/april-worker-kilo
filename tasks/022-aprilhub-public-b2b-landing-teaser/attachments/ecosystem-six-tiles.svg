@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 400" role="img" aria-labelledby="eco-title eco-desc">
+  <title id="eco-title">Экосистема инструментов управления компанией</title>
+  <desc id="eco-desc">Шесть областей: процессы, коммуникации, структура, люди и документы, интеграции, отчётность.</desc>
+  <defs>
+    <style type="text/css"><![CDATA[
+      .tile { fill: #FFFFFF; stroke: #DEE2E6; stroke-width: 1; }
+      .accent { fill: #12B886; }
+      .label { font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; font-size: 15px; font-weight: 600; fill: #212529; }
+      .bg { fill: #F8F9FA; }
+    ]]></style>
+  </defs>
+  <rect class="bg" x="0" y="0" width="960" height="400" rx="12" />
+  <g id="row1">
+    <g transform="translate(36,36)">
+      <rect class="tile" x="0" y="0" width="282" height="148" rx="10" />
+      <rect class="accent" x="0" y="0" width="4" height="148" rx="2" />
+      <text class="label" x="143" y="84" text-anchor="middle">Процессы</text>
+    </g>
+    <g transform="translate(338,36)">
+      <rect class="tile" x="0" y="0" width="282" height="148" rx="10" />
+      <rect class="accent" x="0" y="0" width="4" height="148" rx="2" />
+      <text class="label" x="143" y="84" text-anchor="middle">Коммуникации</text>
+    </g>
+    <g transform="translate(640,36)">
+      <rect class="tile" x="0" y="0" width="284" height="148" rx="10" />
+      <rect class="accent" x="0" y="0" width="4" height="148" rx="2" />
+      <text class="label" x="144" y="84" text-anchor="middle">Структура</text>
+    </g>
+  </g>
+  <g id="row2">
+    <g transform="translate(36,204)">
+      <rect class="tile" x="0" y="0" width="282" height="148" rx="10" />
+      <rect class="accent" x="0" y="0" width="4" height="148" rx="2" />
+      <text class="label" x="143" y="84" text-anchor="middle">Люди и документы</text>
+    </g>
+    <g transform="translate(338,204)">
+      <rect class="tile" x="0" y="0" width="282" height="148" rx="10" />
+      <rect class="accent" x="0" y="0" width="4" height="148" rx="2" />
+      <text class="label" x="143" y="84" text-anchor="middle">Интеграции</text>
+    </g>
+    <g transform="translate(640,204)">
+      <rect class="tile" x="0" y="0" width="284" height="148" rx="10" />
+      <rect class="accent" x="0" y="0" width="4" height="148" rx="2" />
+      <text class="label" x="144" y="84" text-anchor="middle">Отчётность</text>
+    </g>
+  </g>
+</svg>
