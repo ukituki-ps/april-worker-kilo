@@ -69,12 +69,12 @@ workspace "April Service" "C4-модель экосистемы April c микр
             orgWorker = container "OrgFlow Worker" "Фоновая синхронизация и пересчёт иерархий оргструктуры." "Go, Asynq"
         }
 
-        aprilProfil = softwareSystem "AprilProfil" "Версионируемые профили сотрудников/подразделений/должностей с аудитом." {
+        aprilProfile = softwareSystem "AprilProfile" "Централизованные версионируемые профили сущностей (полиморфная модель; репозиторий ukituki-ps/april-profile)." {
             tags "April"
 
             profileWidget = container "ProfileWidget" "Микрофронт работы с профилями и версиями." "TypeScript, React"
-            profileApi = container "Profil API" "REST API профилей, версионирование и аудит изменений." "Go, REST"
-            profileWorker = container "Profil Worker" "Фоновые задачи обогащения профилей и синхронизации атрибутов." "Go, Asynq"
+            profileApi = container "Profile API" "REST API профилей, версионирование и аудит изменений." "Go, REST"
+            profileWorker = container "Profile Worker" "Фоновые задачи обогащения профилей и синхронизации атрибутов." "Go, Asynq"
         }
 
         aprilEdc = softwareSystem "AprilEDC" "Коннектор внешних кадровых и рыночных данных (External Data Connector)." {
@@ -101,7 +101,7 @@ workspace "April Service" "C4-модель экосистемы April c микр
                 workerHttp = component "Worker HTTP API" "REST-endpoints запуска бизнес-сценариев." "Go, net/http"
                 scenarioOrchestrator = component "Scenario Orchestrator" "Координация синхронных шагов межсервисного сценария." "Go"
                 policyEngine = component "Policy Engine" "Вычисление правил, ветвлений и precondition-проверок." "Go"
-                serviceGateway = component "Service Gateway" "Клиентские адаптеры к AprilWorkFlow/NFlow/OrgFlow/Profil/Report/EDC." "Go HTTP clients"
+                serviceGateway = component "Service Gateway" "Клиентские адаптеры к AprilWorkFlow/NFlow/OrgFlow/AprilProfile/Report/EDC." "Go HTTP clients"
             }
             aprilWorkerEngine = container "AprilWorker Engine" "Исполнитель бизнес-правил, оркестрации и компенсаций." "Go, Asynq" {
                 taskConsumer = component "Task Consumer" "Обработчик асинхронных задач и ретраев." "Asynq consumer"
@@ -269,7 +269,7 @@ workspace "April Service" "C4-модель экосистемы April c микр
             autolayout lr
         }
 
-        container aprilProfil "AprilProfilContainers" {
+        container aprilProfile "AprilProfileContainers" {
             include *
             autolayout lr
         }

@@ -9,7 +9,7 @@
 Подготовить единый документационный baseline для масштабирования экосистемы April (AprilHub + комплементарные сервисы): человеко-ориентированную документацию (onboarding, architecture, operations) и агент-ориентированные артефакты (правила, шаблоны, contract/index), чтобы запуск нового сервиса происходил предсказуемо, без расхождения источников истины между docs, контрактами и runtime-процессами.
 
 ## Контекст для агента
-- Экосистема включает AprilHub как точку входа и набор комплементарных сервисов (`AprilWorkFlow`, `AprilNFlow`, `AprilOrgFlow`, `AprilProfil`, `AprilEDC`, `AprilReport`, `AprilWorker`) с разными границами ответственности.
+- Экосистема включает AprilHub как точку входа и набор комплементарных сервисов (`AprilWorkFlow`, `AprilNFlow`, `AprilOrgFlow`, `AprilProfile`, `AprilEDC`, `AprilReport`, `AprilWorker`) с разными границами ответственности.
 - В `docs/AGENT_ARCHITECTURE_CONTEXT.md` зафиксировано правило: один репозиторий = один сервис; внутри допустим модульный монолит. Документационный baseline должен поддерживать именно эту модель масштабирования.
 - В репозитории уже есть фундамент (`task_list.md`, `tasks/<NNN-slug>/`, C4/Structurizr, deployment/testing docs), но нет единой постановки, которая свяжет human-first и agent-first контуры в обязательный стандарт для следующих сервисов.
 - Нужно сохранить текущие подходы (Structurizr C4, ADR, OpenAPI, task-driven workflow), не вводя параллельных "источников истины" и не ломая согласованный pipeline dev-деплоя/проверок.

@@ -9,7 +9,7 @@
 - [backend] Добавлен compatibility endpoint `/api/v1/overview` в `hub-bff` (route + handler + тест), чтобы зафиксировать policy депрекации без breaking-change.
 - [backend] Проверен и сохранён единый error-format (`code`, `message`, `metadata`) для `401/403` и metadata propagation (`correlationId/requestId/sourceService`).
 - [docs] В `docs/architecture/INTEGRATION_CONTRACTS.md` добавлен отдельный agreed baseline блок `Hub BFF -> downstream` с contract IDs, timeout/retry/idempotency и degraded policy.
-- [docs] Обновлён `docs/architecture/INTERSERVICE_LINKS.md`: зафиксированы runtime read-links `Hub BFF -> AprilWorkFlow/AprilNFlow/AprilOrgFlow/AprilProfil/AprilReport` как UI-агрегация без ownership.
+- [docs] Обновлён `docs/architecture/INTERSERVICE_LINKS.md`: зафиксированы runtime read-links `Hub BFF -> AprilWorkFlow/AprilNFlow/AprilOrgFlow/AprilProfile/AprilReport` как UI-агрегация без ownership.
 - [docs] `openapi/aprilhub-bff.yaml` синхронизирован с runtime: compatibility endpoint `/api/v1/overview`, baseline версия `1.0.0`, единые security/error/degraded/metadata схемы.
 - [infra/ci] Добавлена проверка backward compatibility OpenAPI в CI (`.github/workflows/ci.yml`) и скрипт `scripts/check-openapi-compat.sh`.
 

@@ -18,6 +18,8 @@
 
 **AprilHub как инфраструктурная база экосистемы:** этот репозиторий (AprilHub / april-worker) — **источник правды** для **общей** инфраструктуры, которой пользуются **остальные микросервисы April**: наблюдаемость, onboarding стендов, связанные runbook'и (`infra/observability/`, [`guides/OBSERVABILITY_INDEX.md`](./guides/OBSERVABILITY_INDEX.md)). Они **интегрируются** в контур по документам и артефактам здесь и **не копируют** полный observability-стек в свой репозиторий без отдельного решения.
 
+**AprilProfile** (доменные профили сущностей): реализация, OpenAPI, Docusaurus и дизайн модуля ведутся в репозитории [ukituki-ps/april-profile](https://github.com/ukituki-ps/april-profile) (`DESIGN_AprilProfile.md`, `AGENT_ARCHITECTURE_CONTEXT.md` там). Связи с AprilHub (BFF-агрегация для UI, матрица sync/async) фиксируются **здесь**: [`architecture/INTERSERVICE_LINKS.md`](./architecture/INTERSERVICE_LINKS.md), [`architecture/INTEGRATION_CONTRACTS.md`](./architecture/INTEGRATION_CONTRACTS.md), `structurizr/workspace.dsl`.
+
 Граница: **один репозиторий = один сервис**; внутри репозитория допустим **модульный монолит** (не путать с «микросервисом на каждый модуль»).
 
 Версии инструментов и образов — в [`guides/VERSIONS.md`](./guides/VERSIONS.md). Форк репозитория под новый сервис — [`guides/FORK_AND_CUSTOMIZE.md`](./guides/FORK_AND_CUSTOMIZE.md).

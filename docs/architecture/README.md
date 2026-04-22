@@ -19,7 +19,7 @@
 
 ## Назначение файлов
 
-- `структура сервиса.md` — обзор сервисов экосистемы и их роли.
+- `структура сервиса.md` — обзор сервисов экосистемы и их роли (в т.ч. **AprilProfile**; каноничное описание продукта и модели — в репозитории [april-profile](https://github.com/ukituki-ps/april-profile)).
 - `INTERSERVICE_LINKS.md` — матрица межсервисных связей (`Sync`/`Async`).
 - `INTEGRATION_CONTRACTS.md` — рабочие контракты интеграций (draft).
 - `ERROR_TELEMETRY_MODEL.md` — модель обработки и корреляции frontend/API ошибок (`Sentry + Loki/Prometheus`).

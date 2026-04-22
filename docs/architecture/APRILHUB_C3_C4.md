@@ -60,7 +60,7 @@
    - Не подменяет доменную оркестрацию сервисов.
 
 4. **Service Adapters**
-   - Клиенты к `AprilWorkFlow`, `AprilNFlow`, `AprilOrgFlow`, `AprilProfil`, `AprilEDC`, `AprilReport`, `AprilWorker`.
+   - Клиенты к `AprilWorkFlow`, `AprilNFlow`, `AprilOrgFlow`, `AprilProfile`, `AprilEDC`, `AprilReport`, `AprilWorker`.
 
 5. **Response Composer**
    - Собирает и нормализует данные из нескольких сервисов в frontend-friendly DTO.
@@ -123,7 +123,7 @@
 - доменные workflow-правила сервисов;
 - интеграционную бизнес-оркестрацию между доменными сервисами.
 
-Эти обязанности остаются в доменных системах (`AprilWorkFlow`, `AprilNFlow`, `AprilOrgFlow`, `AprilProfil`, `AprilEDC`, `AprilReport`) и в `AprilWorker`.
+Эти обязанности остаются в доменных системах (`AprilWorkFlow`, `AprilNFlow`, `AprilOrgFlow`, `AprilProfile`, `AprilEDC`, `AprilReport`) и в `AprilWorker`.
 
 ## 5. Минимальные технические требования к реализации
 

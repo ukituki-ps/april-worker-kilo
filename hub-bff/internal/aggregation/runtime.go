@@ -52,7 +52,7 @@ func NewRuntime(client *http.Client, opts Options, serviceURLs map[string]string
 		workflow: NewServiceAdapter(client, "AprilWorkFlow", serviceURLs["workflow"], opts),
 		nflow:    NewServiceAdapter(client, "AprilNFlow", serviceURLs["nflow"], opts),
 		orgflow:  NewServiceAdapter(client, "AprilOrgFlow", serviceURLs["orgflow"], opts),
-		profil:   NewServiceAdapter(client, "AprilProfil", serviceURLs["profil"], opts),
+		profil:   NewServiceAdapter(client, "AprilProfile", serviceURLs["profil"], opts),
 		report:   NewServiceAdapter(client, "AprilReport", serviceURLs["report"], opts),
 	}
 }

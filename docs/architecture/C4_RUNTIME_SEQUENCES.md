@@ -46,7 +46,7 @@ sequenceDiagram
     participant WF as AprilWorkFlow API
     participant NF as AprilNFlow API
     participant OF as AprilOrgFlow API
-    participant PF as AprilProfil API
+    participant PF as AprilProfile API
     participant CH as Канал уведомлений
 
     WF->>NF: Инициация уведомления по этапу
@@ -102,7 +102,7 @@ sequenceDiagram
     autonumber
     participant EW as AprilEDC Worker
     participant OF as AprilOrgFlow API
-    participant PF as AprilProfil API
+    participant PF as AprilProfile API
     participant WF as AprilWorkFlow API
     participant NF as AprilNFlow API
     participant RP as AprilReport API
@@ -135,7 +135,7 @@ sequenceDiagram
     participant AW as AprilWorker API
     participant AWE as AprilWorker Engine
     participant OF as AprilOrgFlow API
-    participant PF as AprilProfil API
+    participant PF as AprilProfile API
     participant NF as AprilNFlow API
     participant EAPI as AprilEDC API
     participant R as Redis/Asynq

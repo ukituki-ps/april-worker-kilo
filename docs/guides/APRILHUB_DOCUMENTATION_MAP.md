@@ -31,6 +31,7 @@
 | Observability | [`OBSERVABILITY_INDEX.md`](./OBSERVABILITY_INDEX.md), [`OBSERVABILITY_MULTI_STAND_OPERATING_MODEL.md`](./OBSERVABILITY_MULTI_STAND_OPERATING_MODEL.md) |
 | Incident / error triage (агент) | [`AGENT_ERROR_TRIAGE_PROMPT.md`](https://github.com/ukituki-ps/april-worker/blob/develop/docs/AGENT_ERROR_TRIAGE_PROMPT.md), [`runbooks/APRIL_ERROR_TELEMETRY_TRIAGE.md`](https://github.com/ukituki-ps/april-worker/blob/develop/docs/runbooks/APRIL_ERROR_TELEMETRY_TRIAGE.md) |
 | ADR решения | `/adr/` |
+| Сервис **AprilProfile** (профили сущностей, не репозиторий Hub) | Канон: [github.com/ukituki-ps/april-profile](https://github.com/ukituki-ps/april-profile) (`README.md`, `docs/DESIGN_AprilProfile.md`, OpenAPI). Интеграция с Hub BFF и матрица связей — `docs/architecture/INTERSERVICE_LINKS.md`, `docs/architecture/INTEGRATION_CONTRACTS.md` |
 
 ## Обязательный минимум для нового участника
 
