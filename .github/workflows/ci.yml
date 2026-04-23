@@ -11,6 +11,13 @@ concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  GOMODCACHE: /var/cache/aprilhub/go/pkg/mod
+  GOCACHE: /var/cache/aprilhub/go/build
+  npm_config_cache: /var/cache/aprilhub/npm
+  APRIL_DOCKER_MIRROR: 127.0.0.1:5000
+  APRIL_GCR_MIRROR: 127.0.0.1:5001
+
 jobs:
   openapi-compatibility:
     name: OpenAPI compatibility (no breaking changes)
@@ -27,6 +34,9 @@ jobs:
         with:
           fetch-depth: 0
           clean: true
+
+      - name: Ensure local cache directories
+        run: mkdir -p "$GOMODCACHE" "$GOCACHE" "$npm_config_cache"
 
       - name: Setup Go
         uses: actions/setup-go@v5
@@ -56,6 +66,9 @@ jobs:
         with:
           clean: true
 
+      - name: Ensure local cache directories
+        run: mkdir -p "$GOMODCACHE" "$GOCACHE" "$npm_config_cache"
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -84,6 +97,9 @@ jobs:
         with:
           clean: true
 
+      - name: Ensure local cache directories
+        run: mkdir -p "$GOMODCACHE" "$GOCACHE" "$npm_config_cache"
+
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
@@ -108,6 +124,9 @@ jobs:
         with:
           submodules: false
           clean: true
+
+      - name: Ensure local cache directories
+        run: mkdir -p "$GOMODCACHE" "$GOCACHE" "$npm_config_cache"
 
       - name: Init git submodules (public DisignApril; avoid GITHUB_TOKEN 404)
         run: ./scripts/ci-init-git-submodules.sh
@@ -158,6 +177,9 @@ jobs:
           submodules: false
           clean: true
 
+      - name: Ensure local cache directories
+        run: mkdir -p "$GOMODCACHE" "$GOCACHE" "$npm_config_cache"
+
       - name: Init git submodules (public DisignApril; avoid GITHUB_TOKEN 404)
         run: ./scripts/ci-init-git-submodules.sh
 
@@ -187,6 +209,9 @@ jobs:
         with:
           submodules: false
           clean: true
+
+      - name: Ensure local cache directories
+        run: mkdir -p "$GOMODCACHE" "$GOCACHE" "$npm_config_cache"
 
       - name: Init git submodules (public DisignApril; avoid GITHUB_TOKEN 404)
         run: ./scripts/ci-init-git-submodules.sh
@@ -219,6 +244,9 @@ jobs:
         with:
           submodules: false
           clean: true
+
+      - name: Ensure local cache directories
+        run: mkdir -p "$GOMODCACHE" "$GOCACHE" "$npm_config_cache"
 
       - name: Init git submodules (public DisignApril; avoid GITHUB_TOKEN 404)
         run: ./scripts/ci-init-git-submodules.sh

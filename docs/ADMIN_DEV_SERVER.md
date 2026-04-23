@@ -37,10 +37,48 @@ CI workflow `.github/workflows/ci.yml` выполняется на отдель�
 1. Установите `actions/runner` и зарегистрируйте runner в репозитории/организации с labels `ci,profile`.
 2. Убедитесь, что на хосте есть Docker, Node.js 20+, Go и доступ к интернету для установки зависимостей.
 3. Проверьте статус runner в GitHub (**Idle**) и запуск CI на PR/push.
-4. Чтобы избежать `EACCES` на `actions/checkout` из-за root-owned артефактов (`.pnpm-store`, `node_modules`, `dist`), запускайте санитацию workspace под root:
+4. Runner service не должен запускаться под `root`: все CI-команды выполняются от пользователя runner (`runner-user`/`ukituki`).
+5. Чтобы избежать `EACCES` на `actions/checkout` из-за root-owned артефактов (`.pnpm-store`, `node_modules`, `dist`), запускайте санитацию workspace под root:
    - `bash scripts/sanitize-ci-workspace.sh`
    - либо с явным шаблоном: `bash scripts/sanitize-ci-workspace.sh "/home/ukituki/actions-runner-april-worker-ci-*/_work/april-worker/april-worker"`
-5. Рекомендуется повесить `scripts/sanitize-ci-workspace.sh` на `cron`/`systemd timer` (например, раз в 5-15 минут) на CI-хосте.
+6. Рекомендуется повесить `scripts/sanitize-ci-workspace.sh` на `cron`/`systemd timer` (например, раз в 5-15 минут) на CI-хосте.
+
+### Локальные кэши CI
+
+Для self-hosted CI используются shared-кэши:
+
+- `GOMODCACHE=/var/cache/aprilhub/go/pkg/mod`
+- `GOCACHE=/var/cache/aprilhub/go/build`
+- `npm_config_cache=/var/cache/aprilhub/npm`
+
+Базовая подготовка на хосте:
+
+- `mkdir -p /var/cache/aprilhub/go/pkg/mod /var/cache/aprilhub/go/build /var/cache/aprilhub/npm`
+- `sudo chown -R "$(id -u):$(id -g)" /var/cache/aprilhub`
+
+### Локальные registry mirror'ы
+
+Для ускорения `docker pull` и Buildx:
+
+- DockerHub mirror: `127.0.0.1:5000`
+- GCR mirror: `127.0.0.1:5001`
+
+Поднять mirror-контейнеры:
+
+- `mkdir -p /home/ukituki/.cache/registry-mirror/docker /home/ukituki/.cache/registry-mirror/gcr`
+- `docker rm -f dockerhub-mirror gcr-mirror >/dev/null 2>&1 || true`
+- `docker run -d --restart unless-stopped --name dockerhub-mirror -p 127.0.0.1:5000:5000 -e REGISTRY_PROXY_REMOTEURL=https://registry-1.docker.io -v /home/ukituki/.cache/registry-mirror/docker:/var/lib/registry registry:2`
+- `docker run -d --restart unless-stopped --name gcr-mirror -p 127.0.0.1:5001:5000 -e REGISTRY_PROXY_REMOTEURL=https://gcr.io -v /home/ukituki/.cache/registry-mirror/gcr:/var/lib/registry registry:2`
+
+В workflow прогрев кэшей и mirror'ов выполняет `.github/workflows/ci-cache-warmup.yml` (по `cron` и вручную).
+
+### Диагностика ownership-проблем
+
+Проверить root-owned артефакты в workspace runner:
+
+- `find /home/ukituki/actions-runner-april-worker-ci-*/_work -user root -print`
+
+Если root-owned файлы появляются снова, в первую очередь проверьте шаги `docker run`/`docker compose` с bind mount: контейнеры, пишущие в workspace, должны запускаться с UID/GID текущего runner-пользователя.
 
 ## 5. Проверка документации на dev
 

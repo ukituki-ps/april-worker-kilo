@@ -1,0 +1,75 @@
+name: CI Cache Warmup
+
+on:
+  schedule:
+    - cron: "20 */6 * * *"
+  workflow_dispatch:
+
+env:
+  GOMODCACHE: /var/cache/aprilhub/go/pkg/mod
+  GOCACHE: /var/cache/aprilhub/go/build
+  npm_config_cache: /var/cache/aprilhub/npm
+  APRIL_DOCKER_MIRROR: 127.0.0.1:5000
+  APRIL_GCR_MIRROR: 127.0.0.1:5001
+
+jobs:
+  warmup:
+    name: Warm local caches and mirrors
+    runs-on: [self-hosted, ci, profile]
+    timeout-minutes: 30
+    steps:
+      - name: Pre-clean workspace (temporary safeguard)
+        run: |
+          WORKDIR="${GITHUB_WORKSPACE:-$PWD}"
+          chown -R "$(id -u):$(id -g)" "$WORKDIR" 2>/dev/null || true
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          clean: true
+
+      - name: Ensure local cache directories
+        run: mkdir -p "$GOMODCACHE" "$GOCACHE" "$npm_config_cache"
+
+      - name: Rotate stale cache files (best effort)
+        run: |
+          find "$GOMODCACHE" -type f -mtime +14 -delete 2>/dev/null || true
+          find "$GOCACHE" -type f -mtime +14 -delete 2>/dev/null || true
+          find "$npm_config_cache" -type f -mtime +14 -delete 2>/dev/null || true
+          find "$HOME/.cache/registry-mirror/docker" -type f -mtime +14 -delete 2>/dev/null || true
+          find "$HOME/.cache/registry-mirror/gcr" -type f -mtime +14 -delete 2>/dev/null || true
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: hub-bff/go.mod
+
+      - name: Warm Go dependencies
+        working-directory: hub-bff
+        run: go mod download
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Warm npm cache
+        working-directory: hub-shell
+        run: npm ci --prefer-offline
+
+      - name: Setup Buildx with local mirrors
+        uses: docker/setup-buildx-action@v3
+        with:
+          buildkitd-config-inline: |
+            [registry."docker.io"]
+              mirrors = ["http://${{ env.APRIL_DOCKER_MIRROR }}"]
+            [registry."registry-1.docker.io"]
+              mirrors = ["http://${{ env.APRIL_DOCKER_MIRROR }}"]
+            [registry."gcr.io"]
+              mirrors = ["http://${{ env.APRIL_GCR_MIRROR }}"]
+
+      - name: Warm registry mirrors
+        run: |
+          docker pull "${APRIL_DOCKER_MIRROR}/library/alpine:3.20" || true
+          docker pull "${APRIL_DOCKER_MIRROR}/library/node:20-alpine" || true
+          docker pull "${APRIL_GCR_MIRROR}/distroless/static:nonroot" || true
