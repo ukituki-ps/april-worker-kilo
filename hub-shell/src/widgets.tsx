@@ -56,7 +56,7 @@ export function ProfileWidget({ context }: WidgetProps) {
       <EntityProfileWidget
         hostContext={hostContext}
         entityId="00000000-0000-0000-0000-000000000001"
-        apiBaseUrl="/api/v1/admin/profile"
+        apiBaseUrl="/api/v1/admin/profile/api"
         accessToken={keycloak.token}
         onSaveSuccess={(payload) => {
           setSaveResult(payload);
