@@ -22,6 +22,7 @@ type Config struct {
 	NFlowURL          string
 	OrgFlowURL        string
 	ProfilURL         string
+	ProfileAdminURL   string
 	ReportURL         string
 }
 
@@ -40,6 +41,7 @@ func Load() (Config, error) {
 		NFlowURL:          os.Getenv("APRIL_NFLOW_URL"),
 		OrgFlowURL:        os.Getenv("APRIL_ORGFLOW_URL"),
 		ProfilURL:         os.Getenv("APRIL_PROFIL_URL"),
+		ProfileAdminURL:   getEnv("APRIL_PROFILE_ADMIN_URL", os.Getenv("APRIL_PROFIL_URL")),
 		ReportURL:         os.Getenv("APRIL_REPORT_URL"),
 	}
 	if cfg.KeycloakURL == "" || cfg.KeycloakRealm == "" {

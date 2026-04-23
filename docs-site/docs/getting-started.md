@@ -111,3 +111,20 @@ curl -i -H "Authorization: Bearer $TOKEN" http://localhost:8081/api/v1/admin/pin
 
 6. OpenAPI Hub BFF:
 - `http://localhost:8080/openapi/aprilhub-bff.yaml`
+
+## Admin proxy to AprilProfile (task 021)
+
+Для админских сценариев Hub BFF проксирует маршруты `/api/v1/admin/profile/*` в upstream AprilProfile.
+
+- ENV: `APRIL_PROFILE_ADMIN_URL` (пример: `http://april-profile:8000`)
+- Доступ: только роли `admin` и выше (через существующий Keycloak JWT guard)
+- Пробрасываемые заголовки: `Authorization`, `X-Correlation-Id`, `X-Request-Id`, `X-Tenant-*`
+
+Проверка (пример):
+
+```bash
+curl -i \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "X-Tenant-Id: demo-tenant" \
+  http://localhost:8081/api/v1/admin/profile/api/v1/admin/users
+```
