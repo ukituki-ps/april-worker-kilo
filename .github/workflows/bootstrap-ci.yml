@@ -11,7 +11,7 @@ on:
 
 jobs:
   docs-and-compose:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, ci, profile]
     steps:
       - uses: actions/checkout@v4
 
@@ -36,7 +36,7 @@ jobs:
         run: docker compose config
 
   hub-modules-smoke:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, ci, profile]
     steps:
       - uses: actions/checkout@v4
         with:
