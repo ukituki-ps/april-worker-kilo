@@ -1,0 +1,47 @@
+# AprilProfile (april-profile repo): Prometheus alerts for metrics scraped via
+# job `aprilhub_dynamic_targets` and target labels env / stand / host / service.
+# Runbook: docs/runbooks/APRILPROFILE_SLO_DRAFT.md
+groups:
+  - name: aprilprofile-baseline-alerts
+    rules:
+      - alert: AprilProfileHigh5xxRate
+        expr: |
+          (
+            sum(rate(april_profile_http_requests_total{job="aprilhub_dynamic_targets", service="april-profile", status=~"5.."}[5m]))
+            /
+            clamp_min(sum(rate(april_profile_http_requests_total{job="aprilhub_dynamic_targets", service="april-profile"}[5m])), 0.001)
+          ) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+          area: availability
+        annotations:
+          summary: "AprilProfile 5xx ratio is high"
+          description: "5xx responses exceed 5% of traffic for `service=april-profile` (rolling 5m). See runbook docs/runbooks/APRILPROFILE_SLO_DRAFT.md (april-worker)."
+
+      - alert: AprilProfileReadyzFailures
+        expr: |
+          sum(rate(april_profile_http_requests_total{job="aprilhub_dynamic_targets", service="april-profile", route="/readyz", status!~"2.."}[5m])) > 0
+        for: 3m
+        labels:
+          severity: critical
+          area: availability
+        annotations:
+          summary: "AprilProfile /readyz returning non-2xx"
+          description: "Readiness endpoint is failing for `service=april-profile`. Check process, DB, Redis. Runbook: docs/runbooks/APRILPROFILE_SLO_DRAFT.md"
+
+      - alert: AprilProfileHTTPMetricsMissing
+        expr: |
+          (
+            up{job="aprilhub_dynamic_targets", service="april-profile"} == 1
+          )
+          unless on (job, instance) (
+            count by (job, instance) (april_profile_http_requests_total{service="april-profile"}) > 0
+          )
+        for: 30m
+        labels:
+          severity: warning
+          area: observability
+        annotations:
+          summary: "AprilProfile target is UP but no HTTP metrics series"
+          description: "Scrape succeeds but `april_profile_http_requests_total` is absent for 30m (idle low-traffic stands may need silence). Confirm `GET /metrics` and middleware. Runbook: docs/runbooks/APRILPROFILE_SLO_DRAFT.md"

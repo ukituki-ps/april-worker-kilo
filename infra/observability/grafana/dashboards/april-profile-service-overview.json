@@ -1,0 +1,303 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "editable": false,
+  "graphTooltip": 1,
+  "panels": [
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(april_profile_http_requests_total{job=\"aprilhub_dynamic_targets\",env=~\"$env\",stand=~\"$stand\",host=~\"$host\",service=~\"$service\"}[5m])) by (route, status)",
+          "legendFormat": "{{route}} {{status}}",
+          "refId": "A"
+        }
+      ],
+      "title": "HTTP request rate (by route / status)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "id": 2,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(april_profile_http_request_duration_seconds_bucket{job=\"aprilhub_dynamic_targets\",env=~\"$env\",stand=~\"$stand\",host=~\"$host\",service=~\"$service\"}[5m])) by (le, route)) * 1000",
+          "legendFormat": "{{route}} p95",
+          "refId": "A"
+        }
+      ],
+      "title": "HTTP latency p95 by route",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "max": 1,
+          "min": 0
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 8
+      },
+      "id": 3,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(april_profile_http_requests_total{job=\"aprilhub_dynamic_targets\",env=~\"$env\",stand=~\"$stand\",host=~\"$host\",service=~\"$service\",status=~\"5..\"}[5m])) / clamp_min(sum(rate(april_profile_http_requests_total{job=\"aprilhub_dynamic_targets\",env=~\"$env\",stand=~\"$stand\",host=~\"$host\",service=~\"$service\"}[5m])), 0.001)",
+          "legendFormat": "5xx_ratio",
+          "refId": "A"
+        }
+      ],
+      "title": "HTTP 5xx error ratio",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      },
+      "id": 4,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(april_profile_http_requests_total{job=\"aprilhub_dynamic_targets\",env=~\"$env\",stand=~\"$stand\",host=~\"$host\",service=~\"$service\",route=\"/readyz\",status!~\"2..\"}[5m])) by (status)",
+          "legendFormat": "/readyz {{status}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Readiness (/readyz) non-2xx rate",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 16
+      },
+      "id": 5,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "targets": [
+        {
+          "expr": "max(april_profile_source_sync_lag_seconds{job=\"aprilhub_dynamic_targets\",env=~\"$env\",stand=~\"$stand\",host=~\"$host\",service=~\"$service\"}) by (tenant_id, source_system)",
+          "legendFormat": "{{tenant_id}} / {{source_system}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Source sync lag (max by tenant / source_system)",
+      "type": "timeseries"
+    }
+  ],
+  "schemaVersion": 39,
+  "style": "dark",
+  "tags": [
+    "april-profile",
+    "multi-stand",
+    "aprilhub"
+  ],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "selected": false,
+          "text": "All",
+          "value": ".*"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+        },
+        "definition": "label_values(up{job=\"aprilhub_dynamic_targets\"}, env)",
+        "hide": 0,
+        "includeAll": true,
+        "label": "env",
+        "multi": true,
+        "name": "env",
+        "options": [],
+        "query": {
+          "query": "label_values(up{job=\"aprilhub_dynamic_targets\"}, env)",
+          "refId": "Prometheus-env-Variable-Query"
+        },
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "current": {
+          "selected": false,
+          "text": "All",
+          "value": ".*"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+        },
+        "definition": "label_values(up{job=\"aprilhub_dynamic_targets\",env=~\"$env\"}, stand)",
+        "hide": 0,
+        "includeAll": true,
+        "label": "stand",
+        "multi": true,
+        "name": "stand",
+        "options": [],
+        "query": {
+          "query": "label_values(up{job=\"aprilhub_dynamic_targets\",env=~\"$env\"}, stand)",
+          "refId": "Prometheus-stand-Variable-Query"
+        },
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "current": {
+          "selected": false,
+          "text": "All",
+          "value": ".*"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+        },
+        "definition": "label_values(up{job=\"aprilhub_dynamic_targets\",env=~\"$env\",stand=~\"$stand\"}, host)",
+        "hide": 0,
+        "includeAll": true,
+        "label": "host",
+        "multi": true,
+        "name": "host",
+        "options": [],
+        "query": {
+          "query": "label_values(up{job=\"aprilhub_dynamic_targets\",env=~\"$env\",stand=~\"$stand\"}, host)",
+          "refId": "Prometheus-host-Variable-Query"
+        },
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "current": {
+          "selected": false,
+          "text": "All",
+          "value": ".*"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+        },
+        "definition": "label_values(up{job=\"aprilhub_dynamic_targets\",env=~\"$env\",stand=~\"$stand\",host=~\"$host\"}, service)",
+        "hide": 0,
+        "includeAll": true,
+        "label": "service",
+        "multi": true,
+        "name": "service",
+        "options": [],
+        "query": {
+          "query": "label_values(up{job=\"aprilhub_dynamic_targets\",env=~\"$env\",stand=~\"$stand\",host=~\"$host\"}, service)",
+          "refId": "Prometheus-service-Variable-Query"
+        },
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "title": "AprilProfile Service Overview",
+  "uid": "april-profile-service-overview",
+  "version": 1
+}
