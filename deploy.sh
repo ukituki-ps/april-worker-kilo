@@ -27,6 +27,7 @@ EOF
   SKIP_DB_BACKUP=1     не вызывать scripts/db-backup.sh (если есть)
   SKIP_MIGRATIONS=1    не вызывать scripts/run-migrations.sh (если есть)
   SKIP_FRONTEND_RECREATE=1 пропустить force-recreate frontend-сервисов при изменении lock-файлов
+  SKIP_HUB_BFF_RECREATE=1 пропустить force-recreate hub-bff при изменениях в Go-коде hub-bff/
   SKIP_KEYCLOAK_RECREATE=1 пропустить force-recreate keycloak при изменении theme/realm/compose
   SKIP_OBSERVABILITY_ONBOARD=1 пропустить авто-onboarding стенда в central observability
   SKIP_HEALTHCHECK=1   пропустить health/readiness проверки
@@ -325,6 +326,73 @@ sync_frontend_service_on_lock_change() {
   printf '%s\n' "$lock_hash" >"$state_file"
 }
 
+git_tree_rev() {
+  local path="$1"
+  if ! git -C "${ROOT}" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    return 1
+  fi
+  git -C "${ROOT}" rev-parse "HEAD:${path}" 2>/dev/null
+}
+
+sync_go_service_on_git_tree_change() {
+  local service="$1"
+  local git_path="$2"
+  local state_file="$3"
+
+  if [[ "${SKIP_HUB_BFF_RECREATE:-}" == "1" ]]; then
+    log "пропуск hub-bff force-recreate (SKIP_HUB_BFF_RECREATE=1)"
+    return 0
+  fi
+
+  local rev=""
+  rev="$(git_tree_rev "${git_path}" || true)"
+  if [[ -z "$rev" ]]; then
+    log "не удалось вычислить git tree rev для ${git_path} — пропуск sync для ${service}"
+    return 0
+  fi
+
+  local prev_rev=""
+  if [[ -f "$state_file" ]]; then
+    prev_rev="$(cat "$state_file" 2>/dev/null || true)"
+  fi
+
+  if [[ "$rev" == "$prev_rev" ]]; then
+    log "git tree без изменений для ${git_path} — force-recreate для ${service} не требуется"
+    return 0
+  fi
+
+  if ! is_service_running "$service"; then
+    log "${service} не запущен — обновляем сохранённый git tree rev и пропускаем force-recreate"
+    printf '%s\n' "$rev" >"$state_file"
+    return 0
+  fi
+
+  log "обнаружены изменения в ${git_path} — docker compose up -d --force-recreate ${service}"
+  "${compose_files[@]}" up -d --force-recreate "$service"
+  printf '%s\n' "$rev" >"$state_file"
+}
+
+repair_bind_mount_permissions() {
+  # hub-shell/hub-bff в compose запускаются от LOCAL_UID/LOCAL_GID (по умолчанию 1000),
+  # но иногда артефакты на bind-mount создаются от root (CI/временные контейнеры) → npm/vite падают с EACCES.
+  if ! command -v docker >/dev/null 2>&1; then
+    return 0
+  fi
+
+  local uid="${LOCAL_UID:-}"
+  local gid="${LOCAL_GID:-}"
+  if [[ -z "$uid" || -z "$gid" ]]; then
+    uid="$(id -u)"
+    gid="$(id -g)"
+  fi
+
+  log "проверка владельца bind-mount для hub-shell (uid:gid=${uid}:${gid})"
+  docker run --rm \
+    -v "${ROOT}:/workspace" \
+    alpine:3.20 \
+    sh -c "chown -R ${uid}:${gid} /workspace/hub-shell >/dev/null 2>&1 || true"
+}
+
 sync_frontend_dependencies() {
   if [[ "${SKIP_FRONTEND_RECREATE:-}" == "1" ]]; then
     log "пропуск frontend force-recreate (SKIP_FRONTEND_RECREATE=1)"
@@ -515,6 +583,7 @@ main() {
   persist_images_state
   run_git_pull
   run_submodules
+  repair_bind_mount_permissions
   run_openapi_lint
   run_hook "scripts/db-backup.sh" "SKIP_DB_BACKUP" "db-backup"
   run_hook "scripts/run-migrations.sh" "SKIP_MIGRATIONS" "миграции"
@@ -522,6 +591,10 @@ main() {
   run_compose
   sync_keycloak_on_theme_or_realm_change
   sync_frontend_dependencies
+  sync_go_service_on_git_tree_change \
+    "hub-bff" \
+    "hub-bff" \
+    "${state_dir}/hub-bff-git-tree.rev"
   run_observability_onboarding
   run_health_checks
   run_ingress_checks
