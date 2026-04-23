@@ -28,7 +28,19 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Ensure local cache directories
-        run: mkdir -p "$GOMODCACHE" "$GOCACHE" "$npm_config_cache"
+        run: |
+          if mkdir -p "$GOMODCACHE" "$GOCACHE" "$npm_config_cache" 2>/dev/null; then
+            echo "Using system cache paths under /var/cache/aprilhub"
+          else
+            FALLBACK_ROOT="$HOME/.cache/aprilhub"
+            mkdir -p "$FALLBACK_ROOT/go/pkg/mod" "$FALLBACK_ROOT/go/build" "$FALLBACK_ROOT/npm"
+            {
+              echo "GOMODCACHE=$FALLBACK_ROOT/go/pkg/mod"
+              echo "GOCACHE=$FALLBACK_ROOT/go/build"
+              echo "npm_config_cache=$FALLBACK_ROOT/npm"
+            } >> "$GITHUB_ENV"
+            echo "System cache not writable; switched to $FALLBACK_ROOT"
+          fi
 
       - uses: actions/setup-node@v4
         with:
@@ -63,7 +75,19 @@ jobs:
           submodules: false
 
       - name: Ensure local cache directories
-        run: mkdir -p "$GOMODCACHE" "$GOCACHE" "$npm_config_cache"
+        run: |
+          if mkdir -p "$GOMODCACHE" "$GOCACHE" "$npm_config_cache" 2>/dev/null; then
+            echo "Using system cache paths under /var/cache/aprilhub"
+          else
+            FALLBACK_ROOT="$HOME/.cache/aprilhub"
+            mkdir -p "$FALLBACK_ROOT/go/pkg/mod" "$FALLBACK_ROOT/go/build" "$FALLBACK_ROOT/npm"
+            {
+              echo "GOMODCACHE=$FALLBACK_ROOT/go/pkg/mod"
+              echo "GOCACHE=$FALLBACK_ROOT/go/build"
+              echo "npm_config_cache=$FALLBACK_ROOT/npm"
+            } >> "$GITHUB_ENV"
+            echo "System cache not writable; switched to $FALLBACK_ROOT"
+          fi
 
       - name: Init git submodules (public DisignApril; avoid GITHUB_TOKEN 404)
         run: ./scripts/ci-init-git-submodules.sh

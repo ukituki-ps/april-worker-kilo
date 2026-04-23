@@ -51,6 +51,8 @@ CI workflow `.github/workflows/ci.yml` выполняется на отдель�
 - `GOCACHE=/var/cache/aprilhub/go/build`
 - `npm_config_cache=/var/cache/aprilhub/npm`
 
+Если runner-пользователь не имеет прав на `/var/cache/aprilhub`, workflow автоматически переключается на fallback в `$HOME/.cache/aprilhub/*` без падения job.
+
 Базовая подготовка на хосте:
 
 - `mkdir -p /var/cache/aprilhub/go/pkg/mod /var/cache/aprilhub/go/build /var/cache/aprilhub/npm`
