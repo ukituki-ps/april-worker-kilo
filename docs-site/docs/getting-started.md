@@ -128,3 +128,17 @@ curl -i \
   -H "X-Tenant-Id: demo-tenant" \
   http://localhost:8081/api/v1/admin/profile/api/v1/admin/users
 ```
+
+## Widget host e2e smoke (task 023)
+
+Минимальный smoke-сценарий host-driven интеграции profile widget запускается отдельным скриптом:
+
+```bash
+./scripts/run-playwright-aprilhub.sh
+```
+
+Сценарий проверяет:
+- гостевой вход и redirect в Keycloak;
+- вход тестовым пользователем;
+- отображение profile widget в авторизованной зоне Hub;
+- успешный callback `onSaveSuccess` после сохранения.

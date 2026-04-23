@@ -20,6 +20,7 @@ type AppProps = {
 const shellNavigation = [
   { id: "overview", label: "Обзор платформы", href: "#overview" },
   { id: "roles", label: "Роли доступа", href: "#roles" },
+  { id: "profile-widget", label: "Профиль (виджет)", href: "#profile-widget" },
   { id: "admin-control", label: "Админ-контур", href: "#admin-control" },
 ];
 

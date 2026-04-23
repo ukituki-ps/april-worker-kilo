@@ -38,4 +38,35 @@ test.describe("AprilHub smoke e2e", () => {
     await page.getByLabel("Меню профиля и настроек").click();
     await expect(page.getByRole("menuitem", { name: "Выйти" })).toBeVisible();
   });
+
+  test("рендерит profile widget и фиксирует onSaveSuccess", async ({ page }) => {
+    await page.route("**/api/v1/admin/profile/v1/entities/*", async (route) => {
+      if (route.request().method() !== "PUT") {
+        await route.continue();
+        return;
+      }
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          entity_id: "00000000-0000-0000-0000-000000000001",
+          version: 2,
+          document: {
+            tenant_id: "default",
+          },
+        }),
+      });
+    });
+
+    await page.goto("/");
+    await startLoginFromGuestHeader(page);
+    await page.locator("#username").fill(process.env.PLAYWRIGHT_USER ?? "april-dev");
+    await page.locator("#password").fill(process.env.PLAYWRIGHT_PASSWORD ?? "april-dev-pass");
+    await page.locator("#kc-login").click();
+
+    await page.waitForURL("/");
+    await expect(page.getByRole("heading", { name: "Профиль (виджет)" })).toBeVisible();
+    await page.getByRole("button", { name: "Сохранить профиль" }).click();
+    await expect(page.getByTestId("profile-widget-save-success")).toContainText("onSaveSuccess");
+  });
 });
