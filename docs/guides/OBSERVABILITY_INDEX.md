@@ -17,12 +17,15 @@
 - Stack root: `infra/observability/`
 - Compose: `infra/observability/docker-compose.yml`
 - Prometheus config: `infra/observability/config/prometheus/prometheus.yml`
-- Alert rules: `infra/observability/config/prometheus/rules/aprilhub-alerts.yml`
+- Alert rules:
+  - `infra/observability/config/prometheus/rules/aprilhub-alerts.yml`
+  - `infra/observability/config/prometheus/rules/aprilprofile-alerts.yml` (AprilProfile)
 - Promtail (central): `infra/observability/config/promtail/promtail.yml`
 - Promtail agent (remote stands): `infra/observability/agents/promtail/`
 - Dashboards:
   - `infra/observability/grafana/dashboards/multi-stand-overview.json`
   - `infra/observability/grafana/dashboards/multi-stand-logs-overview.json`
+  - `infra/observability/grafana/dashboards/april-profile-service-overview.json` (AprilProfile; UID `april-profile-service-overview`)
 
 ## Quick scenarios
 
@@ -65,6 +68,7 @@ Reference:
 - Grafana dashboards:
   - `Multi Stand Service Overview`
   - `Multi Stand Logs Overview`
+  - `AprilProfile Service Overview`
 - Loki explore query:
 
 ```logql
@@ -77,6 +81,8 @@ Reference:
   - `docs/runbooks/OBSERVABILITY_STACK_DEPLOY.md`
 - Onboarding and query troubleshooting:
   - `docs/runbooks/OBSERVABILITY_STACK_ONBOARDING.md`
+- AprilProfile SLO (черновик) и алерты:
+  - `docs/runbooks/APRILPROFILE_SLO_DRAFT.md`
 - Agent execution checklist:
   - `docs/guides/OBSERVABILITY_AGENT_PLAYBOOK.md`
 
