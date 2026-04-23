@@ -14,7 +14,7 @@ concurrency:
 jobs:
   openapi-compatibility:
     name: OpenAPI compatibility (no breaking changes)
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, ci, profile]
     timeout-minutes: 10
     steps:
       - name: Checkout
@@ -37,7 +37,7 @@ jobs:
 
   quality:
     name: Lint OpenAPI and build docs
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, ci, profile]
     timeout-minutes: 20
     steps:
       - name: Checkout
@@ -58,7 +58,7 @@ jobs:
 
   hub-bff:
     name: Hub BFF tests
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, ci, profile]
     timeout-minutes: 10
     steps:
       - name: Checkout
@@ -75,7 +75,7 @@ jobs:
 
   hub-shell:
     name: Hub Shell lint, test and build
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, ci, profile]
     timeout-minutes: 10
     steps:
       - name: Checkout
@@ -118,7 +118,7 @@ jobs:
 
   hub-shell-alpine-runtime:
     name: Hub Shell alpine runtime preflight
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, ci, profile]
     timeout-minutes: 15
     steps:
       - name: Checkout
@@ -139,7 +139,7 @@ jobs:
 
   aprilhub-smoke:
     name: AprilHub runtime smoke
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, ci, profile]
     timeout-minutes: 15
     steps:
       - name: Checkout
@@ -165,7 +165,7 @@ jobs:
 
   aprilhub-k6-baseline:
     name: AprilHub k6 baseline
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, ci, profile]
     timeout-minutes: 20
     steps:
       - name: Checkout

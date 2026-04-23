@@ -2,7 +2,7 @@
 
 Документ для агента и команды: зафиксированные решения и порядок шагов для деплоя на **dev-хост** (`DEV_HOST`). Конкретные значения — в [`guides/PROJECT_DEFAULTS.md`](./guides/PROJECT_DEFAULTS.md); при копировании шаблона замените их по [`guides/FORK_AND_CUSTOMIZE.md`](./guides/FORK_AND_CUSTOMIZE.md).
 
-Ниже для микросервиса **aprilWorker**: `DEV_HOST` = `dev.example.com`, **`DEPLOY_ROOT`** = `/opt/april-worker`.
+Ниже для микросервиса **AprilProfile**: `DEV_HOST` = `dev.profile.april.ukituki.tech`, `DEV_HOST_IP` = `192.168.1.42` (Orange Pi), **`DEPLOY_ROOT`** = `/opt/april-profile`. CI self-hosted runner размещён отдельно на `192.168.1.29`.
 
 ## 1. Репозиторий и триггеры
 
@@ -21,16 +21,18 @@
 
 **Практика для GitHub Actions:** workflow запускается на **`push` в `develop`** (merge PR даёт такой push). Чтобы исключить прямой push в `develop`, на GitHub включается **branch protection** для `develop` (запрет прямых push, обязательный PR). Тогда событие `push` в `develop` по смыслу соответствует «приняли PR».
 
-**Реализация в репозитории:** workflow **Deploy to dev** (файл `.github/workflows/dev-deploy.yml`) на **self-hosted** runner с labels **`dev`** и **`RUNNER_LABEL_EXTRA`** (для april-worker: `worker`) выполняет в каталоге клона (**`DEPLOY_ROOT`**, для april-worker: `/opt/april-worker`) `git fetch`, переход на коммит **`github.sha`**, затем **`SKIP_GIT_PULL=1 ./deploy.sh`**. Путь к клону можно переопределить **repository variable** `APRIL_DEPLOY_ROOT`. Ручной перезапуск того же сценария — **Actions → Deploy to dev → Run workflow** (`workflow_dispatch`).
+**Реализация в репозитории:** workflow **Deploy to dev** (файл `.github/workflows/dev-deploy.yml`) на **self-hosted** runner с labels **`dev`** и **`RUNNER_LABEL_EXTRA`** (для AprilProfile: `profile`) выполняет в каталоге клона (**`DEPLOY_ROOT`**, для AprilProfile: `/opt/april-profile`) `git fetch`, переход на коммит **`github.sha`**, затем **`SKIP_GIT_PULL=1 ./deploy.sh`**. Путь к клону можно переопределить **repository variable** `APRIL_DEPLOY_ROOT`. Ручной перезапуск того же сценария — **Actions → Deploy to dev → Run workflow** (`workflow_dispatch`).
 
 ## 2. Runner
 
 | Решение | Значение |
 |--------|----------|
-| Размещение | Тот же сервер, что обслуживает `DEV_HOST` (для april-worker: `dev.example.com`) |
+| Размещение | Deploy runner на том же сервере, что обслуживает `DEV_HOST` (для AprilProfile: `dev.profile.april.ukituki.tech` / `192.168.1.42`) |
 | Охват | Один runner на все репозитории |
 | Администрирование | Вручную: обновления и перезапуск `actions.runner` |
-| Labels | `dev`, **`RUNNER_LABEL_EXTRA`** — jobs указывают `runs-on` с этими labels (для april-worker: `dev`, `worker`) |
+| Labels | `dev`, **`RUNNER_LABEL_EXTRA`** — jobs указывают `runs-on` с этими labels (для AprilProfile: `dev`, `profile`) |
+
+CI jobs (`.github/workflows/ci.yml`) выполняются на отдельном self-hosted runner на `192.168.1.29` с labels `self-hosted`, `ci`, `profile`.
 
 | Решение | Значение |
 |--------|----------|
@@ -40,7 +42,7 @@
 ## 3. Секреты
 
 - **GitHub Secrets** — всё, что нужно CI (логин в ghcr, при необходимости токены).
-- **На сервере** — `.env` и при необходимости отдельные env-файлы вне репозитория в каталоге **`DEPLOY_ROOT`** (для april-worker: `/opt/april-worker`).
+- **На сервере** — `.env` и при необходимости отдельные env-файлы вне репозитория в каталоге **`DEPLOY_ROOT`** (для AprilProfile: `/opt/april-profile`).
 
 Ограничение workflow по путям/файлам: **не используется** — любой merge в `develop` ведёт к полному пайплайну.
 
@@ -56,7 +58,7 @@
 
 | Решение | Значение |
 |--------|----------|
-| Путь на сервере | `DEPLOY_ROOT` (для april-worker: `/opt/april-worker`) |
+| Путь на сервере | `DEPLOY_ROOT` (для AprilProfile: `/opt/april-profile`) |
 | Обновление исходников на сервере | **`git pull`** в этом каталоге |
 | Инструмент | **`docker compose` v2** |
 | Файлы | `docker-compose.yml` + overrides |
@@ -160,13 +162,13 @@ Release-gate checklist для завершения AprilHub roadmap `001-010`: [
 - [`runbooks/OBSERVABILITY_STACK_DEPLOY.md`](./runbooks/OBSERVABILITY_STACK_DEPLOY.md)
 - [`runbooks/OBSERVABILITY_STACK_ONBOARDING.md`](./runbooks/OBSERVABILITY_STACK_ONBOARDING.md)
 
-- Ручной redeploy на сервере: из каталога клона (**`DEPLOY_ROOT`**, для april-worker: `/opt/april-worker`) выполнить **`./deploy.sh`** (обёртка над шагами ниже; см. `--help` и переменные `SKIP_*` / `AUTO_ROLLBACK` / `REQUIRE_IMAGES_ENV`).
+- Ручной redeploy на сервере: из каталога клона (**`DEPLOY_ROOT`**, для AprilProfile: `/opt/april-profile`) выполнить **`./deploy.sh`** (обёртка над шагами ниже; см. `--help` и переменные `SKIP_*` / `AUTO_ROLLBACK` / `REQUIRE_IMAGES_ENV`).
 - Артефакты деплоя (`compose config`, `compose ps`, smoke/rollback логи, commit SHA) сохраняются в `.deploy-artifacts/deploy-<timestamp>` и подхватываются workflow как artifacts.
 - Уведомления (Telegram, Slack, email): не используются.
 
 ## 12. Порядок шагов для агента (скелет pipeline)
 
-1. Job на runner с labels `self-hosted`, `dev`, **`RUNNER_LABEL_EXTRA`** (для april-worker: `worker`), ref = commit после merge в `develop`.
+1. Job на runner с labels `self-hosted`, `dev`, **`RUNNER_LABEL_EXTRA`** (для AprilProfile: `profile`), ref = commit после merge в `develop`.
 2. Сборка и тесты (как принято в репо).
 3. Сборка образов, push в ghcr.io с тегом по **git sha**.
 4. На сервере: `cd` в **`DEPLOY_ROOT`** → **`./deploy.sh`** (внутри: preflight + `git pull`, `make openapi-lint`, `scripts/db-backup.sh`, `scripts/run-migrations.sh`, `make docs-build`, `docker compose pull` → `up -d`, health/readiness, ingress-check `/` c блокировкой 5xx, `scripts/smoke-after-deploy.sh`, фиксация `last-good`). Дополнительно `deploy.sh` отслеживает изменения lock-файлов фронтенда (`hub-shell/package-lock.json`, `design-system/DisignApril/pnpm-lock.yaml`) и делает `docker compose up -d --force-recreate` для соответствующего сервиса (`hub-shell` / `april-showcase`), чтобы гарантировать повторную установку зависимостей после merge. Либо те же шаги вручную: `git pull` → п.5–9.
@@ -211,12 +213,12 @@ Release-gate checklist для завершения AprilHub roadmap `001-010`: [
 
 ### Локально и в CI
 
-- На **pull request** и **push** в `main` / `develop`: workflow **CI** (`.github/workflows/ci.yml`) на GitHub-hosted runner выполняет `make openapi-lint` и `make docs-build` (без деплоя).
+- На **pull request** и **push** в `main` / `develop`: workflow **CI** (`.github/workflows/ci.yml`) на self-hosted runner (`self-hosted`, `ci`, `profile`, хост `192.168.1.29`) выполняет `make openapi-lint` и `make docs-build` (без деплоя).
 - Сборка сайта: из корня репозитория `make docs-build` (внутри: `npm ci` + `npm run build` в `docs-site/`).
 - Проверка OpenAPI: `make openapi-lint` (Redocly, конфиг `redocly.yaml`).
 - Просмотр через Compose: после `make docs-build` — `docker compose up -d`; Nginx работает как unified ingress: `hub-shell` на `/`, docs на `/docs/`, OpenAPI на `/openapi/`, Swagger UI на `/swagger/`; Structurizr Lite — отдельный порт (см. `.env.example`).
 
-### На dev-хосте (`DEV_HOST`, для april-worker: `dev.example.com`)
+### На dev-хосте (`DEV_HOST`, для AprilProfile: `dev.profile.april.ukituki.tech`)
 
 1. После `git pull` в **`DEPLOY_ROOT`** — **`./deploy.sh`** (включает `make docs-build`; нужны Node.js 18+ и npm на сервере, либо собрать статику в CI и скопировать артефакт — по договорённости) или вручную `make docs-build`.
 2. Поднять/обновить сервисы — шаг `docker compose up -d` внутри **`deploy.sh`** с тем же `docker-compose.yml` (публично достаточно ingress-порта Nginx; TLS остаётся на внешнем reverse proxy/edge).
