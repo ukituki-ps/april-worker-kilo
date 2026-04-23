@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"slices"
 	"strings"
+	"time"
 
 	"github.com/MicahParks/keyfunc/v3"
 	"github.com/golang-jwt/jwt/v5"
@@ -36,7 +37,20 @@ type Middleware struct {
 }
 
 func NewMiddleware(issuer, audience, jwksURL string) (*Middleware, error) {
-	jwks, err := keyfunc.NewDefaultCtx(context.Background(), []string{jwksURL})
+	var (
+		jwks keyfunc.Keyfunc
+		err  error
+	)
+	for attempt := 1; attempt <= 60; attempt++ {
+		jwks, err = keyfunc.NewDefaultCtx(context.Background(), []string{jwksURL})
+		if err == nil {
+			break
+		}
+		// Keycloak can be started in parallel with hub-bff in compose/CI.
+		if attempt < 60 {
+			time.Sleep(2 * time.Second)
+		}
+	}
 	if err != nil {
 		return nil, fmt.Errorf("create jwks client: %w", err)
 	}

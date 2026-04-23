@@ -40,13 +40,7 @@ services:
     profiles: ["aprilhub"]
     user: "${LOCAL_UID:-1000}:${LOCAL_GID:-1000}"
     working_dir: /workspace/hub-bff
-    command: >-
-      sh -c "go mod download &&
-      until wget -q -O- ${KEYCLOAK_JWKS_URL:-http://keycloak:8080/auth/realms/april/protocol/openid-connect/certs} >/dev/null; do
-        echo 'hub-bff: waiting for Keycloak JWKS...';
-        sleep 2;
-      done &&
-      go run ./cmd/hub-bff"
+    command: sh -c "go mod download && go run ./cmd/hub-bff"
     environment:
       HUB_BFF_PORT: ${HUB_BFF_PORT:-8081}
       KEYCLOAK_URL: ${KEYCLOAK_URL:-http://keycloak:8080/auth}
