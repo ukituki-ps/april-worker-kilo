@@ -13,6 +13,11 @@ jobs:
   docs-and-compose:
     runs-on: [self-hosted, ci, profile]
     steps:
+      - name: Pre-clean workspace (best effort)
+        run: |
+          WORKDIR="${GITHUB_WORKSPACE:-$PWD}"
+          chown -R "$(id -u):$(id -g)" "$WORKDIR" 2>/dev/null || true
+          rm -rf "$WORKDIR/.pnpm-store" "$WORKDIR/hub-shell/node_modules" "$WORKDIR/hub-shell/dist" || true
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
@@ -38,6 +43,11 @@ jobs:
   hub-modules-smoke:
     runs-on: [self-hosted, ci, profile]
     steps:
+      - name: Pre-clean workspace (best effort)
+        run: |
+          WORKDIR="${GITHUB_WORKSPACE:-$PWD}"
+          chown -R "$(id -u):$(id -g)" "$WORKDIR" 2>/dev/null || true
+          rm -rf "$WORKDIR/.pnpm-store" "$WORKDIR/hub-shell/node_modules" "$WORKDIR/hub-shell/dist" || true
       - uses: actions/checkout@v4
         with:
           submodules: false

@@ -17,6 +17,11 @@ jobs:
     runs-on: [self-hosted, ci, profile]
     timeout-minutes: 10
     steps:
+      - name: Pre-clean workspace (best effort)
+        run: |
+          WORKDIR="${GITHUB_WORKSPACE:-$PWD}"
+          chown -R "$(id -u):$(id -g)" "$WORKDIR" 2>/dev/null || true
+          rm -rf "$WORKDIR/.pnpm-store" "$WORKDIR/hub-shell/node_modules" "$WORKDIR/hub-shell/dist" || true
       - name: Checkout
         uses: actions/checkout@v4
         with:
@@ -41,6 +46,11 @@ jobs:
     runs-on: [self-hosted, ci, profile]
     timeout-minutes: 20
     steps:
+      - name: Pre-clean workspace (best effort)
+        run: |
+          WORKDIR="${GITHUB_WORKSPACE:-$PWD}"
+          chown -R "$(id -u):$(id -g)" "$WORKDIR" 2>/dev/null || true
+          rm -rf "$WORKDIR/.pnpm-store" "$WORKDIR/hub-shell/node_modules" "$WORKDIR/hub-shell/dist" || true
       - name: Checkout
         uses: actions/checkout@v4
         with:
@@ -64,6 +74,11 @@ jobs:
     runs-on: [self-hosted, ci, profile]
     timeout-minutes: 10
     steps:
+      - name: Pre-clean workspace (best effort)
+        run: |
+          WORKDIR="${GITHUB_WORKSPACE:-$PWD}"
+          chown -R "$(id -u):$(id -g)" "$WORKDIR" 2>/dev/null || true
+          rm -rf "$WORKDIR/.pnpm-store" "$WORKDIR/hub-shell/node_modules" "$WORKDIR/hub-shell/dist" || true
       - name: Checkout
         uses: actions/checkout@v4
         with:
@@ -83,6 +98,11 @@ jobs:
     runs-on: [self-hosted, ci, profile]
     timeout-minutes: 10
     steps:
+      - name: Pre-clean workspace (best effort)
+        run: |
+          WORKDIR="${GITHUB_WORKSPACE:-$PWD}"
+          chown -R "$(id -u):$(id -g)" "$WORKDIR" 2>/dev/null || true
+          rm -rf "$WORKDIR/.pnpm-store" "$WORKDIR/hub-shell/node_modules" "$WORKDIR/hub-shell/dist" || true
       - name: Checkout
         uses: actions/checkout@v4
         with:
@@ -127,6 +147,11 @@ jobs:
     runs-on: [self-hosted, ci, profile]
     timeout-minutes: 15
     steps:
+      - name: Pre-clean workspace (best effort)
+        run: |
+          WORKDIR="${GITHUB_WORKSPACE:-$PWD}"
+          chown -R "$(id -u):$(id -g)" "$WORKDIR" 2>/dev/null || true
+          rm -rf "$WORKDIR/.pnpm-store" "$WORKDIR/hub-shell/node_modules" "$WORKDIR/hub-shell/dist" || true
       - name: Checkout
         uses: actions/checkout@v4
         with:
@@ -152,6 +177,11 @@ jobs:
     runs-on: [self-hosted, ci, profile]
     timeout-minutes: 15
     steps:
+      - name: Pre-clean workspace (best effort)
+        run: |
+          WORKDIR="${GITHUB_WORKSPACE:-$PWD}"
+          chown -R "$(id -u):$(id -g)" "$WORKDIR" 2>/dev/null || true
+          rm -rf "$WORKDIR/.pnpm-store" "$WORKDIR/hub-shell/node_modules" "$WORKDIR/hub-shell/dist" || true
       - name: Checkout
         uses: actions/checkout@v4
         with:
@@ -179,6 +209,11 @@ jobs:
     runs-on: [self-hosted, ci, profile]
     timeout-minutes: 20
     steps:
+      - name: Pre-clean workspace (best effort)
+        run: |
+          WORKDIR="${GITHUB_WORKSPACE:-$PWD}"
+          chown -R "$(id -u):$(id -g)" "$WORKDIR" 2>/dev/null || true
+          rm -rf "$WORKDIR/.pnpm-store" "$WORKDIR/hub-shell/node_modules" "$WORKDIR/hub-shell/dist" || true
       - name: Checkout
         uses: actions/checkout@v4
         with:
