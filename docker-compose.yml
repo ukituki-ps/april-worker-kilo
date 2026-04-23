@@ -40,7 +40,13 @@ services:
     profiles: ["aprilhub"]
     user: "${LOCAL_UID:-1000}:${LOCAL_GID:-1000}"
     working_dir: /workspace/hub-bff
-    command: sh -c "go mod download && go run ./cmd/hub-bff"
+    command: >-
+      sh -c "go mod download &&
+      until wget -q -O- ${KEYCLOAK_JWKS_URL:-http://keycloak:8080/auth/realms/april/protocol/openid-connect/certs} >/dev/null; do
+        echo 'hub-bff: waiting for Keycloak JWKS...';
+        sleep 2;
+      done &&
+      go run ./cmd/hub-bff"
     environment:
       HUB_BFF_PORT: ${HUB_BFF_PORT:-8081}
       KEYCLOAK_URL: ${KEYCLOAK_URL:-http://keycloak:8080/auth}
@@ -81,7 +87,12 @@ services:
     profiles: ["aprilhub"]
     user: "${LOCAL_UID:-1000}:${LOCAL_GID:-1000}"
     working_dir: /workspace/design-system/DisignApril
-    command: sh -c "corepack enable && CI=true pnpm install --frozen-lockfile && pnpm --filter @april/showcase exec vite --host 0.0.0.0 --port ${APRIL_SHOWCASE_PORT:-4174}"
+    command: >-
+      sh -c "mkdir -p /tmp/.local/bin &&
+      export PATH=/tmp/.local/bin:$PATH &&
+      corepack enable --install-directory /tmp/.local/bin &&
+      CI=true pnpm install --frozen-lockfile &&
+      pnpm --filter @april/showcase exec vite --host 0.0.0.0 --port ${APRIL_SHOWCASE_PORT:-4174}"
     volumes:
       - ./:/workspace
     expose:
