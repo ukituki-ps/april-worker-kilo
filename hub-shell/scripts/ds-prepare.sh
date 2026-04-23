@@ -48,6 +48,9 @@ if [ -d "${DS_DIR}/packages/tokens/dist" ] && [ ! -w "${DS_DIR}/packages/tokens/
   exit 0
 fi
 
-corepack enable
+COREPACK_INSTALL_DIR="${COREPACK_INSTALL_DIR:-/tmp/.local/bin}"
+mkdir -p "${COREPACK_INSTALL_DIR}"
+export PATH="${COREPACK_INSTALL_DIR}:$PATH"
+corepack enable --install-directory "${COREPACK_INSTALL_DIR}"
 CI=true pnpm --dir "${DS_DIR}" install --frozen-lockfile
 pnpm --dir "${DS_DIR}" build
