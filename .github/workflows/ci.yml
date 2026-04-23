@@ -292,7 +292,9 @@ jobs:
         run: mkdir -p artifacts/smoke
 
       - name: Run AprilHub smoke checks
-        run: ./scripts/smoke-aprilhub.sh | tee artifacts/smoke/smoke.log
+        run: |
+          set -o pipefail
+          ./scripts/smoke-aprilhub.sh | tee artifacts/smoke/smoke.log
 
       - name: Upload smoke artifacts
         if: always()
@@ -341,7 +343,9 @@ jobs:
       - name: Run AprilHub k6 baseline
         env:
           K6_SUMMARY_EXPORT: artifacts/k6/summary.json
-        run: ./scripts/run-k6-aprilhub.sh | tee artifacts/k6/k6.log
+        run: |
+          set -o pipefail
+          ./scripts/run-k6-aprilhub.sh | tee artifacts/k6/k6.log
 
       - name: Upload k6 artifacts
         if: always()

@@ -21,6 +21,13 @@ compose() {
   docker compose -p "$COMPOSE_PROJECT_NAME" "$@"
 }
 
+debug_compose_state() {
+  echo "[smoke] compose service status:"
+  compose --profile aprilhub ps || true
+  echo "[smoke] recent compose logs:"
+  compose --profile aprilhub logs --tail=120 || true
+}
+
 cleanup() {
   if [[ "$started_compose" -eq 1 ]]; then
     compose --profile aprilhub down -v >/dev/null 2>&1 || true
@@ -36,23 +43,40 @@ else
   started_compose=1
 fi
 
-echo "[smoke] waiting for ingress health endpoint"
-for _ in {1..60}; do
-  if curl -fsS "${ingress_base}/healthz" >/dev/null; then
-    break
+wait_http_code() {
+  local expected="$1"
+  local url="$2"
+  local attempts="$3"
+  local sleep_seconds="$4"
+  local label="$5"
+  shift 5
+
+  local code=""
+  for ((attempt = 1; attempt <= attempts; attempt++)); do
+    code="$(curl -sS --max-time 15 -o /tmp/smoke.out -w "%{http_code}" "$@" "$url" || true)"
+    if [[ "$code" == "$expected" ]]; then
+      return 0
+    fi
+    if (( attempt % 10 == 0 )); then
+      echo "[smoke] ${label}: attempt ${attempt}/${attempts}, got HTTP ${code:-000}, waiting..."
+    fi
+    sleep "$sleep_seconds"
+  done
+
+  echo "[smoke] ${label}: expected HTTP ${expected}, got ${code:-000} for ${url}"
+  if [[ -s /tmp/smoke.out ]]; then
+    echo "[smoke] last response body:"
+    cat /tmp/smoke.out
   fi
-  sleep 2
-done
-curl -fsS "${ingress_base}/healthz" >/dev/null
+  debug_compose_state
+  exit 1
+}
+
+echo "[smoke] waiting for ingress health endpoint"
+wait_http_code "200" "${ingress_base}/healthz" 120 2 "ingress health endpoint"
 
 echo "[smoke] waiting for keycloak token endpoint"
-for _ in {1..60}; do
-  if curl -fsS "${ingress_base}/auth/realms/april/.well-known/openid-configuration" >/dev/null; then
-    break
-  fi
-  sleep 2
-done
-curl -fsS "${ingress_base}/auth/realms/april/.well-known/openid-configuration" >/dev/null
+wait_http_code "200" "${ingress_base}/auth/realms/april/.well-known/openid-configuration" 120 2 "keycloak oidc config endpoint"
 
 echo "[smoke] checking keycloak login page theme (ru + aprilhub css)"
 CODE_VERIFIER="$(
@@ -105,24 +129,18 @@ PY
 expect_http_code() {
   local expected="$1"
   local url="$2"
-  shift 2
-  local code
-  code="$(curl -sS --max-time 15 -o /tmp/smoke.out -w "%{http_code}" "$@" "$url")"
-  if [[ "$code" != "$expected" ]]; then
-    echo "[smoke] expected HTTP $expected, got $code for $url"
-    cat /tmp/smoke.out
-    exit 1
+  local label="${3:-request check}"
+  if [[ $# -ge 3 ]]; then
+    shift 3
+  else
+    shift 2
   fi
+  wait_http_code "$expected" "$url" 1 0 "$label" "$@"
 }
 
 echo "[smoke] checking shell entrypoint"
-for _ in {1..180}; do
-  if curl -fsS "${ingress_base}/" >/dev/null; then
-    break
-  fi
-  sleep 2
-done
-expect_http_code "200" "${ingress_base}/"
+wait_http_code "200" "${ingress_base}/" 300 2 "shell entrypoint"
+expect_http_code "200" "${ingress_base}/" "shell entrypoint"
 curl -fsS "${ingress_base}/" -o /tmp/shell-entrypoint.html
 python3 - <<'PY'
 from pathlib import Path
@@ -131,16 +149,11 @@ assert "<title>April — экосистема инструментов упра�
 PY
 
 echo "[smoke] checking design-system showcase entrypoint"
-for _ in {1..180}; do
-  if curl -fsS "${ingress_base}/showcase/" >/dev/null; then
-    break
-  fi
-  sleep 2
-done
-expect_http_code "200" "${ingress_base}/showcase/"
+wait_http_code "200" "${ingress_base}/showcase/" 300 2 "showcase entrypoint"
+expect_http_code "200" "${ingress_base}/showcase/" "showcase entrypoint"
 
 echo "[smoke] checking unauthenticated path"
-expect_http_code "401" "${ingress_base}/api/v1/aggregation/dashboard"
+expect_http_code "401" "${ingress_base}/api/v1/aggregation/dashboard" "unauthenticated dashboard"
 
 echo "[smoke] obtaining Keycloak dev token"
 TOKEN="$(
@@ -154,13 +167,14 @@ TOKEN="$(
 )"
 if [[ -z "$TOKEN" ]]; then
   echo "[smoke] token is empty"
+  debug_compose_state
   exit 1
 fi
 
 echo "[smoke] checking authorized and role-guard paths"
-expect_http_code "200" "${ingress_base}/api/v1/me" -H "Authorization: Bearer $TOKEN"
-expect_http_code "403" "${ingress_base}/api/v1/admin/ping" -H "Authorization: Bearer $TOKEN"
-expect_http_code "200" "${ingress_base}/api/v1/aggregation/dashboard" \
+expect_http_code "200" "${ingress_base}/api/v1/me" "authorized me endpoint" -H "Authorization: Bearer $TOKEN"
+expect_http_code "403" "${ingress_base}/api/v1/admin/ping" "rbac deny endpoint" -H "Authorization: Bearer $TOKEN"
+expect_http_code "200" "${ingress_base}/api/v1/aggregation/dashboard" "authorized dashboard endpoint" \
   -H "Authorization: Bearer $TOKEN" \
   -H "X-Correlation-Id: corr-smoke-ci" \
   -H "X-Request-Id: req-smoke-ci"

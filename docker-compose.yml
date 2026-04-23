@@ -61,7 +61,7 @@ services:
     profiles: ["aprilhub"]
     user: "${LOCAL_UID:-1000}:${LOCAL_GID:-1000}"
     working_dir: /workspace/hub-shell
-    command: sh -c "npm install && npm run dev -- --host 0.0.0.0 --port ${HUB_SHELL_PORT:-4173}"
+    command: sh -c "npm ci && npm run dev -- --host 0.0.0.0 --port ${HUB_SHELL_PORT:-4173}"
     environment:
       VITE_API_BASE_URL: ${VITE_API_BASE_URL:-/api}
       VITE_KEYCLOAK_URL: ${VITE_KEYCLOAK_URL:-/auth}
