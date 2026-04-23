@@ -170,7 +170,7 @@ jobs:
             -v "$PWD:/workspace" \
             -w /workspace/hub-shell \
             node:20-alpine \
-            sh -lc "export PATH=/tmp/.local/bin:$PATH && corepack enable --install-directory /tmp/.local/bin && npm ci && npm run ds:prepare && npm run build"
+            sh -lc "mkdir -p /tmp/.local/bin && export PATH=/tmp/.local/bin:$PATH && corepack enable --install-directory /tmp/.local/bin && npm ci && npm run ds:prepare && npm run build"
 
   aprilhub-smoke:
     name: AprilHub runtime smoke
