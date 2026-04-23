@@ -97,6 +97,7 @@ if [[ -n "$K6_SUMMARY_EXPORT" ]]; then
 fi
 
 docker run --rm --network "${COMPOSE_PROJECT_NAME}_default" \
+  --user "${LOCAL_UID}:${LOCAL_GID}" \
   -e BASE_URL="http://hub-bff:${HUB_BFF_PORT}" \
   -e AUTH_TOKEN="$TOKEN" \
   -e K6_VUS="$K6_VUS" \
@@ -104,5 +105,12 @@ docker run --rm --network "${COMPOSE_PROJECT_NAME}_default" \
   -v "$ROOT_DIR/k6:/scripts:ro" \
   "${DOCKER_VOLUME_ARGS[@]}" \
   grafana/k6:0.53.0 run "${K6_ARGS[@]}" /scripts/aprilhub-baseline.js
+
+if [[ -n "$K6_SUMMARY_EXPORT" ]]; then
+  if [[ ! -s "$K6_SUMMARY_EXPORT" ]]; then
+    echo "[k6] summary export is missing or empty at $K6_SUMMARY_EXPORT"
+    exit 1
+  fi
+fi
 
 echo "[k6] baseline completed"

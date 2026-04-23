@@ -12,6 +12,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
   GOMODCACHE: /var/cache/aprilhub/go/pkg/mod
   GOCACHE: /var/cache/aprilhub/go/build
   npm_config_cache: /var/cache/aprilhub/npm
@@ -54,6 +55,7 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: "1.24.x"
+          cache: false
 
       - name: Install oasdiff
         run: go install github.com/oasdiff/oasdiff@latest
@@ -140,6 +142,7 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version-file: hub-bff/go.mod
+          cache-dependency-path: hub-bff/go.sum
 
       - name: Run Hub BFF tests
         working-directory: hub-bff
