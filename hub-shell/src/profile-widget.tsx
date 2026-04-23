@@ -36,7 +36,25 @@ type Snapshot = {
   document: Record<string, unknown>;
 };
 
+type ApiErrorPayload = {
+  code?: string;
+  message?: string;
+};
+
 const prettyJson = (value: unknown): string => JSON.stringify(value ?? {}, null, 2);
+
+const toUserErrorMessage = (status: number, payload: ApiErrorPayload): string => {
+  if (status === 404 && payload.code === "entity_not_found") {
+    return "Сущность профиля не найдена. Сначала создайте профиль через POST /v1/entities.";
+  }
+  if (status === 409 && payload.code === "authority_all_blocked") {
+    return "Сохранение отклонено политикой authority для всех переданных полей.";
+  }
+  if (payload.message) {
+    return payload.message;
+  }
+  return `profile save failed: ${status}`;
+};
 
 export function EntityProfileWidget({
   hostContext,
@@ -63,6 +81,7 @@ export function EntityProfileWidget({
     setSaveState("saving");
     setError("");
     try {
+      const body = { document };
       const response = await fetch(`${apiBaseUrl}/v1/entities/${entityId}`, {
         method: "PUT",
         headers: {
@@ -70,10 +89,16 @@ export function EntityProfileWidget({
           ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
           ...(hostContext.telemetry?.requestId ? { "X-Request-Id": hostContext.telemetry.requestId } : {}),
         },
-        body: JSON.stringify({ document }),
+        body: JSON.stringify(body),
       });
       if (!response.ok) {
-        throw new Error(`profile save failed: ${response.status}`);
+        let payload: ApiErrorPayload = {};
+        try {
+          payload = (await response.json()) as ApiErrorPayload;
+        } catch {
+          payload = {};
+        }
+        throw new Error(toUserErrorMessage(response.status, payload));
       }
       const payload = (await response.json()) as Snapshot;
       setVersion(payload.version);
@@ -94,7 +119,7 @@ export function EntityProfileWidget({
         <Text size="sm">Tenant: {hostContext.tenant.id}</Text>
         <Text size="sm">Entity: {entityId}</Text>
         <Text size="xs" c="dimmed">
-          Payload: {prettyJson(document)}
+          Payload: {prettyJson({ document })}
         </Text>
         <Button onClick={() => void handleSave()} loading={saveState === "saving"}>
           Сохранить профиль
