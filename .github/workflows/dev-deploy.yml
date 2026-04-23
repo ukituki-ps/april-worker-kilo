@@ -19,10 +19,10 @@ permissions:
 jobs:
   deploy:
     name: Sync repo and run deploy.sh
-    runs-on: [self-hosted, dev, worker]
+    runs-on: [self-hosted, dev, profile]
     timeout-minutes: 60
     env:
-      APRIL_DEPLOY_ROOT: ${{ vars.APRIL_DEPLOY_ROOT != '' && vars.APRIL_DEPLOY_ROOT || '/opt/april-worker' }}
+      APRIL_DEPLOY_ROOT: ${{ vars.APRIL_DEPLOY_ROOT != '' && vars.APRIL_DEPLOY_ROOT || '/opt/april-profile' }}
     steps:
       - name: Checkout ref and deploy
         run: |
