@@ -89,9 +89,11 @@ echo "[k6] running baseline load test"
 K6_ARGS=()
 DOCKER_VOLUME_ARGS=()
 if [[ -n "$K6_SUMMARY_EXPORT" ]]; then
-  mkdir -p "$(dirname "$K6_SUMMARY_EXPORT")"
+  summary_dir="$(dirname "$K6_SUMMARY_EXPORT")"
+  mkdir -p "$summary_dir"
+  summary_dir_abs="$(cd "$summary_dir" && pwd)"
   K6_ARGS+=(--summary-export "/scripts-artifacts/summary.json")
-  DOCKER_VOLUME_ARGS+=(-v "$(dirname "$K6_SUMMARY_EXPORT"):/scripts-artifacts")
+  DOCKER_VOLUME_ARGS+=(-v "${summary_dir_abs}:/scripts-artifacts")
 fi
 
 docker run --rm --network "${COMPOSE_PROJECT_NAME}_default" \
