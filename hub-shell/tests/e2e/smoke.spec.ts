@@ -40,22 +40,70 @@ test.describe("AprilHub smoke e2e", () => {
   });
 
   test("рендерит profile widget и фиксирует onSaveSuccess", async ({ page }) => {
-    await page.route("**/api/v1/admin/profile/v1/entities/*", async (route) => {
-      if (route.request().method() !== "PUT") {
-        await route.continue();
+    const entityTypeId = "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb";
+    const missingEntityId = "00000000-0000-0000-0000-000000000001";
+    const createdEntityId = "11111111-1111-1111-1111-111111111111";
+
+    await page.route("**/api/v1/admin/profile/api/v1/entities**", async (route) => {
+      const request = route.request();
+      const method = request.method();
+      const url = new URL(request.url());
+
+      if (method === "POST" && url.pathname.endsWith("/v1/entities")) {
+        const body = JSON.parse(request.postData() ?? "{}") as { entity_type_id?: string };
+        if (body.entity_type_id !== entityTypeId) {
+          await route.fulfill({
+            status: 400,
+            contentType: "application/json",
+            body: JSON.stringify({ code: "invalid_request", message: "unexpected entity_type_id in test stub" }),
+          });
+          return;
+        }
+
+        await route.fulfill({
+          status: 201,
+          contentType: "application/json",
+          body: JSON.stringify({
+            entity_id: createdEntityId,
+            version: 1,
+            document: { tenant_id: "default" },
+          }),
+        });
         return;
       }
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({
-          entity_id: "00000000-0000-0000-0000-000000000001",
-          version: 2,
-          document: {
-            tenant_id: "default",
-          },
-        }),
-      });
+
+      if (method === "PUT") {
+        const match = url.pathname.match(/\/v1\/entities\/([^/]+)\/?$/);
+        const entityId = match?.[1];
+        if (!entityId) {
+          await route.continue();
+          return;
+        }
+
+        if (entityId === missingEntityId) {
+          await route.fulfill({
+            status: 404,
+            contentType: "application/json",
+            body: JSON.stringify({ code: "entity_not_found", message: "stub: missing entity" }),
+          });
+          return;
+        }
+
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({
+            entity_id: entityId,
+            version: 2,
+            document: {
+              tenant_id: "default",
+            },
+          }),
+        });
+        return;
+      }
+
+      await route.continue();
     });
 
     await page.goto("/");

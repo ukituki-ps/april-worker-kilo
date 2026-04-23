@@ -35,6 +35,11 @@ export function BrokenWidget(_props: WidgetProps): JSX.Element {
 export function ProfileWidget({ context }: WidgetProps) {
   const [saveResult, setSaveResult] = useState<SaveSuccessPayload | null>(null);
   const [saveError, setSaveError] = useState<string>("");
+  const profileEntityTypeId = useMemo(() => import.meta.env.VITE_PROFILE_DEFAULT_ENTITY_TYPE_ID?.trim() || "", []);
+  const profileInitialEntityId = useMemo(
+    () => import.meta.env.VITE_PROFILE_DEMO_ENTITY_ID?.trim() || "",
+    [],
+  );
   const hostContext = useMemo<ProfileWidgetHostContext>(
     () => ({
       tenant: { id: context.orgScope },
@@ -55,7 +60,8 @@ export function ProfileWidget({ context }: WidgetProps) {
     <div>
       <EntityProfileWidget
         hostContext={hostContext}
-        entityId="00000000-0000-0000-0000-000000000001"
+        initialEntityId={profileInitialEntityId || undefined}
+        entityTypeId={profileEntityTypeId}
         apiBaseUrl="/api/v1/admin/profile/api"
         accessToken={keycloak.token}
         onSaveSuccess={(payload) => {
