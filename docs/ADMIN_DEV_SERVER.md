@@ -37,6 +37,10 @@ CI workflow `.github/workflows/ci.yml` выполняется на отдель�
 1. Установите `actions/runner` и зарегистрируйте runner в репозитории/организации с labels `ci,profile`.
 2. Убедитесь, что на хосте есть Docker, Node.js 20+, Go и доступ к интернету для установки зависимостей.
 3. Проверьте статус runner в GitHub (**Idle**) и запуск CI на PR/push.
+4. Чтобы избежать `EACCES` на `actions/checkout` из-за root-owned артефактов (`.pnpm-store`, `node_modules`, `dist`), запускайте санитацию workspace под root:
+   - `bash scripts/sanitize-ci-workspace.sh`
+   - либо с явным шаблоном: `bash scripts/sanitize-ci-workspace.sh "/home/ukituki/actions-runner-april-worker-ci-*/_work/april-worker/april-worker"`
+5. Рекомендуется повесить `scripts/sanitize-ci-workspace.sh` на `cron`/`systemd timer` (например, раз в 5-15 минут) на CI-хосте.
 
 ## 5. Проверка документации на dev
 
