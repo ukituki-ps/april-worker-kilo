@@ -41,6 +41,10 @@ func main() {
 		"report":   cfg.ReportURL,
 	})
 	handlers := httpapi.NewHandlers(aggregationRuntime)
+	profileAdminProxy, err := httpapi.NewProfileAdminProxy(cfg.ProfileAdminURL)
+	if err != nil {
+		log.Fatalf("init profile admin proxy: %v", err)
+	}
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/healthz", httpapi.Healthz)
@@ -69,6 +73,10 @@ func main() {
 	mux.Handle(
 		"/api/v1/admin/ping",
 		authMiddleware.Validate(auth.RequireAnyRole("admin")(http.HandlerFunc(httpapi.AdminPing))),
+	)
+	mux.Handle(
+		"/api/v1/admin/profile/",
+		authMiddleware.Validate(auth.RequireAnyRole("admin")(profileAdminProxy)),
 	)
 
 	addr := ":" + cfg.Port

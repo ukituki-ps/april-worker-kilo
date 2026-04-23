@@ -197,6 +197,133 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /api/v1/admin/profile/{proxyPath}:
+    parameters:
+      - name: proxyPath
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Path that is proxied to AprilProfile upstream.
+    get:
+      summary: Admin proxy to AprilProfile (GET)
+      operationId: adminProfileProxyGet
+      tags: [AdminProxy]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Response from AprilProfile upstream
+        "401":
+          description: Missing or invalid token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: Insufficient role
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "502":
+          description: Upstream unavailable
+    post:
+      summary: Admin proxy to AprilProfile (POST)
+      operationId: adminProfileProxyPost
+      tags: [AdminProxy]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Response from AprilProfile upstream
+        "201":
+          description: Resource created by AprilProfile upstream
+        "401":
+          description: Missing or invalid token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: Insufficient role
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "502":
+          description: Upstream unavailable
+    put:
+      summary: Admin proxy to AprilProfile (PUT)
+      operationId: adminProfileProxyPut
+      tags: [AdminProxy]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Response from AprilProfile upstream
+        "401":
+          description: Missing or invalid token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: Insufficient role
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "502":
+          description: Upstream unavailable
+    patch:
+      summary: Admin proxy to AprilProfile (PATCH)
+      operationId: adminProfileProxyPatch
+      tags: [AdminProxy]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Response from AprilProfile upstream
+        "401":
+          description: Missing or invalid token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: Insufficient role
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "502":
+          description: Upstream unavailable
+    delete:
+      summary: Admin proxy to AprilProfile (DELETE)
+      operationId: adminProfileProxyDelete
+      tags: [AdminProxy]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Response from AprilProfile upstream
+        "204":
+          description: Resource deleted by AprilProfile upstream
+        "401":
+          description: Missing or invalid token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: Insufficient role
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "502":
+          description: Upstream unavailable
 components:
   securitySchemes:
     bearerAuth:
