@@ -15,8 +15,8 @@
    - [`APRILHUB_TEAM_WORKFLOW.md`](./APRILHUB_TEAM_WORKFLOW.md)
    - [`APRILHUB_AGENT_DEVELOPMENT.md`](./APRILHUB_AGENT_DEVELOPMENT.md)
 4. Для frontend/DS интеграции:
-   - [`../FRONTEND_STRATEGY.md`](../FRONTEND_STRATEGY.md)
-   - [`../WIDGET_CONTRACTS.md`](../WIDGET_CONTRACTS.md)
+   - [`FRONTEND_STRATEGY`](https://github.com/ukituki-ps/april-worker/blob/develop/docs/FRONTEND_STRATEGY.md)
+   - [`WIDGET_CONTRACTS`](https://github.com/ukituki-ps/april-worker/blob/develop/docs/WIDGET_CONTRACTS.md)
    - [`DESIGN_SYSTEM.md`](./DESIGN_SYSTEM.md)
 
 ## Где искать информацию по доменам
