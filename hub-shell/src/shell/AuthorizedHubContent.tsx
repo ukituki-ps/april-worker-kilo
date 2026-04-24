@@ -1,6 +1,13 @@
 import { useEffect } from "react";
 import { CompositionErrorBoundary } from "../composition-error-boundary";
-import { OverviewWidget, RolesWidget, BrokenWidget, ProfilesListHostWidget, ProfileInstancesHostWidget } from "../widgets";
+import {
+  OverviewWidget,
+  RolesWidget,
+  BrokenWidget,
+  ProfilesListHostWidget,
+  ProfileInstancesHostWidget,
+  InstanceHistoryHostWidget,
+} from "../widgets";
 import type { ShellUserContext } from "../types";
 import { SharedState } from "../shared-ux";
 import { matchShellRoute, shellNavigate, shellPaths } from "./shell-paths";
@@ -72,6 +79,16 @@ export function AuthorizedHubContent({ context }: Props): JSX.Element {
       <RouteChrome>
         <CompositionErrorBoundary moduleName="Профиль (экземпляры)">
           <ProfileInstancesHostWidget context={context} routeEntityId={match.instanceId} />
+        </CompositionErrorBoundary>
+      </RouteChrome>
+    );
+  }
+
+  if (match.kind === "profile-instance-history") {
+    return (
+      <RouteChrome>
+        <CompositionErrorBoundary moduleName="Профиль (история экземпляра)">
+          <InstanceHistoryHostWidget context={context} routeEntityId={match.instanceId} />
         </CompositionErrorBoundary>
       </RouteChrome>
     );

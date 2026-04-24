@@ -59,6 +59,22 @@ export function ShellBreadcrumbs({ match }: Props): JSX.Element {
         Экземпляры / {match.instanceId}
       </Text>,
     );
+  } else if (match.kind === "profile-instance-history") {
+    items.push(
+      <Anchor key="prof" href={`#${shellPaths.profilesList}`} size="sm">
+        Профиль
+      </Anchor>,
+    );
+    items.push(
+      <Anchor key="instance" href={`#${shellPaths.profileInstance(match.instanceId)}`} size="sm">
+        Экземпляры
+      </Anchor>,
+    );
+    items.push(
+      <Text key="cur" size="sm">
+        История / {match.instanceId}
+      </Text>,
+    );
   } else {
     items.push(
       <Text key="cur" size="sm">

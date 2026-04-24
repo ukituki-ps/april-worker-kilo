@@ -33,7 +33,13 @@ export function buildPrimaryShellNav(): ShellNavItem[] {
       id: "profile-instance-demo",
       label: "Профиль — экземпляры",
       href: toHash(shellPaths.profileInstance("demo-instance")),
-      activePrefix: "/app/profile/instances",
+      activePrefix: shellPaths.profileInstance("demo-instance"),
+    },
+    {
+      id: "profile-instance-history-demo",
+      label: "Профиль — история экземпляра",
+      href: toHash(shellPaths.profileInstanceHistory("demo-instance")),
+      activePrefix: shellPaths.profileInstanceHistory("demo-instance"),
     },
     {
       id: "admin-control",

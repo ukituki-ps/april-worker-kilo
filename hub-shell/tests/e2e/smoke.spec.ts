@@ -228,10 +228,18 @@ test.describe("AprilHub smoke e2e", () => {
     await expect(page.getByTestId("profiles-list-last-action")).toContainText("created");
   });
 
-  test("рендерит profile instances widget и выполняет create через BFF префикс", async ({ page }) => {
+  test("выполняет update экземпляра и проверяет историю версий через host", async ({ page }) => {
     const instanceId = "demo-instance";
     const createdEntityId = "33333333-3333-3333-3333-333333333333";
     const entityTypeId = "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb";
+    let currentVersion = 1;
+    const versions: Record<number, Record<string, unknown>> = {
+      1: {
+        profile_id: "00000000-0000-0000-0000-000000000001",
+        status: "draft",
+        _meta: { updated_by: "operator-v1" },
+      },
+    };
 
     await page.route("**/api/v1/admin/profile/api/v1/entities**", async (route) => {
       const request = route.request();
@@ -245,9 +253,9 @@ test.describe("AprilHub smoke e2e", () => {
           body: JSON.stringify({
             entity_id: instanceId,
             entity_type_id: entityTypeId,
-            version: 1,
+            version: currentVersion,
             created_at: "2026-04-24T00:00:00Z",
-            document: { profile_id: "00000000-0000-0000-0000-000000000001" },
+            document: versions[currentVersion],
           }),
         });
         return;
@@ -268,6 +276,45 @@ test.describe("AprilHub smoke e2e", () => {
         return;
       }
 
+      if (method === "PUT" && url.pathname.endsWith(`/v1/entities/${instanceId}`)) {
+        currentVersion = 2;
+        versions[2] = {
+          profile_id: "00000000-0000-0000-0000-000000000001",
+          status: "approved",
+          _meta: { updated_by: "operator-v2" },
+        };
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({
+            entity_id: instanceId,
+            entity_type_id: entityTypeId,
+            version: currentVersion,
+            created_at: "2026-04-24T00:02:00Z",
+            document: versions[currentVersion],
+          }),
+        });
+        return;
+      }
+
+      const versionMatch = url.pathname.match(/\/v1\/entities\/demo-instance\/versions\/(\d+)$/);
+      if (method === "GET" && versionMatch) {
+        const version = Number(versionMatch[1]);
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({
+            entity_id: instanceId,
+            entity_type_id: entityTypeId,
+            version,
+            created_at: `2026-04-24T00:0${version}:00Z`,
+            document: versions[version] ?? versions[1],
+            external_refs: [{ source_system: "bff-smoke" }],
+          }),
+        });
+        return;
+      }
+
       await route.continue();
     });
 
@@ -283,5 +330,12 @@ test.describe("AprilHub smoke e2e", () => {
     await page.getByLabel("Entity type ID").fill(entityTypeId);
     await page.getByRole("button", { name: "Create instance" }).click();
     await expect(page.getByTestId("profile-instances-last-action")).toContainText("created");
+    await page.getByRole("button", { name: "Update first instance" }).click();
+    await expect(page.getByTestId("profile-instances-last-action")).toContainText("updated");
+
+    await page.getByRole("link", { name: "Профиль — история экземпляра" }).click();
+    await expect(page.getByRole("heading", { name: "История экземпляра" })).toBeVisible();
+    await expect(page.getByTestId("instance-history-selected-version")).toContainText("v2");
+    await expect(page.getByTestId("instance-history-diff-table")).toContainText("status");
   });
 });

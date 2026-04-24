@@ -2,6 +2,8 @@
 images.env
 *.log
 node_modules/
+hub-shell/test-results/
+hub-shell/playwright-report/
 docs-site/build/
 docs-site/.docusaurus/
 docs-site/static/openapi/*.yaml
