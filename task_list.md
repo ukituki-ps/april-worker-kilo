@@ -37,7 +37,7 @@
 - [x] `020`: Testing contour extensions (P1/P2: Playwright smoke, Testcontainers integration, extended k6, quality metrics)
 - [x] `021`: AprilHub documentation refactoring (полное описание платформы + системная актуализация `docs/` и `docs-site/`)
 - [x] `022`: Публичный B2B-лендинг-тизер платформы April (неавторизованная зона `hub-shell`)
-- [ ] `024`: Исполнение внешней задачи 023 из `april-profile-1` (анализ docs + реализация + двойной отчёт)
+- [x] `024`: Исполнение внешней задачи 023 из `april-profile-1` (анализ docs + реализация + двойной отчёт)
 
 ## Текущий фокус
 
@@ -62,7 +62,7 @@
 - [x] `020-hub-testing-contour-extensions`: реализовать P1/P2-расширения тестового контура (Playwright, Testcontainers, extended load, quality metrics)
 - [x] `021-aprilhub-documentation-refactoring`: подготовить полноценное описание AprilHub (что это/как работает/для чего) и актуализировать `docs/` + `docs-site/` для людей и агентной разработки
 - [x] `022-aprilhub-public-b2b-landing-teaser`: публичный B2B-лендинг-тизер (карта возможностей April*, этапы, статус, FAQ, форма) в неавторизованной зоне `hub-shell`
-- [ ] `024-aprilhub-execute-external-task-023-april-profile-1`: изучить задачу 023 и документацию в `april-profile-1`, реализовать требования и оформить отчёт в обоих репозиториях
+- [x] `024-aprilhub-execute-external-task-023-april-profile-1`: изучить задачу 023 и документацию в `april-profile-1`, реализовать требования и оформить отчёт в обоих репозиториях
 
 ## План реализации AprilHub: статусы
 
@@ -89,4 +89,4 @@
 | `020` | Testing contour extensions (P1/P2: Playwright smoke, Testcontainers integration, extended k6, quality metrics) | ✅ Выполнено | [`tasks/020-hub-testing-contour-extensions/TASK.md`](./tasks/020-hub-testing-contour-extensions/TASK.md), [`tasks/020-hub-testing-contour-extensions/PLAN.md`](./tasks/020-hub-testing-contour-extensions/PLAN.md), [`tasks/020-hub-testing-contour-extensions/REPORT.md`](./tasks/020-hub-testing-contour-extensions/REPORT.md) |
 | `021` | AprilHub documentation refactoring (platform narrative + docs/docs-site sync) | ✅ Выполнено | [`tasks/021-aprilhub-documentation-refactoring/TASK.md`](./tasks/021-aprilhub-documentation-refactoring/TASK.md), [`tasks/021-aprilhub-documentation-refactoring/PLAN.md`](./tasks/021-aprilhub-documentation-refactoring/PLAN.md), [`tasks/021-aprilhub-documentation-refactoring/REPORT.md`](./tasks/021-aprilhub-documentation-refactoring/REPORT.md) |
 | `022` | Публичный B2B-лендинг-тизер платформы April (guest `hub-shell`) | ✅ Выполнено | [`tasks/022-aprilhub-public-b2b-landing-teaser/TASK.md`](./tasks/022-aprilhub-public-b2b-landing-teaser/TASK.md), [`tasks/022-aprilhub-public-b2b-landing-teaser/REPORT.md`](./tasks/022-aprilhub-public-b2b-landing-teaser/REPORT.md) |
-| `024` | Исполнение внешней задачи 023 из `april-profile-1` (анализ docs + реализация + двойной отчёт) | ⏳ Запланировано | [`tasks/024-aprilhub-execute-external-task-023-april-profile-1/TASK.md`](./tasks/024-aprilhub-execute-external-task-023-april-profile-1/TASK.md) |
+| `024` | Исполнение внешней задачи 023 из `april-profile-1` (анализ docs + реализация + двойной отчёт) | ✅ Выполнено | [`tasks/024-aprilhub-execute-external-task-023-april-profile-1/TASK.md`](./tasks/024-aprilhub-execute-external-task-023-april-profile-1/TASK.md), [`tasks/024-aprilhub-execute-external-task-023-april-profile-1/PLAN.md`](./tasks/024-aprilhub-execute-external-task-023-april-profile-1/PLAN.md), [`tasks/024-aprilhub-execute-external-task-023-april-profile-1/REPORT.md`](./tasks/024-aprilhub-execute-external-task-023-april-profile-1/REPORT.md) |

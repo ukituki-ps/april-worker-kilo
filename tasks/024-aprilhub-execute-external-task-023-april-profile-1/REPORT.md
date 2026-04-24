@@ -1,9 +1,16 @@
 ## 1) Итого
-- Статус: ✅ выполнено (MVP + последовательные UX hotfix’ы); ниже — дополнение по auto-create
+- Статус: ✅ выполнено
 - Задача: Исполнение внешней задачи 023 (AprilHub widget host + e2e smoke)
-- Ветка: `develop` (через PR; локально — отдельная feature-ветка под новый PR)
+- Ветка: `develop`
 - Коммиты: см. PR ниже
-- PR (merged): [#40](https://github.com/ukituki-ps/april-worker/pull/40), [#41](https://github.com/ukituki-ps/april-worker/pull/41), [#42](https://github.com/ukituki-ps/april-worker/pull/42)
+- PR (merged): [#40](https://github.com/ukituki-ps/april-worker/pull/40), [#41](https://github.com/ukituki-ps/april-worker/pull/41), [#42](https://github.com/ukituki-ps/april-worker/pull/42), [#43](https://github.com/ukituki-ps/april-worker/pull/43), [#44](https://github.com/ukituki-ps/april-worker/pull/44)
+
+### Статус по acceptance
+- [x] Основная реализация widget host в `hub-shell` выполнена.
+- [x] Smoke/e2e сценарий добавлен и проходил в CI.
+- [x] Финализация auto-create изменений закрыта PR #43.
+- [x] Внешний отчёт в `april-profile-1` обновлён финальными ссылками на PR/коммиты.
+- [x] Формальная приёмка задачи 024 завершена.
 
 ## 2) Что сделано
 - [frontend] В `hub-shell` добавлен host-driven модуль `Профиль (виджет)` и интеграция в composition registry / навигацию авторизованной зоны.
@@ -52,11 +59,12 @@ cd hub-shell && npm run lint && npm run test && npm run build
 ```
 
 ## 6) Деплой
-- Среда: `develop` (после merge PR #40/#41/#42)
+- Среда: `develop` (после merge PR #40/#41/#42/#43/#44)
 - Согласовано с: `docs/DEPLOYMENT_STRATEGY.md`
 - Образы: по пайплайну `april-worker` после merge
 - Health / readiness: по пайплайну окружения
 - Rollback: откат merge PR (или revert)
+- Примечание по стабилизации dev runtime: после инцидента с `404` на `/api/v1/admin/profile/*` и `EACCES` в `hub-shell` зафиксирован deploy hardening в PR #44 (авто-recreate `hub-bff` при изменениях в `hub-bff/` + repair прав для bind-mount `hub-shell` в `deploy.sh`).
 
 ## 7) Риски и ограничения
 - Локальная сборка `hub-shell` может упасть на `vite build`, если в `hub-shell/dist/*` остались root-owned файлы (см. раздел «Проверка качества»).
@@ -64,5 +72,5 @@ cd hub-shell && npm run lint && npm run test && npm run build
 - До публикации внешнего `@april/profile-ui` в registry используется локальная реализация виджета с совместимым контрактом; нужен follow-up на подключение semver dependency.
 
 ## 8) Что осталось
-- [ ] Открыть/смержить PR с auto-create + обновлениями Playwright helper script (после публикации изменений в этом репозитории).
-- [ ] Обновить отчёт во внешнем репозитории `april-profile-1` ссылками на PR/коммиты после публикации изменений.
+- [x] Открыть/смержить PR с auto-create + обновлениями Playwright helper script (PR #43).
+- [x] Обновить отчёт во внешнем репозитории `april-profile-1` ссылками на PR/коммиты после публикации изменений.
