@@ -38,6 +38,7 @@
 - [x] `021`: AprilHub documentation refactoring (полное описание платформы + системная актуализация `docs/` и `docs-site/`)
 - [x] `022`: Публичный B2B-лендинг-тизер платформы April (неавторизованная зона `hub-shell`)
 - [x] `024`: Исполнение внешней задачи 023 из `april-profile-1` (анализ docs + реализация + двойной отчёт)
+- [ ] `025`: Исполнение внешней задачи 035 из `april-profile-1` (анализ docs + реализация + двойной отчёт)
 
 ## Текущий фокус
 
@@ -63,6 +64,7 @@
 - [x] `021-aprilhub-documentation-refactoring`: подготовить полноценное описание AprilHub (что это/как работает/для чего) и актуализировать `docs/` + `docs-site/` для людей и агентной разработки
 - [x] `022-aprilhub-public-b2b-landing-teaser`: публичный B2B-лендинг-тизер (карта возможностей April*, этапы, статус, FAQ, форма) в неавторизованной зоне `hub-shell`
 - [x] `024-aprilhub-execute-external-task-023-april-profile-1`: изучить задачу 023 и документацию в `april-profile-1`, реализовать требования и оформить отчёт в обоих репозиториях
+- [ ] `025-aprilhub-execute-external-task-035-april-profile-1`: изучить задачу 035 и документацию в `april-profile-1`, реализовать требования и оформить отчёт в обоих репозиториях
 
 ## План реализации AprilHub: статусы
 
@@ -90,3 +92,4 @@
 | `021` | AprilHub documentation refactoring (platform narrative + docs/docs-site sync) | ✅ Выполнено | [`tasks/021-aprilhub-documentation-refactoring/TASK.md`](./tasks/021-aprilhub-documentation-refactoring/TASK.md), [`tasks/021-aprilhub-documentation-refactoring/PLAN.md`](./tasks/021-aprilhub-documentation-refactoring/PLAN.md), [`tasks/021-aprilhub-documentation-refactoring/REPORT.md`](./tasks/021-aprilhub-documentation-refactoring/REPORT.md) |
 | `022` | Публичный B2B-лендинг-тизер платформы April (guest `hub-shell`) | ✅ Выполнено | [`tasks/022-aprilhub-public-b2b-landing-teaser/TASK.md`](./tasks/022-aprilhub-public-b2b-landing-teaser/TASK.md), [`tasks/022-aprilhub-public-b2b-landing-teaser/REPORT.md`](./tasks/022-aprilhub-public-b2b-landing-teaser/REPORT.md) |
 | `024` | Исполнение внешней задачи 023 из `april-profile-1` (анализ docs + реализация + двойной отчёт) | ✅ Выполнено | [`tasks/024-aprilhub-execute-external-task-023-april-profile-1/TASK.md`](./tasks/024-aprilhub-execute-external-task-023-april-profile-1/TASK.md), [`tasks/024-aprilhub-execute-external-task-023-april-profile-1/PLAN.md`](./tasks/024-aprilhub-execute-external-task-023-april-profile-1/PLAN.md), [`tasks/024-aprilhub-execute-external-task-023-april-profile-1/REPORT.md`](./tasks/024-aprilhub-execute-external-task-023-april-profile-1/REPORT.md) |
+| `025` | Исполнение внешней задачи 035 из `april-profile-1` (анализ docs + реализация + двойной отчёт) | ⏳ В работе | [`tasks/025-aprilhub-execute-external-task-035-april-profile-1/TASK.md`](./tasks/025-aprilhub-execute-external-task-035-april-profile-1/TASK.md) |
