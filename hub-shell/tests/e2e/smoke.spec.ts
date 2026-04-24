@@ -113,8 +113,61 @@ test.describe("AprilHub smoke e2e", () => {
     await page.locator("#kc-login").click();
 
     await page.waitForURL("/");
+    await expect(page.getByRole("heading", { name: "Обзор" })).toBeVisible();
+    await page.getByRole("link", { name: "Профиль — карточка" }).click();
+    await expect(page.getByTestId("profile-domain-shell")).toBeVisible();
     await expect(page.getByRole("heading", { name: "Профиль (виджет)" })).toBeVisible();
     await page.getByRole("button", { name: "Сохранить профиль" }).click();
     await expect(page.getByTestId("profile-widget-save-success")).toContainText("onSaveSuccess");
+  });
+
+  test("deep-link на карточку профиля открывает виджетный слот после входа", async ({ page }) => {
+    const entityId = "00000000-0000-0000-0000-000000000001";
+    const deepPath = `/#/app/profile/entities/${entityId}/card`;
+
+    await page.route("**/api/v1/admin/profile/api/v1/entities**", async (route) => {
+      const request = route.request();
+      const method = request.method();
+      const url = new URL(request.url());
+
+      if (method === "POST" && url.pathname.endsWith("/v1/entities")) {
+        await route.fulfill({
+          status: 201,
+          contentType: "application/json",
+          body: JSON.stringify({
+            entity_id: "11111111-1111-1111-1111-111111111111",
+            version: 1,
+            document: { tenant_id: "default" },
+          }),
+        });
+        return;
+      }
+
+      if (method === "PUT") {
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({
+            entity_id: entityId,
+            version: 2,
+            document: { tenant_id: "default" },
+          }),
+        });
+        return;
+      }
+
+      await route.continue();
+    });
+
+    await page.goto("/");
+    await startLoginFromGuestHeader(page);
+    await page.locator("#username").fill(process.env.PLAYWRIGHT_USER ?? "april-dev");
+    await page.locator("#password").fill(process.env.PLAYWRIGHT_PASSWORD ?? "april-dev-pass");
+    await page.locator("#kc-login").click();
+
+    await page.waitForURL("/");
+    await page.goto(deepPath);
+    await expect(page.getByTestId("profile-domain-shell")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Профиль (виджет)" })).toBeVisible();
   });
 });

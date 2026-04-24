@@ -1,14 +1,9 @@
 import type { ReactNode } from "react";
 import { ProfileAccountMenu, type ProfileAccountMenuProps } from "./shell-header/ProfileAccountMenu";
-
-type ShellNavigationItem = {
-  id: string;
-  label: string;
-  href: string;
-};
+import type { ShellNavItem } from "./shell/shell-nav-config";
 
 type Props = {
-  navigationItems: ShellNavigationItem[];
+  navigationItems: ShellNavItem[];
   activeNavId?: string;
   title: string;
   subtitle: string;

@@ -80,3 +80,9 @@ Host работает через API/BFF без развитого слоя ви
 3. События виджета типизированы и обрабатываются host-ом.
 4. Tenant/auth берутся из доверенного контекста, а не из формы/query.
 5. Документация по интеграции обновлена вместе с изменением кода.
+
+---
+
+## 7. Shell AprilHub (профиль-домен)
+
+Единый каркас авторизованной зоны (`hub-shell`): sidebar по IA, hash-маршруты `/app/...`, вкладки как подпути одной сущности, провайдеры `HubHostContext` и `ShellToast`, breadcrumbs и навигация «Назад». Детали и канонические URL: [`WIDGET_CONTRACTS.md`](./WIDGET_CONTRACTS.md) §8; кодовая точка входа — `hub-shell/src/shell/AuthorizedShellGate.tsx`.
