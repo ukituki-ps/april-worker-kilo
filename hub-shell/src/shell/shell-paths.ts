@@ -16,6 +16,7 @@ export const shellPaths = {
   profileEntity: (entityId: string, tab: ProfileEntityTab = "card") =>
     `/app/profile/entities/${encodeURIComponent(entityId)}/${tab}`,
   profileInstance: (instanceId: string) => `/app/profile/instances/${encodeURIComponent(instanceId)}`,
+  profileInstanceHistory: (instanceId: string) => `/app/profile/instances/${encodeURIComponent(instanceId)}/history`,
 } as const;
 
 export type ProfileEntityTab = "card" | "meta";
@@ -27,6 +28,7 @@ export type ShellRouteMatch =
   | { kind: "admin" }
   | { kind: "profile-list" }
   | { kind: "profile-instance"; instanceId: string }
+  | { kind: "profile-instance-history"; instanceId: string }
   | { kind: "profile-entity"; entityId: string; tab: ProfileEntityTab }
   | { kind: "not-found" };
 
@@ -53,6 +55,11 @@ export function matchShellRoute(pathname: string): ShellRouteMatch {
   }
   if (p === "/app/profile/entities") {
     return { kind: "profile-list" };
+  }
+
+  const instanceHistoryMatch = /^\/app\/profile\/instances\/([^/]+)\/history\/?$/.exec(p);
+  if (instanceHistoryMatch) {
+    return { kind: "profile-instance-history", instanceId: decodeURIComponent(instanceHistoryMatch[1]) };
   }
 
   const instanceMatch = /^\/app\/profile\/instances\/([^/]+)\/?$/.exec(p);

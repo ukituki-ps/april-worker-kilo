@@ -48,7 +48,7 @@ export function HubHostContextProvider({ context, children }: ProviderProps): JS
         profileEntityTab: match.tab,
       };
     }
-    if (match.kind === "profile-instance") {
+    if (match.kind === "profile-instance" || match.kind === "profile-instance-history") {
       return { pathname, match, profileInstanceId: match.instanceId };
     }
     return { pathname, match };

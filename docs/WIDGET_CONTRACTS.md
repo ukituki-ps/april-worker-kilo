@@ -94,9 +94,9 @@
 
 ### 8.1 Информационная архитектура (IA)
 
-- **Платформа (sidebar):** «Обзор», «Роли», далее блок **Профиль April** — «Карточка сущности» (deeplink на `entityId` по умолчанию из env или стаба), «Экземпляры» (маршрут `/app/profile/instances/:instanceId`), «Админ-контур» (только роль `admin`).
+- **Платформа (sidebar):** «Обзор», «Роли», далее блок **Профиль April** — «Карточка сущности» (deeplink на `entityId` по умолчанию из env или стаба), «Экземпляры» (маршрут `/app/profile/instances/:instanceId`), «История экземпляра» (маршрут `/app/profile/instances/:instanceId/history`), «Админ-контур» (только роль `admin`).
 - **Вкладки vs маршруты:** состояние одной сущности, не требующее отдельного deep-link, остаётся во **вкладках-подпутях** (`/card`, `/meta`). Списки профилей, другая сущность, экземпляр — **отдельный маршрут** (`/app/profile/entities/:entityId/...`, `/app/profile/instances/:instanceId`).
-- **Канонические пути:** заданы в `hub-shell/src/shell/shell-paths.ts` (`shellPaths`, `matchShellRoute`). Параметры: `entityId` (карточка), `instanceId` (экземпляры профиля).
+- **Канонические пути:** заданы в `hub-shell/src/shell/shell-paths.ts` (`shellPaths`, `matchShellRoute`). Параметры: `entityId` (карточка), `instanceId` (экземпляры и история профиля).
 
 ### 8.2 Расширенный `HubHostContext` (host → виджет и страницы)
 
@@ -113,4 +113,4 @@
 1. Зафиксировать контракт host/widget (§2–§6) и сценарий маршрута (§8.1).
 2. Добавить маршрут в `AuthorizedHubContent` / вложенный layout, не открывая второй маршрутный контур в обход BFF.
 3. Оборачивать lazy/рискованные модули в `CompositionErrorBoundary`.
-4. Расширить Playwright smoke для критичного deep-link / навигации sidebar → слот виджета.
+4. Расширить Playwright smoke для критичного deep-link / навигации sidebar → слот виджета, включая happy-path истории экземпляра (`update -> новая версия -> history + diff`).

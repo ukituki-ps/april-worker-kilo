@@ -51,16 +51,39 @@ wait_for_url() {
   return 1
 }
 
+wait_keycloak_jwks() {
+  local jwks_url="http://keycloak:8080/auth/realms/april/protocol/openid-connect/certs"
+  local i
+  for i in $(seq 1 360); do
+    if docker run --rm --network "${COMPOSE_PROJECT_NAME}_default" busybox:1.36 wget -qO- "$jwks_url" >/dev/null 2>&1; then
+      return 0
+    fi
+    sleep 2
+  done
+  return 1
+}
+
 cleanup() {
   compose --profile aprilhub down -v >/dev/null 2>&1 || true
 }
 trap cleanup EXIT
 
-echo "[playwright] starting aprilhub profile"
-compose --profile aprilhub up -d keycloak-db keycloak hub-bff hub-shell nginx-docs
+echo "[playwright] starting keycloak (DB + Keycloak)"
+compose --profile aprilhub up -d keycloak-db keycloak
+
+echo "[playwright] waiting for Keycloak JWKS (hub-bff auth init depends on it)"
+# Образ Keycloak без wget/curl в PATH; проверяем JWKS из ephemeral busybox в сети compose.
+if ! wait_keycloak_jwks; then
+  echo "[playwright] keycloak did not expose JWKS in time"
+  exit 1
+fi
+
+echo "[playwright] starting hub-bff, hub-shell, nginx-docs"
+compose --profile aprilhub up -d hub-bff hub-shell nginx-docs
 
 echo "[playwright] waiting for hub-bff health (direct container check)"
-if ! compose exec -T hub-bff sh -lc "for i in \$(seq 1 300); do wget -qO- http://127.0.0.1:8081/healthz >/dev/null 2>&1 && exit 0; sleep 2; done; exit 1"; then
+# После JWKS Keycloak обычно достаточно 1–2 минут; оставляем запас на холодный go mod + compile.
+if ! compose exec -T hub-bff sh -lc "for i in \$(seq 1 450); do wget -qO- http://127.0.0.1:8081/healthz >/dev/null 2>&1 && exit 0; sleep 2; done; exit 1"; then
   echo "[playwright] hub-bff did not become healthy in time"
   exit 1
 fi

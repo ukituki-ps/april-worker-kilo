@@ -34,7 +34,22 @@ type ProfileInstanceItem = {
 
 type ProfileInstancesAction =
   | { type: "created"; item: ProfileInstanceItem }
+  | { type: "updated"; item: ProfileInstanceItem }
   | { type: "loaded"; count: number };
+
+type InstanceHistoryVersion = {
+  version: number;
+  createdAt: string;
+  actor: string;
+  source: string;
+  document: Record<string, unknown>;
+};
+
+type InstanceHistoryDiffRow = {
+  path: string;
+  beforeValue: string;
+  afterValue: string;
+};
 
 const readProfileListIds = (): string[] => {
   const raw = import.meta.env.VITE_PROFILE_LIST_ENTITY_IDS?.trim();
@@ -61,6 +76,57 @@ const readProfileInstanceIds = (routeInstanceId?: string): string[] => {
     return [fallback];
   }
   return parsed.includes(fallback) ? parsed : [fallback, ...parsed];
+};
+
+const safeStringify = (value: unknown): string => {
+  try {
+    return JSON.stringify(value);
+  } catch {
+    return String(value);
+  }
+};
+
+const prettyJson = (value: unknown): string => {
+  try {
+    return JSON.stringify(value, null, 2);
+  } catch {
+    return "{}";
+  }
+};
+
+const flattenDocument = (input: unknown, prefix = ""): Map<string, string> => {
+  if (input === null || typeof input !== "object" || Array.isArray(input)) {
+    const terminalPath = prefix === "" ? "$" : prefix;
+    return new Map([[terminalPath, safeStringify(input)]]);
+  }
+
+  const objectValue = input as Record<string, unknown>;
+  const keys = Object.keys(objectValue).sort();
+  if (keys.length === 0) {
+    const emptyPath = prefix === "" ? "$" : prefix;
+    return new Map([[emptyPath, "{}"]]);
+  }
+
+  const output = new Map<string, string>();
+  keys.forEach((key) => {
+    const childPath = prefix ? `${prefix}.${key}` : key;
+    const childMap = flattenDocument(objectValue[key], childPath);
+    childMap.forEach((value, path) => output.set(path, value));
+  });
+  return output;
+};
+
+const buildDiff = (beforeDoc: unknown, afterDoc: unknown): InstanceHistoryDiffRow[] => {
+  const before = flattenDocument(beforeDoc);
+  const after = flattenDocument(afterDoc);
+  const allPaths = [...new Set([...before.keys(), ...after.keys()])].sort();
+  return allPaths
+    .filter((path) => before.get(path) !== after.get(path))
+    .map((path) => ({
+      path,
+      beforeValue: before.get(path) ?? "undefined",
+      afterValue: after.get(path) ?? "undefined",
+    }));
 };
 
 export function OverviewWidget({ context }: WidgetProps) {
@@ -370,6 +436,60 @@ export function ProfileInstancesHostWidget({ context, routeEntityId }: WidgetPro
     }
   };
 
+  const handleUpdateFirst = async (): Promise<void> => {
+    const fallback = items[0];
+    const targetEntityId = routeEntityId?.trim() || fallback?.entityId;
+    if (!targetEntityId) {
+      const message = "Нет экземпляра для обновления";
+      setLastError(message);
+      toast.showError(message);
+      return;
+    }
+    setCreateLoading(true);
+    setLastError("");
+    try {
+      const response = await fetch(`/api/v1/admin/profile/api/v1/entities/${targetEntityId}`, {
+        method: "PUT",
+        headers: {
+          ...(keycloak.token ? { Authorization: `Bearer ${keycloak.token}` } : {}),
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          document: {
+            tenant_id: hostContext.tenant.id,
+            profile_id: profileId,
+            source: "hub-shell-instances-update",
+            updated_at: new Date().toISOString(),
+          },
+        }),
+      });
+      if (!response.ok) {
+        throw new Error(`update failed: ${response.status}`);
+      }
+      const snapshot = (await response.json()) as {
+        entity_id: string;
+        entity_type_id?: string;
+        version: number;
+        document?: Record<string, unknown>;
+      };
+      const updatedItem: ProfileInstanceItem = {
+        entityId: snapshot.entity_id,
+        entityTypeId: snapshot.entity_type_id ?? fallback?.entityTypeId ?? entityTypeId.trim() ?? "unknown",
+        version: snapshot.version,
+        preview: JSON.stringify(snapshot.document ?? {}),
+      };
+      setItems((prev) => [updatedItem, ...prev.filter((item) => item.entityId !== updatedItem.entityId)]);
+      setLastAction({ type: "updated", item: updatedItem });
+      toast.showSuccess("Instances action: updated");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "instances update failed";
+      setLastError(message);
+      toast.showError(message);
+    } finally {
+      setCreateLoading(false);
+    }
+  };
+
   return (
     <div>
       <article className="widget-card" data-testid="profile-instances-widget-card">
@@ -386,6 +506,9 @@ export function ProfileInstancesHostWidget({ context, routeEntityId }: WidgetPro
         <button type="button" onClick={() => void handleCreate()} disabled={createLoading}>
           Create instance
         </button>
+        <button type="button" onClick={() => void handleUpdateFirst()} disabled={createLoading}>
+          Update first instance
+        </button>
         <ul>
           {items.map((item) => (
             <li key={item.entityId}>
@@ -398,6 +521,201 @@ export function ProfileInstancesHostWidget({ context, routeEntityId }: WidgetPro
       {lastError ? (
         <Alert color="red" data-testid="profile-instances-last-error">
           Ошибка списка экземпляров: {lastError}
+        </Alert>
+      ) : null}
+    </div>
+  );
+}
+
+export function InstanceHistoryHostWidget({ context, routeEntityId }: WidgetProps): JSX.Element {
+  const toast = useShellToast();
+  const [loading, setLoading] = useState(true);
+  const [versions, setVersions] = useState<InstanceHistoryVersion[]>([]);
+  const [selectedVersion, setSelectedVersion] = useState<number | null>(null);
+  const [compareMode, setCompareMode] = useState<"current" | "previous">("previous");
+  const [lastError, setLastError] = useState("");
+  const instanceId = routeEntityId?.trim() || "demo-instance";
+  const hostContext = useMemo<ProfileWidgetHostContext>(
+    () => ({
+      tenant: { id: context.orgScope },
+      auth: {
+        subject: context.user.sub,
+        roles: context.roles,
+        tokenRef: "keycloak",
+      },
+      locale: "ru-RU",
+      telemetry: {
+        requestId: context.correlationId,
+      },
+    }),
+    [context],
+  );
+
+  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      setLoading(true);
+      setLastError("");
+      try {
+        const currentResponse = await fetch(`/api/v1/admin/profile/api/v1/entities/${instanceId}`, {
+          headers: {
+            ...(keycloak.token ? { Authorization: `Bearer ${keycloak.token}` } : {}),
+            "Content-Type": "application/json",
+          },
+        });
+        if (!currentResponse.ok) {
+          throw new Error(`history load failed: ${currentResponse.status}`);
+        }
+        const current = (await currentResponse.json()) as {
+          version: number;
+        };
+        const requests = Array.from({ length: current.version }, (_, index) => {
+          const version = index + 1;
+          return fetch(`/api/v1/admin/profile/api/v1/entities/${instanceId}/versions/${version}`, {
+            headers: {
+              ...(keycloak.token ? { Authorization: `Bearer ${keycloak.token}` } : {}),
+              "Content-Type": "application/json",
+            },
+          }).then(async (response) => {
+            if (!response.ok) {
+              throw new Error(`history version load failed: ${response.status}`);
+            }
+            const payload = (await response.json()) as {
+              version: number;
+              created_at: string;
+              document?: Record<string, unknown>;
+              external_refs?: Array<{ source_system?: string }>;
+            };
+            const meta =
+              payload.document && typeof payload.document._meta === "object" && payload.document._meta !== null
+                ? (payload.document._meta as Record<string, unknown>)
+                : undefined;
+            const actor = typeof meta?.updated_by === "string" ? meta.updated_by : "unknown";
+            return {
+              version: payload.version,
+              createdAt: payload.created_at,
+              actor,
+              source: payload.external_refs?.[0]?.source_system ?? "api",
+              document: payload.document ?? {},
+            } satisfies InstanceHistoryVersion;
+          });
+        });
+        const loaded = (await Promise.all(requests)).sort((a, b) => b.version - a.version);
+        if (cancelled) {
+          return;
+        }
+        setVersions(loaded);
+        setSelectedVersion(loaded[0]?.version ?? null);
+      } catch (error) {
+        if (cancelled) {
+          return;
+        }
+        const message = error instanceof Error ? error.message : "history load failed";
+        setLastError(message);
+        toast.showError(message);
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+    void load();
+    return () => {
+      cancelled = true;
+    };
+  }, [instanceId, toast]);
+
+  const selected = versions.find((item) => item.version === selectedVersion) ?? null;
+  const current = versions[0] ?? null;
+  const previous = selected ? versions.find((item) => item.version === selected.version - 1) ?? null : null;
+  const compareTarget = compareMode === "current" ? current : previous;
+  const diffRows = selected && compareTarget ? buildDiff(compareTarget.document, selected.document) : [];
+
+  return (
+    <div>
+      <article className="widget-card" data-testid="instance-history-widget-card">
+        <h3>История экземпляра</h3>
+        <p>Entity ID: {instanceId}</p>
+        <p>Tenant: {hostContext.tenant.id}</p>
+        <p>Restore недоступен в текущем API-контракте. История доступна в режиме read-only.</p>
+        {loading ? <p data-testid="instance-history-loading">Загрузка истории…</p> : null}
+        {versions.length === 0 && !loading ? <p data-testid="instance-history-empty">Версии не найдены.</p> : null}
+        {versions.length > 0 ? (
+          <table>
+            <thead>
+              <tr>
+                <th>Версия</th>
+                <th>Создано</th>
+                <th>Actor</th>
+                <th>Source</th>
+                <th />
+              </tr>
+            </thead>
+            <tbody>
+              {versions.map((item) => (
+                <tr key={item.version}>
+                  <td>v{item.version}</td>
+                  <td>{item.createdAt}</td>
+                  <td>{item.actor}</td>
+                  <td>{item.source}</td>
+                  <td>
+                    <button type="button" onClick={() => setSelectedVersion(item.version)}>
+                      View
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : null}
+        {selected ? (
+          <div data-testid="instance-history-selected-version">
+            <p>Выбрана версия: v{selected.version}</p>
+            <label htmlFor="instance-history-compare-mode">Сравнение</label>
+            <select
+              id="instance-history-compare-mode"
+              aria-label="Сравнение"
+              value={compareMode}
+              onChange={(event) => setCompareMode(event.currentTarget.value === "current" ? "current" : "previous")}
+            >
+              <option value="previous">С предыдущей версией</option>
+              <option value="current">С текущей версией</option>
+            </select>
+            <pre data-testid="instance-history-snapshot">{prettyJson(selected.document)}</pre>
+            {compareTarget ? (
+              diffRows.length > 0 ? (
+                <table data-testid="instance-history-diff-table">
+                  <thead>
+                    <tr>
+                      <th>Path</th>
+                      <th>Before</th>
+                      <th>After</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {diffRows.map((row) => (
+                      <tr key={row.path}>
+                        <td>{row.path}</td>
+                        <td>{row.beforeValue}</td>
+                        <td>{row.afterValue}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                <p data-testid="instance-history-diff-empty">Изменений относительно выбранного сравнения нет.</p>
+              )
+            ) : (
+              <p data-testid="instance-history-diff-unavailable">
+                Сравнение недоступно: для выбранной версии нет базы сравнения.
+              </p>
+            )}
+          </div>
+        ) : null}
+      </article>
+      {lastError ? (
+        <Alert color="red" data-testid="instance-history-last-error">
+          Ошибка истории экземпляра: {lastError}
         </Alert>
       ) : null}
     </div>
