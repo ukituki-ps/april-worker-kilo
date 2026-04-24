@@ -3,9 +3,10 @@ import { Button } from "@mantine/core";
 import { authConfig } from "./auth";
 import { apiRequest } from "./api";
 import { AppShell } from "./app-shell";
-import { CompositionLayer } from "./composition-layer";
 import { GuestB2BLanding } from "./landing/GuestB2BLanding";
 import { keycloak } from "./keycloak";
+import { AuthorizedShellGate } from "./shell/AuthorizedShellGate";
+import { buildPrimaryShellNav } from "./shell/shell-nav-config";
 import { SharedState } from "./shared-ux";
 import type { ShellUserContext, UserProfile } from "./types";
 import { buildShellUserContext } from "./user-context";
@@ -16,13 +17,6 @@ type AuthZone = "guest" | "transition" | "authorized" | "forbidden";
 type AppProps = {
   authInitError?: string;
 };
-
-const shellNavigation = [
-  { id: "overview", label: "Обзор платформы", href: "#overview" },
-  { id: "roles", label: "Роли доступа", href: "#roles" },
-  { id: "profile-widget", label: "Профиль (виджет)", href: "#profile-widget" },
-  { id: "admin-control", label: "Админ-контур", href: "#admin-control" },
-];
 
 export default function App({ authInitError = "" }: AppProps) {
   const [me, setMe] = useState<UserProfile | null>(null);
@@ -93,7 +87,7 @@ export default function App({ authInitError = "" }: AppProps) {
   if (zone === "transition") {
     return (
       <AppShell
-        navigationItems={shellNavigation}
+        navigationItems={buildPrimaryShellNav()}
         activeNavId="overview"
         title="Рабочая зона AprilHub"
         subtitle="Стандартный каркас авторизованной зоны для модульного расширения."
@@ -112,7 +106,7 @@ export default function App({ authInitError = "" }: AppProps) {
   if (zone === "forbidden") {
     return (
       <AppShell
-        navigationItems={shellNavigation}
+        navigationItems={buildPrimaryShellNav()}
         title="Рабочая зона AprilHub"
         subtitle="Стандартный каркас авторизованной зоны для модульного расширения."
         statusBadgeLabel="Доступ ограничен"
@@ -139,7 +133,7 @@ export default function App({ authInitError = "" }: AppProps) {
   if (!context) {
     return (
       <AppShell
-        navigationItems={shellNavigation}
+        navigationItems={buildPrimaryShellNav()}
         title="Рабочая зона AprilHub"
         subtitle="Стандартный каркас авторизованной зоны для модульного расширения."
         statusBadgeLabel="Контекст отсутствует"
@@ -156,9 +150,9 @@ export default function App({ authInitError = "" }: AppProps) {
   }
 
   return (
-    <AppShell
-      navigationItems={shellNavigation}
-      activeNavId="overview"
+    <AuthorizedShellGate
+      context={context}
+      error={error}
       title="Рабочая зона AprilHub"
       subtitle="Стандартный каркас авторизованной зоны для модульного расширения."
       statusBadgeLabel="Авторизовано"
@@ -169,9 +163,6 @@ export default function App({ authInitError = "" }: AppProps) {
         onProfile: () => window.location.assign(keycloak.createAccountUrl()),
         onLogout: () => void keycloak.logout(),
       }}
-    >
-      <CompositionLayer context={context} />
-      {error && <SharedState state="error" message={error} />}
-    </AppShell>
+    />
   );
 }

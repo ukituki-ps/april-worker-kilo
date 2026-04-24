@@ -14,6 +14,10 @@
    - [`APRILHUB_HOW_IT_WORKS.md`](./APRILHUB_HOW_IT_WORKS.md)
    - [`APRILHUB_TEAM_WORKFLOW.md`](./APRILHUB_TEAM_WORKFLOW.md)
    - [`APRILHUB_AGENT_DEVELOPMENT.md`](./APRILHUB_AGENT_DEVELOPMENT.md)
+4. Для frontend/DS интеграции:
+   - [`../FRONTEND_STRATEGY.md`](../FRONTEND_STRATEGY.md)
+   - [`../WIDGET_CONTRACTS.md`](../WIDGET_CONTRACTS.md)
+   - [`DESIGN_SYSTEM.md`](./DESIGN_SYSTEM.md)
 
 ## Где искать информацию по доменам
 
@@ -21,6 +25,7 @@
 | --- | --- |
 | Архитектурные границы и C4 | `docs/architecture/README.md`, `structurizr/workspace.dsl` |
 | Интеграции и контракты | `docs/architecture/INTEGRATION_CONTRACTS.md`, `/openapi/openapi.yaml`, `/openapi/aprilhub-bff.yaml` |
+| Frontend host/widget модель | `docs/FRONTEND_STRATEGY.md`, `docs/WIDGET_CONTRACTS.md`, `docs/guides/DESIGN_SYSTEM.md` |
 | Deployment/dev flow | `docs/DEPLOYMENT_STRATEGY.md` |
 | Тестовый контур | `docs/TESTING_STRATEGY.md`, `docs/runbooks/APRILHUB_TESTING_TRIAGE.md` |
 | Observability | [`OBSERVABILITY_INDEX.md`](./OBSERVABILITY_INDEX.md), [`OBSERVABILITY_MULTI_STAND_OPERATING_MODEL.md`](./OBSERVABILITY_MULTI_STAND_OPERATING_MODEL.md) |

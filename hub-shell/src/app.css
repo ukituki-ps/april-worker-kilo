@@ -269,6 +269,54 @@
   background: var(--april-neutral-bg);
 }
 
+.shell-toast-stack {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 400;
+  max-width: min(420px, 92vw);
+}
+
+.shell-text-button {
+  border: none;
+  background: none;
+  color: var(--april-accent-teal-9);
+  cursor: pointer;
+  text-decoration: underline;
+  font: inherit;
+  padding: 0;
+}
+
+.profile-domain-shell,
+.shell-route-chrome {
+  display: grid;
+  gap: 14px;
+}
+
+.shell-profile-tab {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 0.92rem;
+  font-weight: 500;
+  text-decoration: none;
+  color: var(--april-neutral-text-primary);
+  border: 1px solid var(--april-neutral-border);
+  background: var(--april-neutral-bg);
+}
+
+.shell-profile-tab:hover {
+  background: color-mix(in srgb, var(--april-accent-teal-1) 45%, white 55%);
+}
+
+.shell-profile-tab-active {
+  border-color: var(--april-accent-teal-6);
+  background: var(--april-accent-teal-1);
+  color: var(--april-accent-teal-10);
+  font-weight: 600;
+}
+
 .composition-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));

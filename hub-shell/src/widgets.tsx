@@ -2,11 +2,14 @@ import { useMemo, useState } from "react";
 import { Alert } from "@mantine/core";
 import { EntityProfileWidget } from "./profile-widget";
 import type { ProfileWidgetHostContext, SaveSuccessPayload } from "./profile-widget";
+import { useShellToast } from "./shell/shell-toast-context";
 import type { ShellUserContext } from "./types";
 import { keycloak } from "./keycloak";
 
 type WidgetProps = {
   context: ShellUserContext;
+  /** С маршрута: id сущности. `null` — явный сценарий создания без demo-id из env. */
+  routeEntityId?: string | null;
 };
 
 export function OverviewWidget({ context }: WidgetProps) {
@@ -32,14 +35,20 @@ export function BrokenWidget(_props: WidgetProps): JSX.Element {
   throw new Error("Widget crash");
 }
 
-export function ProfileWidget({ context }: WidgetProps) {
+export function ProfileWidget({ context, routeEntityId }: WidgetProps) {
+  const toast = useShellToast();
   const [saveResult, setSaveResult] = useState<SaveSuccessPayload | null>(null);
   const [saveError, setSaveError] = useState<string>("");
   const profileEntityTypeId = useMemo(() => import.meta.env.VITE_PROFILE_DEFAULT_ENTITY_TYPE_ID?.trim() || "", []);
-  const profileInitialEntityId = useMemo(
-    () => import.meta.env.VITE_PROFILE_DEMO_ENTITY_ID?.trim() || "",
-    [],
-  );
+  const profileInitialEntityId = useMemo(() => {
+    if (routeEntityId === null) {
+      return "";
+    }
+    if (routeEntityId !== undefined) {
+      return routeEntityId;
+    }
+    return import.meta.env.VITE_PROFILE_DEMO_ENTITY_ID?.trim() || "";
+  }, [routeEntityId]);
   const hostContext = useMemo<ProfileWidgetHostContext>(
     () => ({
       tenant: { id: context.orgScope },
@@ -60,16 +69,18 @@ export function ProfileWidget({ context }: WidgetProps) {
     <div>
       <EntityProfileWidget
         hostContext={hostContext}
-        initialEntityId={profileInitialEntityId || undefined}
+        initialEntityId={profileInitialEntityId ? profileInitialEntityId : undefined}
         entityTypeId={profileEntityTypeId}
         apiBaseUrl="/api/v1/admin/profile/api"
         accessToken={keycloak.token}
         onSaveSuccess={(payload) => {
           setSaveResult(payload);
           setSaveError("");
+          toast.showSuccess(`Профиль сохранён (версия ${payload.version})`);
         }}
         onError={(payload) => {
           setSaveError(payload.message);
+          toast.showError(payload.message);
         }}
       />
       {saveResult ? (

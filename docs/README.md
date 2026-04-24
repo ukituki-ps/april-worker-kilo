@@ -8,6 +8,8 @@
 - Что такое AprilHub: [`guides/APRILHUB_WHAT_IS_IT.md`](./guides/APRILHUB_WHAT_IS_IT.md)
 - Как работает AprilHub: [`guides/APRILHUB_HOW_IT_WORKS.md`](./guides/APRILHUB_HOW_IT_WORKS.md)
 - Как работать с проектом: [`guides/APRILHUB_TEAM_WORKFLOW.md`](./guides/APRILHUB_TEAM_WORKFLOW.md)
+- Frontend strategy (host/widget): [`FRONTEND_STRATEGY.md`](./FRONTEND_STRATEGY.md)
+- Контракты виджетов и host: [`WIDGET_CONTRACTS.md`](./WIDGET_CONTRACTS.md)
 
 ## Agent-first
 
@@ -26,4 +28,5 @@
 - Архитектурный индекс: [`architecture/README.md`](./architecture/README.md)
 - C4 модель: `../structurizr/workspace.dsl`
 - OpenAPI: [`../openapi/openapi.yaml`](../openapi/openapi.yaml), [`../openapi/aprilhub-bff.yaml`](../openapi/aprilhub-bff.yaml)
+- Frontend host/widget contracts: [`FRONTEND_STRATEGY.md`](./FRONTEND_STRATEGY.md), [`WIDGET_CONTRACTS.md`](./WIDGET_CONTRACTS.md)
 - ADR: [`adr/README.md`](./adr/README.md)
