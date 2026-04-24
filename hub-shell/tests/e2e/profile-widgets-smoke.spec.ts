@@ -1,44 +1,13 @@
 import { expect, test } from "@playwright/test";
+import { loginThroughKeycloak } from "./helpers/login";
 
-async function startLoginFromGuestHeader(page: import("@playwright/test").Page): Promise<void> {
-  await page.getByLabel("Меню профиля и настроек").click();
-  await page.getByTestId("guest-landing-login-nav").click();
-}
+const privilegedUser = process.env.PLAYWRIGHT_USER ?? "april-dev";
+const privilegedPass = process.env.PLAYWRIGHT_PASSWORD ?? "april-dev-pass";
 
-test.describe("AprilHub smoke e2e", () => {
-  test("показывает гостевой лендинг и вход в меню профиля", async ({ page }) => {
-    await page.goto("/");
-
-    await expect(page.getByTestId("guest-landing")).toBeVisible();
-    await expect(page.getByTestId("landing-ecosystem-cards")).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Экосистема инструментов управления компанией:" })).toBeVisible();
-    await page.getByLabel("Меню профиля и настроек").click();
-    await expect(page.getByTestId("guest-landing-login-nav")).toBeVisible();
-  });
-
-  test("переводит пользователя на Keycloak login", async ({ page }) => {
-    await page.goto("/");
-    await startLoginFromGuestHeader(page);
-
-    await page.waitForURL(/\/auth\/realms\/april\/protocol\/openid-connect\/auth/);
-    await expect(page.locator("form")).toBeVisible();
-  });
-
-  test("позволяет пройти вход и открыть авторизованную рабочую зону", async ({ page }) => {
-    await page.goto("/");
-    await startLoginFromGuestHeader(page);
-
-    await page.locator("#username").fill(process.env.PLAYWRIGHT_USER ?? "april-dev");
-    await page.locator("#password").fill(process.env.PLAYWRIGHT_PASSWORD ?? "april-dev-pass");
-    await page.locator("#kc-login").click();
-
-    await page.waitForURL("/");
-    await expect(page.getByRole("heading", { name: "Рабочая зона AprilHub" })).toBeVisible();
-    await expect(page.getByText("Авторизовано")).toBeVisible();
-    await page.getByLabel("Меню профиля и настроек").click();
-    await expect(page.getByRole("menuitem", { name: "Выйти" })).toBeVisible();
-  });
-
+/**
+ * @smoke Критичный путь виджетов 4a с перехватом BFF (`page.route`) — быстрый регресс UI без зависимости от AprilProfile upstream.
+ */
+test.describe("AprilProfile widgets в Hub (@smoke, stubs)", () => {
   test("рендерит profile widget и фиксирует onSaveSuccess", async ({ page }) => {
     const entityTypeId = "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb";
     const missingEntityId = "00000000-0000-0000-0000-000000000001";
@@ -106,13 +75,8 @@ test.describe("AprilHub smoke e2e", () => {
       await route.continue();
     });
 
-    await page.goto("/");
-    await startLoginFromGuestHeader(page);
-    await page.locator("#username").fill(process.env.PLAYWRIGHT_USER ?? "april-dev");
-    await page.locator("#password").fill(process.env.PLAYWRIGHT_PASSWORD ?? "april-dev-pass");
-    await page.locator("#kc-login").click();
-
-    await page.waitForURL("/");
+    await loginThroughKeycloak(page, privilegedUser, privilegedPass);
+    await page.goto("/#/app/overview");
     await expect(page.getByRole("heading", { name: "Обзор" })).toBeVisible();
     await page.getByRole("link", { name: "Профиль — карточка" }).click();
     await expect(page.getByTestId("profile-domain-shell")).toBeVisible();
@@ -121,7 +85,7 @@ test.describe("AprilHub smoke e2e", () => {
     await expect(page.getByTestId("profile-widget-save-success")).toContainText("onSaveSuccess");
   });
 
-  test("deep-link на карточку профиля открывает виджетный слот после входа", async ({ page }) => {
+  test("deep-link на карточку профиля открывает виджетный слот", async ({ page }) => {
     const entityId = "00000000-0000-0000-0000-000000000001";
     const deepPath = `/#/app/profile/entities/${entityId}/card`;
 
@@ -159,13 +123,7 @@ test.describe("AprilHub smoke e2e", () => {
       await route.continue();
     });
 
-    await page.goto("/");
-    await startLoginFromGuestHeader(page);
-    await page.locator("#username").fill(process.env.PLAYWRIGHT_USER ?? "april-dev");
-    await page.locator("#password").fill(process.env.PLAYWRIGHT_PASSWORD ?? "april-dev-pass");
-    await page.locator("#kc-login").click();
-
-    await page.waitForURL("/");
+    await loginThroughKeycloak(page, privilegedUser, privilegedPass);
     await page.goto(deepPath);
     await expect(page.getByTestId("profile-domain-shell")).toBeVisible();
     await expect(page.getByRole("heading", { name: "Профиль (виджет)" })).toBeVisible();
@@ -214,13 +172,8 @@ test.describe("AprilHub smoke e2e", () => {
       await route.continue();
     });
 
-    await page.goto("/");
-    await startLoginFromGuestHeader(page);
-    await page.locator("#username").fill(process.env.PLAYWRIGHT_USER ?? "april-dev");
-    await page.locator("#password").fill(process.env.PLAYWRIGHT_PASSWORD ?? "april-dev-pass");
-    await page.locator("#kc-login").click();
-
-    await page.waitForURL("/");
+    await loginThroughKeycloak(page, privilegedUser, privilegedPass);
+    await page.goto("/#/app/overview");
     await page.getByRole("link", { name: "Профиль — список" }).click();
     await expect(page.getByRole("heading", { name: "Profiles list widget" })).toBeVisible();
     await page.getByLabel("Entity type ID").fill(entityTypeId);
@@ -318,13 +271,8 @@ test.describe("AprilHub smoke e2e", () => {
       await route.continue();
     });
 
-    await page.goto("/");
-    await startLoginFromGuestHeader(page);
-    await page.locator("#username").fill(process.env.PLAYWRIGHT_USER ?? "april-dev");
-    await page.locator("#password").fill(process.env.PLAYWRIGHT_PASSWORD ?? "april-dev-pass");
-    await page.locator("#kc-login").click();
-
-    await page.waitForURL("/");
+    await loginThroughKeycloak(page, privilegedUser, privilegedPass);
+    await page.goto("/#/app/overview");
     await page.getByRole("link", { name: "Профиль — экземпляры" }).click();
     await expect(page.getByRole("heading", { name: "Profile instances widget" })).toBeVisible();
     await page.getByLabel("Entity type ID").fill(entityTypeId);
@@ -411,13 +359,8 @@ test.describe("AprilHub smoke e2e", () => {
       await route.continue();
     });
 
-    await page.goto("/");
-    await startLoginFromGuestHeader(page);
-    await page.locator("#username").fill(process.env.PLAYWRIGHT_USER ?? "april-dev");
-    await page.locator("#password").fill(process.env.PLAYWRIGHT_PASSWORD ?? "april-dev-pass");
-    await page.locator("#kc-login").click();
-
-    await page.waitForURL("/");
+    await loginThroughKeycloak(page, privilegedUser, privilegedPass);
+    await page.goto("/#/app/overview");
     await page.getByRole("link", { name: "Профиль — конфликты и merge" }).click();
     await expect(page.getByTestId("conflicts-merge-host-card")).toBeVisible();
     await expect(page.getByTestId("conflicts-merge-table")).toBeVisible();
@@ -425,21 +368,5 @@ test.describe("AprilHub smoke e2e", () => {
     await expect(page.getByTestId("conflicts-merge-last-action")).toContainText("resolve:");
     await page.getByRole("button", { name: "Выполнить merge" }).click();
     await expect(page.getByTestId("conflicts-merge-last-action")).toContainText("merge:");
-  });
-
-  test("без роли admin: прямой переход на экран конфликтов показывает запрет", async ({ page }) => {
-    const restrictedUser = process.env.PLAYWRIGHT_RESTRICTED_USER ?? "april-user";
-    const restrictedPassword = process.env.PLAYWRIGHT_RESTRICTED_PASSWORD ?? "april-user-pass";
-
-    await page.goto("/");
-    await startLoginFromGuestHeader(page);
-    await page.locator("#username").fill(restrictedUser);
-    await page.locator("#password").fill(restrictedPassword);
-    await page.locator("#kc-login").click();
-
-    await page.waitForURL("/");
-    await page.goto("/#/app/profile/admin/conflicts");
-    await expect(page.getByRole("heading", { name: "Доступ запрещен" })).toBeVisible();
-    await expect(page.getByText(/роли admin/i)).toBeVisible();
   });
 });

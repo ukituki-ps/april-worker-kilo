@@ -45,6 +45,7 @@
 - [x] `029`: Исполнение внешней задачи 032 из `april-profile-1` (хостинг конфликтного UI, RBAC/e2e, двойной отчёт)
 - [x] `030`: Исполнение внешней задачи 034 из `april-profile-1` (анализ docs + реализация в Hub + двойной отчёт)
 - [ ] `031`: Исполнение внешней задачи 035 из `april-profile-1` (shell/IA/HostContext по 4a.0 + docs-site во внешнем репо + двойной отчёт)
+- [x] `032`: Полноценный тестовый контур AprilHub + виджеты AprilProfile (матрица ролей Keycloak, сценарии e2e, регрессия UI, дифф stub vs реальный BFF)
 
 ## Текущий фокус
 
@@ -77,6 +78,7 @@
 - [x] `029-aprilhub-execute-external-task-032-april-profile-1`: изучить задачу 032 и документацию в `april-profile-1`, реализовать хостинг конфликтного UI + RBAC/e2e в `april-worker`, оформить отчёт в обоих репозиториях и docs-site по внешней постановке
 - [x] `030-aprilhub-execute-external-task-034-april-profile-1`: изучить задачу 034 и документацию в `april-profile-1`, реализовать требования для AprilHub в `april-worker`, оформить отчёт в обоих репозиториях
 - [ ] `031-aprilhub-execute-external-task-035-april-profile-1`: изучить задачу 035 (фаза 4a.0) и документацию в `april-profile-1`, реализовать shell/IA/`HostContext`/smoke/docs в `april-worker`, оформить отчёт в обоих репозиториях (в т.ч. docs-site по внешней постановке)
+- [x] `032-aprilhub-aprilprofile-widgets-rbac-e2e-suite`: матрица ролей Keycloak + Playwright-сценарии для AprilHub и хостинга виджетов AprilProfile (RBAC, негативные кейсы, слой без network-stub для happy-path); см. [`tasks/032-aprilhub-aprilprofile-widgets-rbac-e2e-suite/TASK.md`](./tasks/032-aprilhub-aprilprofile-widgets-rbac-e2e-suite/TASK.md), [`REPORT.md`](./tasks/032-aprilhub-aprilprofile-widgets-rbac-e2e-suite/REPORT.md)
 
 ## План реализации AprilHub: статусы
 
@@ -111,3 +113,4 @@
 | `029` | Исполнение внешней задачи 032 из `april-profile-1` (хостинг конфликтного UI, RBAC/e2e, двойной отчёт + docs-site в профиле) | ✅ Выполнено | [`tasks/029-aprilhub-execute-external-task-032-april-profile-1/TASK.md`](./tasks/029-aprilhub-execute-external-task-032-april-profile-1/TASK.md), [`tasks/029-aprilhub-execute-external-task-032-april-profile-1/PLAN.md`](./tasks/029-aprilhub-execute-external-task-032-april-profile-1/PLAN.md), [`tasks/029-aprilhub-execute-external-task-032-april-profile-1/REPORT.md`](./tasks/029-aprilhub-execute-external-task-032-april-profile-1/REPORT.md) |
 | `030` | Исполнение внешней задачи 034 из `april-profile-1` (анализ docs + реализация в Hub + двойной отчёт) | ✅ Выполнено | [`tasks/030-aprilhub-execute-external-task-034-april-profile-1/TASK.md`](./tasks/030-aprilhub-execute-external-task-034-april-profile-1/TASK.md), [`tasks/030-aprilhub-execute-external-task-034-april-profile-1/REPORT.md`](./tasks/030-aprilhub-execute-external-task-034-april-profile-1/REPORT.md) |
 | `031` | Исполнение внешней задачи 035 из `april-profile-1` (shell/IA/навигационный контракт 4a.0 + двойной отчёт) | ⏳ Не начато | [`tasks/031-aprilhub-execute-external-task-035-april-profile-1/TASK.md`](./tasks/031-aprilhub-execute-external-task-035-april-profile-1/TASK.md), [`tasks/031-aprilhub-execute-external-task-035-april-profile-1/REPORT.md`](./tasks/031-aprilhub-execute-external-task-035-april-profile-1/REPORT.md) |
+| `032` | Тесты AprilHub + AprilProfile: матрица ролей, e2e/regression UI, stub vs интеграция | ✅ Выполнено | [`tasks/032-aprilhub-aprilprofile-widgets-rbac-e2e-suite/TASK.md`](./tasks/032-aprilhub-aprilprofile-widgets-rbac-e2e-suite/TASK.md), [`tasks/032-aprilhub-aprilprofile-widgets-rbac-e2e-suite/REPORT.md`](./tasks/032-aprilhub-aprilprofile-widgets-rbac-e2e-suite/REPORT.md) |

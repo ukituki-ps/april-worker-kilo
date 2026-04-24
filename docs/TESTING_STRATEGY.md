@@ -27,7 +27,7 @@
 ### 2.1a Release gate виджетов 4a (AprilHub)
 
 - Операционный чеклист, порядок действий при падении smoke/e2e и rollback: [`docs/runbooks/APRILHUB_4A_WIDGET_RELEASE_GATE.md`](./runbooks/APRILHUB_4A_WIDGET_RELEASE_GATE.md).
-- Минимальный набор Playwright для критичного пути виджетов профиля: `hub-shell/tests/e2e/smoke.spec.ts` (см. runbook); на PR в защищённые ветки job не включён — nightly `hub-shell-playwright-smoke` и ручной прогон `./scripts/run-playwright-aprilhub.sh` перед релизом.
+- Минимальный набор Playwright для критичного пути виджетов профиля: `hub-shell/tests/e2e/` (проекты `guest` и `chromium`; см. runbook и [`docs/guides/APRILHUB_PLAYWRIGHT_PERSONAS.md`](./guides/APRILHUB_PLAYWRIGHT_PERSONAS.md)); на PR в защищённые ветки job не включён — nightly `hub-shell-playwright-smoke` и ручной прогон `./scripts/run-playwright-aprilhub.sh` перед релизом.
 
 ### 2.2 Локальный pre-merge прогон
 
@@ -84,10 +84,13 @@ cd hub-shell && npm ci && npm run check:profile-ui-semver && npm run lint && npm
 
 - Команда локального запуска: `cd hub-shell && npm run e2e`.
 - Скрипт полного прогрева окружения: `./scripts/run-playwright-aprilhub.sh`.
-- Базовый smoke-набор:
+- Матрица персон Keycloak, разделение проектов (`guest` / `chromium`), хелпер `loginThroughKeycloak` и переменные окружения: [`docs/guides/APRILHUB_PLAYWRIGHT_PERSONAS.md`](./guides/APRILHUB_PLAYWRIGHT_PERSONAS.md).
+- Базовый smoke-набор (см. также runbook 4a):
   1. Гостевой лендинг и CTA входа.
   2. Редирект на страницу логина Keycloak.
-  3. Логин тестовым пользователем и вход в авторизованную рабочую зону.
+  3. Вход привилегированной и ограниченной персон (явный OIDC в спеках).
+  4. Виджеты профиля 4a: быстрый слой со `page.route` и отдельный файл **`profile-widgets-integration.spec.ts`** без перехвата сети для реального BFF.
+- Доп. команды: `npm run e2e:smoke` (без integration-файла), `npm run e2e:integration`.
 - Артефакты при падениях: trace/screenshot/video (Playwright `retain-on-failure`), HTML report (`hub-shell/playwright-report`).
 
 ### 5.2 Integration suite (`hub-bff`, P1)

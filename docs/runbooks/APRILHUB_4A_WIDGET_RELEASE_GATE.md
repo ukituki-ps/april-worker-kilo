@@ -22,17 +22,20 @@
 
 ## 2. Минимальный набор Playwright (критичный путь виджетов 4a)
 
-Сценарии в `hub-shell/tests/e2e/smoke.spec.ts` (запуск через `./scripts/run-playwright-aprilhub.sh` или `cd hub-shell && npm run e2e` при уже поднятом контуре):
+Спеки разнесены по файлам в `hub-shell/tests/e2e/`; матрица ролей и команд запуска — [`docs/guides/APRILHUB_PLAYWRIGHT_PERSONAS.md`](../guides/APRILHUB_PLAYWRIGHT_PERSONAS.md). Запуск: `./scripts/run-playwright-aprilhub.sh` или `cd hub-shell && npm run e2e` при уже поднятом контуре; интеграция без network-stub: `cd hub-shell && npm run e2e:integration`.
 
-| Сценарий | Покрытие 4a |
-|----------|-------------|
-| Гость → Keycloak → авторизованная зона | Вход и shell |
-| «Профиль — карточка», сохранение, `onSaveSuccess` | Карточка сущности / виджетный слот |
-| Deep-link на карточку | Навигация после входа |
-| «Профиль — список», create | Список профилей |
-| «Профиль — экземпляры» + update + «история экземпляра» | Экземпляры и история версий |
-| «Профиль — конфликты и merge» (stubs) | Админ-конфликты |
-| Вход без `admin` на `#/app/profile/admin/conflicts` | RBAC shell |
+| Сценарий | Файл / проект Playwright | Покрытие 4a |
+|----------|--------------------------|-------------|
+| Гостевой лендинг, OIDC redirect | `guest.spec.ts` (`guest`) | Вход |
+| Рабочая зона, админ-пункты сайдбара, выход | `shell-privileged.spec.ts` (`chromium`) | Shell |
+| «Профиль — карточка», сохранение, `onSaveSuccess` (stubs) | `profile-widgets-smoke.spec.ts` | Карточка |
+| Deep-link на карточку (stubs) | `profile-widgets-smoke.spec.ts` | Навигация |
+| «Профиль — список», create (stubs) | `profile-widgets-smoke.spec.ts` | Список |
+| Экземпляры + история (stubs) | `profile-widgets-smoke.spec.ts` | Экземпляры / версии |
+| «Профиль — конфликты и merge» (stubs) | `profile-widgets-smoke.spec.ts` | Админ-конфликты |
+| RBAC: нет admin-ссылок, запрет conflicts/admin, not-found | `rbac-matrix.spec.ts` | RBAC shell |
+| Список профилей без admin: 403 от BFF | `profile-widgets-restricted.spec.ts` | Негатив API |
+| Карточка: реальный BFF без `page.route` | `profile-widgets-integration.spec.ts` | Контракт / UX |
 
 На PR в `main`/`develop` эти сценарии **не** входят в обязательный self-hosted CI (тяжёлый compose); они включены в nightly (`.github/workflows/testing-extensions-nightly.yml`, job `hub-shell-playwright-smoke`). Перед **релизом** или крупным изменением виджетов 4a рекомендуется локально прогнать `./scripts/run-playwright-aprilhub.sh` и приложить лог/отчёт к PR.
 

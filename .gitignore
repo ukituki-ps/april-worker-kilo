@@ -4,6 +4,7 @@ images.env
 node_modules/
 hub-shell/test-results/
 hub-shell/playwright-report/
+hub-shell/tests/e2e/.auth/
 docs-site/build/
 docs-site/.docusaurus/
 docs-site/static/openapi/*.yaml

@@ -100,6 +100,20 @@ echo "[playwright] waiting for shell entrypoint"
 wait_for_url "${PLAYWRIGHT_BASE_URL}/" 180 2
 curl -fsS "${PLAYWRIGHT_BASE_URL}/" >/dev/null
 
+# Vite dev: первый HTTP на `/` через Nginx не обязательно компилирует `/src/main.tsx`; прогреваем и через ingress, и напрямую `hub-shell:4173` изнутри dev-контейнера.
+echo "[playwright] warming Vite module graph (dev server)"
+for path in "/@vite/client" "/src/main.tsx"; do
+  if ! curl -fsS "${PLAYWRIGHT_BASE_URL}${path}" -o /dev/null 2>/dev/null; then
+    echo "[playwright] warning: warm-up GET ${path} via ingress failed (продолжаем)"
+  fi
+done
+HUB_SHELL_PORT="${HUB_SHELL_PORT:-4173}"
+if compose exec -T hub-shell sh -lc "command -v wget >/dev/null 2>&1"; then
+  compose exec -T hub-shell sh -lc "wget -qO- http://127.0.0.1:${HUB_SHELL_PORT}/src/main.tsx >/dev/null 2>&1" || echo "[playwright] warning: in-container vite warm-up failed"
+else
+  compose exec -T hub-shell sh -lc "node -e \"require('http').get('http://127.0.0.1:${HUB_SHELL_PORT}/src/main.tsx',res=>process.exit(res.statusCode===200?0:1)).on('error',()=>process.exit(1))\"" || echo "[playwright] warning: in-container vite warm-up (node) failed"
+fi
+
 echo "[playwright] running smoke suite"
 (
   cd hub-shell
