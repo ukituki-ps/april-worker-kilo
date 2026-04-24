@@ -1,56 +1,34 @@
 ## 1) Итого
-- Статус: ✅ выполнено
-- Задача: синхронизация документации AprilHub с frontend/DS-подходом `april-profile-1`
-- Ветка: `feature/task-026-ds-docs-alignment`
-- Коммиты: `ef41dac` (scope + TASK/PLAN), `5b184d2` (основная синхронизация документации)
-- PR: отдельный PR не создавался, изменения присутствуют в `develop`
+- Статус: ⏳ в работе
+- Задача: исполнение внешней задачи 026 из `april-profile-1` с двойным отчётом
+- Ветка: `026-aprilhub-align-docs-with-april-profile-design-system-approach` (или актуальная рабочая)
+- Коммиты: будут добавлены после реализации
+- PR: будет указан после выполнения
 
 ## 2) Что сделано
-- [docs] Добавлен документ `docs/FRONTEND_STRATEGY.md` с унифицированной моделью `Host-driven` / `Widget-driven` / `API/BFF-first` для AprilHub.
-- [docs] Добавлен документ `docs/WIDGET_CONTRACTS.md` с контрактом `HostContext v1`, props/events и правилами границ host/widget/DS.
-- [docs] Обновлены entrypoints: `docs/README.md`, `docs-site/docs/intro.md`, `docs/guides/APRILHUB_DOCUMENTATION_MAP.md`, чтобы новые документы были discoverable.
-- [docs] Создан `tasks/026-aprilhub-align-docs-with-april-profile-design-system-approach/PLAN.md` по шаблону для нетривиальной задачи.
+- Подготовлена постановка `TASK.md` в формате внешней задачи (по аналогии с задачами 024/025).
+- Зафиксировано требование двойного отчёта:
+  1) в `april-profile-1` (контекст задачи 026),
+  2) в `april-worker` (текущий `REPORT.md`).
 
 ## 3) Изменённые файлы
-- `docs/FRONTEND_STRATEGY.md`
-- `docs/WIDGET_CONTRACTS.md`
-- `docs/README.md`
-- `docs-site/docs/intro.md`
-- `docs/guides/APRILHUB_DOCUMENTATION_MAP.md`
-- `tasks/026-aprilhub-align-docs-with-april-profile-design-system-approach/PLAN.md`
+- `tasks/026-aprilhub-align-docs-with-april-profile-design-system-approach/TASK.md`
+- `task_list.md`
 - `tasks/026-aprilhub-align-docs-with-april-profile-design-system-approach/REPORT.md`
 
-## 4) Миграции и данные
-- Миграции Atlas: нет
-- Какие таблицы/индексы изменены: не применялось
-- Обратимость: да, откат через `git revert`/удаление документационных изменений
+## 4) Реализация требований внешней задачи 026
+- В процессе; будет заполнено после анализа `april-profile-1/tasks/026-*/TASK.md` и выполнения изменений.
 
 ## 5) Проверка качества
-- Линтер: ok (изменения только в markdown)
-- Сборка: не запускалась (нет изменений runtime-кода)
-- Unit tests: не запускались (нет изменений runtime-кода)
-- Integration tests: не запускались (нет изменений runtime-кода)
-- E2E / smoke: не запускались (нет изменений runtime-кода)
+- Для текущего шага: изменения только в markdown (без runtime-кода).
+- Релевантные проверки по реализации будут добавлены после выполнения внешней задачи 026.
 
-Команды (фактически выполненные):
-```bash
-git log --oneline --decorate -n 25
-git show --name-only --pretty=format: 5b184d2
-rg "Host-driven|Widget-driven|API/BFF-first|HostContext" docs
-rg "FRONTEND_STRATEGY|WIDGET_CONTRACTS|task-story-035" docs-site/docs
-```
+## 6) Риски и ограничения
+- Локальная копия `april-profile-1` должна быть доступна агенту для прямой сверки постановки и документации.
+- До получения точной постановки из `april-profile-1` реализация считается незавершённой.
 
-## 6) Деплой
-- Среда: нет
-- Согласовано с: `docs/DEPLOYMENT_STRATEGY.md`
-- Образы: не применялось
-- Health / readiness: не применялось
-- Rollback: нет
-
-## 7) Риски и ограничения
-- Документы синхронизированы на уровне терминов и контрактов, но не заменяют доменные детали AprilProfile (целенаправленно вне scope).
-- Для будущих интеграций конкретных виджетов потребуется отдельная фиксация semver-матрицы совместимости host × widget.
-
-## 8) Что осталось
-- [x] Создать коммит(ы) по подготовленным изменениям.
-- [x] При необходимости открыть PR с test plan и рисками.
+## 7) Что осталось
+- [ ] Прочитать и проанализировать актуальную задачу 026 и связанные документы в `april-profile-1`.
+- [ ] Выполнить требования задачи 026 в `april-worker`.
+- [ ] Обновить отчёт в `april-profile-1` по задаче 026.
+- [ ] Финализировать отчёт в `tasks/026-aprilhub-align-docs-with-april-profile-design-system-approach/REPORT.md`.
