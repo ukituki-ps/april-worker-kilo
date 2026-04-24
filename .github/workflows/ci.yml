@@ -58,7 +58,7 @@ jobs:
           cache: false
 
       - name: Install oasdiff
-        run: go install github.com/oasdiff/oasdiff@v1.13.6
+        run: go install github.com/oasdiff/oasdiff@v1.13.5
 
       - name: Check OpenAPI backward compatibility
         run: |

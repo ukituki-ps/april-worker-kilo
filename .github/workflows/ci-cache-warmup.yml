@@ -61,7 +61,7 @@ jobs:
         working-directory: hub-bff
         run: |
           go mod download
-          go install github.com/oasdiff/oasdiff@v1.13.6
+          go install github.com/oasdiff/oasdiff@v1.13.5
 
       - name: Setup Node.js
         uses: actions/setup-node@v4

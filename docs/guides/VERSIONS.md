@@ -34,7 +34,7 @@ sidebar_position: 3
 | Артефакт | Версия | Где зафиксировано | Где синхронизировать |
 | -------- | ------ | ----------------- | -------------------- |
 | Go runtime (hub-bff) | `1.24.x` / `go1.24.4` toolchain | `hub-bff/go.mod`, `.github/workflows/ci.yml`, `.github/workflows/bootstrap-ci.yml`, `.github/workflows/ci-cache-warmup.yml` | Все workflow с `actions/setup-go` + `go.mod` |
-| `oasdiff` (OpenAPI compatibility) | `v1.13.6` | `.github/workflows/ci.yml`, `.github/workflows/ci-cache-warmup.yml` | Оба workflow должны иметь одинаковый pinned tag |
+| `oasdiff` (OpenAPI compatibility) | `v1.13.5` | `.github/workflows/ci.yml`, `.github/workflows/ci-cache-warmup.yml` | Оба workflow должны иметь одинаковый pinned tag |
 | pnpm (design-system) | `pnpm@9.15.9` | `design-system/DisignApril/package.json` (`packageManager`) | `hub-shell/scripts/ds-prepare.sh`, `ci-cache-warmup` step `corepack pnpm --version` |
 | Node runtime (hub-shell jobs) | `20` | `.github/workflows/ci.yml`, `.github/workflows/bootstrap-ci.yml` | Все Node-based job'ы + docker runtime checks |
 | Docker mirror namespace | `${APRIL_DOCKER_MIRROR}`, `${APRIL_GCR_MIRROR}` | `.github/workflows/ci.yml`, `.github/workflows/bootstrap-ci.yml`, `.github/workflows/ci-cache-warmup.yml` | Добавлять новые часто используемые образы в warmup |
