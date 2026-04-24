@@ -4,7 +4,7 @@
 - **Задача:** Исполнение внешней задачи 034 (`april-profile-1`) — release gates, smoke/e2e и semver для виджетов 4a в AprilHub
 - **Ветка:** `feature/030-external-034-release-gates` (`april-worker`)
 - **Коммиты:** `april-worker` — ветка `feature/030-external-034-release-gates`, основной коммит с изменениями кода/доков: `a1bbabe` (полная цепочка: `git log --oneline develop..HEAD`); `april-profile-1` — ветка `feature/034-docs-release-gates-story`, первый коммит доков: `3b047db` (`git log develop..HEAD`)
-- **PR:** не создавался из среды агента — открыть PR в GitHub: `april-worker` ← `feature/030-external-034-release-gates`, `april-profile-1` ← `feature/034-docs-release-gates-story`
+- **PR:** [april-worker#52](https://github.com/ukituki-ps/april-worker/pull/52) (squash merge в `develop`, merge commit `fd655480374275bd6a46cdbbeb5eb13a7335a5f3`); [april-profile#81](https://github.com/ukituki-ps/april-profile/pull/81) (merge commit `6327b82d9e8b3dc0cb74aa0c3352812c5fb5938f`)
 
 ## 2) Что сделано
 
@@ -58,7 +58,7 @@ cd /home/ukituki/april-worker/hub-shell && npm ci && npm run check:profile-ui-se
 
 ## 8) Что осталось
 
-- [ ] Создать PR в `april-worker` и при необходимости отдельный PR в `april-profile-1`; обновить этот отчёт ссылками на PR/merge commit.
+- [x] PR и merge в `develop` (april-worker#52, april-profile#81).
 - [ ] После публикации `@april/profile-ui`: добавить зависимость в `hub-shell`, закоммитить lockfile и убедиться, что CI semver-шаг проходит на реальном диапазоне.
 
 ## Подтверждение дублирования отчёта
