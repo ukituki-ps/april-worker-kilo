@@ -16,7 +16,6 @@
   - ожидание `hub-bff` health напрямую внутри контейнера перед ingress-check;
   - запуск только необходимых сервисов (без `april-showcase`);
   - экспорт `KC_HOSTNAME`/`KEYCLOAK_ISSUER` под локальный `PLAYWRIGHT_BASE_URL`.
-- [infra] Для `hub-bff` включён workspace cache (`/workspace/.cache/go-*`), чтобы снизить cold-start на `go mod download`.
 - [docs-site] Добавлена обязательная история `docs-site/docs/task-story-026-phase-4a-hub-profiles-list-host-bff-flow.md`; индекс `task-stories-overview.md` обновлён.
 
 ## 3) Изменённые файлы
