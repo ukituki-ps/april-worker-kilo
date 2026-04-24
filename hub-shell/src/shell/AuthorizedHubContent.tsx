@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { CompositionErrorBoundary } from "../composition-error-boundary";
-import { OverviewWidget, RolesWidget, BrokenWidget } from "../widgets";
+import { OverviewWidget, RolesWidget, BrokenWidget, ProfilesListHostWidget } from "../widgets";
 import type { ShellUserContext } from "../types";
 import { SharedState } from "../shared-ux";
 import { matchShellRoute, shellNavigate, shellPaths } from "./shell-paths";
@@ -74,6 +74,16 @@ export function AuthorizedHubContent({ context }: Props): JSX.Element {
           state="empty"
           message={`Раздел экземпляра профиля (instanceId=${match.instanceId}) зарезервирован под задачу 028. Deep-link: ${pathname}`}
         />
+      </RouteChrome>
+    );
+  }
+
+  if (match.kind === "profile-list") {
+    return (
+      <RouteChrome>
+        <CompositionErrorBoundary moduleName="Профиль (список)">
+          <ProfilesListHostWidget context={context} />
+        </CompositionErrorBoundary>
       </RouteChrome>
     );
   }

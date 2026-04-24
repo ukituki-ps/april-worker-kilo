@@ -170,4 +170,61 @@ test.describe("AprilHub smoke e2e", () => {
     await expect(page.getByTestId("profile-domain-shell")).toBeVisible();
     await expect(page.getByRole("heading", { name: "Профиль (виджет)" })).toBeVisible();
   });
+
+  test("рендерит profiles list widget и выполняет create через BFF префикс", async ({ page }) => {
+    const listEntityId = "00000000-0000-0000-0000-000000000001";
+    const createdEntityId = "22222222-2222-2222-2222-222222222222";
+    const entityTypeId = "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb";
+
+    await page.route("**/api/v1/admin/profile/api/v1/entities**", async (route) => {
+      const request = route.request();
+      const method = request.method();
+      const url = new URL(request.url());
+
+      if (method === "GET" && url.pathname.endsWith(`/v1/entities/${listEntityId}`)) {
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({
+            entity_id: listEntityId,
+            entity_type_id: entityTypeId,
+            version: 1,
+            created_at: "2026-04-24T00:00:00Z",
+            document: { name: "Demo profile" },
+          }),
+        });
+        return;
+      }
+
+      if (method === "POST" && url.pathname.endsWith("/v1/entities")) {
+        await route.fulfill({
+          status: 201,
+          contentType: "application/json",
+          body: JSON.stringify({
+            entity_id: createdEntityId,
+            entity_type_id: entityTypeId,
+            version: 1,
+            created_at: "2026-04-24T00:01:00Z",
+            document: { name: "Created from hub shell" },
+          }),
+        });
+        return;
+      }
+
+      await route.continue();
+    });
+
+    await page.goto("/");
+    await startLoginFromGuestHeader(page);
+    await page.locator("#username").fill(process.env.PLAYWRIGHT_USER ?? "april-dev");
+    await page.locator("#password").fill(process.env.PLAYWRIGHT_PASSWORD ?? "april-dev-pass");
+    await page.locator("#kc-login").click();
+
+    await page.waitForURL("/");
+    await page.getByRole("link", { name: "Профиль — список" }).click();
+    await expect(page.getByRole("heading", { name: "Profiles list widget" })).toBeVisible();
+    await page.getByLabel("Entity type ID").fill(entityTypeId);
+    await page.getByRole("button", { name: "Create profile" }).click();
+    await expect(page.getByTestId("profiles-list-last-action")).toContainText("created");
+  });
 });
