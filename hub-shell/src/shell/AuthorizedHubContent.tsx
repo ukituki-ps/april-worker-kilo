@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { CompositionErrorBoundary } from "../composition-error-boundary";
-import { OverviewWidget, RolesWidget, BrokenWidget, ProfilesListHostWidget } from "../widgets";
+import { OverviewWidget, RolesWidget, BrokenWidget, ProfilesListHostWidget, ProfileInstancesHostWidget } from "../widgets";
 import type { ShellUserContext } from "../types";
 import { SharedState } from "../shared-ux";
 import { matchShellRoute, shellNavigate, shellPaths } from "./shell-paths";
@@ -70,10 +70,9 @@ export function AuthorizedHubContent({ context }: Props): JSX.Element {
   if (match.kind === "profile-instance") {
     return (
       <RouteChrome>
-        <SharedState
-          state="empty"
-          message={`Раздел экземпляра профиля (instanceId=${match.instanceId}) зарезервирован под задачу 028. Deep-link: ${pathname}`}
-        />
+        <CompositionErrorBoundary moduleName="Профиль (экземпляры)">
+          <ProfileInstancesHostWidget context={context} routeEntityId={match.instanceId} />
+        </CompositionErrorBoundary>
       </RouteChrome>
     );
   }

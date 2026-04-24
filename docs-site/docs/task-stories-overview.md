@@ -16,3 +16,5 @@ sidebar_position: 19
   источник постановки: `april-profile-1/tasks/035-phase-4a-hub-ui-shell-information-architecture/TASK.md`
 - `026`: [Hub profiles list host + BFF/OIDC flow (phase 4a.1)](./task-story-026-phase-4a-hub-profiles-list-host-bff-flow)  
   источник постановки: `april-profile-1/tasks/026-phase-4a-hub-profiles-list-host-bff-flow/TASK.md`
+- `028`: [Hub instances host + routing + e2e (phase 4a.2)](./task-story-028-phase-4a-hub-instances-host-routing-e2e)  
+  источник постановки: `april-profile-1/tasks/028-phase-4a-hub-instances-host-routing-e2e/TASK.md`

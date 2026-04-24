@@ -24,6 +24,18 @@ type ProfilesListAction =
   | { type: "created"; item: ProfilesListItem }
   | { type: "loaded"; count: number };
 
+const DEFAULT_PROFILE_INSTANCE_IDS = ["demo-instance"];
+type ProfileInstanceItem = {
+  entityId: string;
+  entityTypeId: string;
+  version: number;
+  preview: string;
+};
+
+type ProfileInstancesAction =
+  | { type: "created"; item: ProfileInstanceItem }
+  | { type: "loaded"; count: number };
+
 const readProfileListIds = (): string[] => {
   const raw = import.meta.env.VITE_PROFILE_LIST_ENTITY_IDS?.trim();
   if (!raw) {
@@ -34,6 +46,21 @@ const readProfileListIds = (): string[] => {
     .map((value) => value.trim())
     .filter(Boolean);
   return parsed.length > 0 ? parsed : DEFAULT_PROFILE_LIST_IDS;
+};
+
+const readProfileInstanceIds = (routeInstanceId?: string): string[] => {
+  const raw = import.meta.env.VITE_PROFILE_INSTANCE_IDS?.trim();
+  const parsed = raw
+    ? raw
+        .split(",")
+        .map((value: string) => value.trim())
+        .filter(Boolean)
+    : [];
+  const fallback = routeInstanceId?.trim() || DEFAULT_PROFILE_INSTANCE_IDS[0];
+  if (parsed.length === 0) {
+    return [fallback];
+  }
+  return parsed.includes(fallback) ? parsed : [fallback, ...parsed];
 };
 
 export function OverviewWidget({ context }: WidgetProps) {
@@ -208,6 +235,169 @@ export function ProfilesListHostWidget({ context }: WidgetProps): JSX.Element {
       {lastError ? (
         <Alert color="red" data-testid="profiles-list-last-error">
           Ошибка списка профилей: {lastError}
+        </Alert>
+      ) : null}
+    </div>
+  );
+}
+
+export function ProfileInstancesHostWidget({ context, routeEntityId }: WidgetProps): JSX.Element {
+  const toast = useShellToast();
+  const [lastAction, setLastAction] = useState<ProfileInstancesAction | null>(null);
+  const [lastError, setLastError] = useState("");
+  const [items, setItems] = useState<ProfileInstanceItem[]>([]);
+  const [entityTypeId, setEntityTypeId] = useState(import.meta.env.VITE_PROFILE_DEFAULT_ENTITY_TYPE_ID?.trim() || "");
+  const [createLoading, setCreateLoading] = useState(false);
+  const profileId = useMemo(
+    () => import.meta.env.VITE_PROFILE_DEMO_ENTITY_ID?.trim() || "00000000-0000-0000-0000-000000000001",
+    [],
+  );
+  const instanceIds = useMemo(() => readProfileInstanceIds(routeEntityId ?? undefined), [routeEntityId]);
+  const hostContext = useMemo<ProfileWidgetHostContext>(
+    () => ({
+      tenant: { id: context.orgScope },
+      auth: {
+        subject: context.user.sub,
+        roles: context.roles,
+        tokenRef: "keycloak",
+      },
+      locale: "ru-RU",
+      telemetry: {
+        requestId: context.correlationId,
+      },
+    }),
+    [context],
+  );
+
+  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      try {
+        const loaded = await Promise.all(
+          instanceIds.map(async (entityId) => {
+            const response = await fetch(`/api/v1/admin/profile/api/v1/entities/${entityId}`, {
+              headers: {
+                ...(keycloak.token ? { Authorization: `Bearer ${keycloak.token}` } : {}),
+                "Content-Type": "application/json",
+              },
+            });
+            if (!response.ok) {
+              throw new Error(`load failed: ${response.status}`);
+            }
+            const snapshot = (await response.json()) as {
+              entity_id: string;
+              entity_type_id?: string;
+              version: number;
+              document?: Record<string, unknown>;
+            };
+            return {
+              entityId: snapshot.entity_id,
+              entityTypeId: snapshot.entity_type_id ?? "unknown",
+              version: snapshot.version,
+              preview: JSON.stringify(snapshot.document ?? {}),
+            } satisfies ProfileInstanceItem;
+          }),
+        );
+        if (cancelled) {
+          return;
+        }
+        setItems(loaded);
+        setLastAction({ type: "loaded", count: loaded.length });
+      } catch (error) {
+        if (cancelled) {
+          return;
+        }
+        const message = error instanceof Error ? error.message : "instances load failed";
+        setLastError(message);
+        toast.showError(message);
+      }
+    };
+    void load();
+    return () => {
+      cancelled = true;
+    };
+  }, [instanceIds, toast]);
+
+  const handleCreate = async (): Promise<void> => {
+    if (!entityTypeId.trim()) {
+      const message = "Entity type ID is required";
+      setLastError(message);
+      toast.showError(message);
+      return;
+    }
+    setCreateLoading(true);
+    setLastError("");
+    try {
+      const response = await fetch("/api/v1/admin/profile/api/v1/entities", {
+        method: "POST",
+        headers: {
+          ...(keycloak.token ? { Authorization: `Bearer ${keycloak.token}` } : {}),
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          entity_type_id: entityTypeId.trim(),
+          document: {
+            tenant_id: hostContext.tenant.id,
+            profile_id: profileId,
+            source: "hub-shell-instances",
+          },
+        }),
+      });
+      if (!response.ok) {
+        throw new Error(`create failed: ${response.status}`);
+      }
+      const snapshot = (await response.json()) as {
+        entity_id: string;
+        entity_type_id?: string;
+        version: number;
+        document?: Record<string, unknown>;
+      };
+      const createdItem: ProfileInstanceItem = {
+        entityId: snapshot.entity_id,
+        entityTypeId: snapshot.entity_type_id ?? entityTypeId.trim(),
+        version: snapshot.version,
+        preview: JSON.stringify(snapshot.document ?? {}),
+      };
+      setItems((prev) => [createdItem, ...prev]);
+      setLastAction({ type: "created", item: createdItem });
+      toast.showSuccess("Instances action: created");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "instances create failed";
+      setLastError(message);
+      toast.showError(message);
+    } finally {
+      setCreateLoading(false);
+    }
+  };
+
+  return (
+    <div>
+      <article className="widget-card" data-testid="profile-instances-widget-card">
+        <h3>Profile instances widget</h3>
+        <p>Tenant: {hostContext.tenant.id}</p>
+        <p>Profile ID: {profileId}</p>
+        <label htmlFor="profile-instances-entity-type-id">Entity type ID</label>
+        <input
+          id="profile-instances-entity-type-id"
+          aria-label="Entity type ID"
+          value={entityTypeId}
+          onChange={(event) => setEntityTypeId(event.currentTarget.value)}
+        />
+        <button type="button" onClick={() => void handleCreate()} disabled={createLoading}>
+          Create instance
+        </button>
+        <ul>
+          {items.map((item) => (
+            <li key={item.entityId}>
+              {item.entityId} (v{item.version})
+            </li>
+          ))}
+        </ul>
+      </article>
+      {lastAction ? <p data-testid="profile-instances-last-action">Последнее действие: {lastAction.type}</p> : null}
+      {lastError ? (
+        <Alert color="red" data-testid="profile-instances-last-error">
+          Ошибка списка экземпляров: {lastError}
         </Alert>
       ) : null}
     </div>

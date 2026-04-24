@@ -56,7 +56,7 @@ export function ShellBreadcrumbs({ match }: Props): JSX.Element {
     );
     items.push(
       <Text key="cur" size="sm">
-        Экземпляр {match.instanceId}
+        Экземпляры / {match.instanceId}
       </Text>,
     );
   } else {
