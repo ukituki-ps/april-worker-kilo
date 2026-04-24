@@ -1,10 +1,10 @@
 ## 1) Итого
 
-- Статус: ⚠️ частично (код и документация готовы; полный `./scripts/run-playwright-aprilhub.sh` на агентской машине не доведён до зелёного из‑за таймаутов/нагрузки compose при параллельном прогоне — см. раздел 5)
+- Статус: ⚠️ частично по полному локальному Playwright-compose (см. раздел 5); **код влит в `develop`**, CI на PR прошёл.
 - Задача: полноценный тестовый контур AprilHub + виджеты AprilProfile (RBAC, сценарии, stub vs реальный BFF)
-- Ветка: `feature/032-aprilhub-aprilprofile-widgets-rbac-e2e-suite`
-- Коммиты: последний на ветке `feature/032-aprilhub-aprilprofile-widgets-rbac-e2e-suite` (по состоянию на завершение работы)
-- PR: не создавался
+- Ветка: `feature/032-aprilhub-aprilprofile-widgets-rbac-e2e-suite` (удалена на origin после merge)
+- Merge в `develop`: squash [`f8f1cbf`](https://github.com/ukituki-ps/april-worker/commit/f8f1cbfe0064b2370e79d8b6c746c464f600b513)
+- PR: [#53](https://github.com/ukituki-ps/april-worker/pull/53) — merged 2026-04-24
 
 ## 2) Что сделано
 
