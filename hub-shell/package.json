@@ -12,6 +12,7 @@
     "build": "tsc --noEmit && vite build",
     "lint": "tsc --noEmit",
     "test": "vitest run",
+    "check:profile-ui-semver": "node scripts/check-april-profile-ui-semver.mjs",
     "e2e": "playwright test",
     "e2e:install": "playwright install --with-deps chromium",
     "preview": "vite preview --host 0.0.0.0 --port 4173"

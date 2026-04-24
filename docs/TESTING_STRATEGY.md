@@ -18,18 +18,23 @@
 1. `openapi-compatibility`
 2. `quality` (OpenAPI lint + docs build)
 3. `hub-bff` (`go test ./...`)
-4. `hub-shell` (`lint + test + build`)
+4. `hub-shell` (`lint + test + build`; внутри job после `npm ci` — `node scripts/check-april-profile-ui-semver.mjs` при объявленной зависимости `@april/profile-ui`)
 5. `aprilhub-smoke` (`./scripts/smoke-aprilhub.sh`)
 6. `aprilhub-k6-baseline` (`./scripts/run-k6-aprilhub.sh`)
 
 Правило: любой `failed` / `cancelled` статус в этом списке — блокировка merge/release-кандидата до исправления причины и повторного зелёного прогона.
+
+### 2.1a Release gate виджетов 4a (AprilHub)
+
+- Операционный чеклист, порядок действий при падении smoke/e2e и rollback: [`docs/runbooks/APRILHUB_4A_WIDGET_RELEASE_GATE.md`](./runbooks/APRILHUB_4A_WIDGET_RELEASE_GATE.md).
+- Минимальный набор Playwright для критичного пути виджетов профиля: `hub-shell/tests/e2e/smoke.spec.ts` (см. runbook); на PR в защищённые ветки job не включён — nightly `hub-shell-playwright-smoke` и ручной прогон `./scripts/run-playwright-aprilhub.sh` перед релизом.
 
 ### 2.2 Локальный pre-merge прогон
 
 ```bash
 make openapi-lint
 cd hub-bff && go test ./...
-cd hub-shell && npm ci && npm run lint && npm run test && npm run build
+cd hub-shell && npm ci && npm run check:profile-ui-semver && npm run lint && npm run test && npm run build
 ./scripts/smoke-aprilhub.sh
 ./scripts/run-k6-aprilhub.sh
 ```
@@ -133,4 +138,5 @@ cd hub-shell && npm ci && npm run lint && npm run test && npm run build
 ## 6. Связь с release gate
 
 - Для release-ready кандидата этапа `019` обязательны все пункты mandatory-слоя.
+- Для изменений в контуре **виджетов профиля 4a** в Hub дополнительно следуйте [`docs/runbooks/APRILHUB_4A_WIDGET_RELEASE_GATE.md`](./runbooks/APRILHUB_4A_WIDGET_RELEASE_GATE.md) (semver, Playwright, согласование при красных проверках).
 - Planned-слой не блокирует merge в `feature/*`/`fix/*` и дальнейший PR в `develop`, пока явно не переведён в mandatory отдельным решением команды.

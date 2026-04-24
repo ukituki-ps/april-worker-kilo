@@ -197,6 +197,10 @@ jobs:
         working-directory: hub-shell
         run: npm ci
 
+      - name: Semver policy for @april/profile-ui (when declared)
+        working-directory: hub-shell
+        run: node scripts/check-april-profile-ui-semver.mjs
+
       - name: Build design system (DisignApril → @april/ui)
         working-directory: hub-shell
         run: npm run ds:prepare
@@ -258,7 +262,7 @@ jobs:
             -v "$HOME/.cache/aprilhub/corepack:/tmp/.corepack" \
             -w /workspace/hub-shell \
             node:20-alpine \
-            sh -lc "npm ci && npm run ds:prepare && npm run build"
+            sh -lc "npm ci && node scripts/check-april-profile-ui-semver.mjs && npm run ds:prepare && npm run build"
 
   aprilhub-smoke:
     name: AprilHub runtime smoke

@@ -20,11 +20,11 @@
 
 - `make openapi-lint`
 - `cd hub-bff && go test ./...`
-- `cd hub-shell && npm ci && npm run lint && npm run test && npm run build`
+- `cd hub-shell && npm ci && npm run check:profile-ui-semver && npm run lint && npm run test && npm run build`
 - `./scripts/smoke-aprilhub.sh`
 - `./scripts/run-k6-aprilhub.sh`
 
-Политика pass/fail, CI jobs и triage-правила: [`docs/TESTING_STRATEGY.md`](docs/TESTING_STRATEGY.md), [`docs/runbooks/APRILHUB_TESTING_TRIAGE.md`](docs/runbooks/APRILHUB_TESTING_TRIAGE.md).
+Политика pass/fail, CI jobs и triage-правила: [`docs/TESTING_STRATEGY.md`](docs/TESTING_STRATEGY.md), [`docs/runbooks/APRILHUB_TESTING_TRIAGE.md`](docs/runbooks/APRILHUB_TESTING_TRIAGE.md). Release gate для виджетов профиля 4a (smoke/e2e, semver, rollback): [`docs/runbooks/APRILHUB_4A_WIDGET_RELEASE_GATE.md`](docs/runbooks/APRILHUB_4A_WIDGET_RELEASE_GATE.md).
 
 ## Документация
 
