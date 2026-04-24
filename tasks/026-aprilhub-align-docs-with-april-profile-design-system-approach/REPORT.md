@@ -2,8 +2,8 @@
 - Статус: ✅ выполнено
 - Задача: синхронизация документации AprilHub с frontend/DS-подходом `april-profile-1`
 - Ветка: `feature/task-026-ds-docs-alignment`
-- Коммиты: `не созданы (изменения подготовлены в рабочем дереве)`
-- PR: не создавался
+- Коммиты: `ef41dac` (scope + TASK/PLAN), `5b184d2` (основная синхронизация документации)
+- PR: отдельный PR не создавался, изменения присутствуют в `develop`
 
 ## 2) Что сделано
 - [docs] Добавлен документ `docs/FRONTEND_STRATEGY.md` с унифицированной моделью `Host-driven` / `Widget-driven` / `API/BFF-first` для AprilHub.
@@ -34,9 +34,10 @@
 
 Команды (фактически выполненные):
 ```bash
-git status --short
-rg "Host-driven|Widget-driven|API/BFF-first|HostContext" docs --files-with-matches
-rg "FRONTEND_STRATEGY|WIDGET_CONTRACTS" docs-site/docs/intro.md
+git log --oneline --decorate -n 25
+git show --name-only --pretty=format: 5b184d2
+rg "Host-driven|Widget-driven|API/BFF-first|HostContext" docs
+rg "FRONTEND_STRATEGY|WIDGET_CONTRACTS|task-story-035" docs-site/docs
 ```
 
 ## 6) Деплой
@@ -51,5 +52,5 @@ rg "FRONTEND_STRATEGY|WIDGET_CONTRACTS" docs-site/docs/intro.md
 - Для будущих интеграций конкретных виджетов потребуется отдельная фиксация semver-матрицы совместимости host × widget.
 
 ## 8) Что осталось
-- [ ] Создать коммит(ы) по подготовленным изменениям.
-- [ ] При необходимости открыть PR с test plan и рисками.
+- [x] Создать коммит(ы) по подготовленным изменениям.
+- [x] При необходимости открыть PR с test plan и рисками.
