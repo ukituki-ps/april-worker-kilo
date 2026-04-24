@@ -3,7 +3,7 @@
 - **Статус:** ✅ выполнено
 - **Задача:** Исполнение внешней задачи 034 (`april-profile-1`) — release gates, smoke/e2e и semver для виджетов 4a в AprilHub
 - **Ветка:** `feature/030-external-034-release-gates` (`april-worker`)
-- **Коммиты:** `april-worker` — ветка `feature/030-external-034-release-gates`, основной коммит с изменениями кода/доков: `a1bbabe` (полная цепочка: `git log --oneline develop..HEAD`); `april-profile-1` — ветка `feature/034-docs-release-gates-story`, первый коммит доков: `3b047db` (`git log develop..HEAD`)
+- **Коммиты (после squash):** merge в `develop` — `fd65548` (april-worker); уточнение отчёта после merge — `2e621fd`. В `april-profile`: squash merge `6327b82`, уточнение REPORT — см. `git log` на `develop`.
 - **PR:** [april-worker#52](https://github.com/ukituki-ps/april-worker/pull/52) (squash merge в `develop`, merge commit `fd655480374275bd6a46cdbbeb5eb13a7335a5f3`); [april-profile#81](https://github.com/ukituki-ps/april-profile/pull/81) (merge commit `6327b82d9e8b3dc0cb74aa0c3352812c5fb5938f`)
 
 ## 2) Что сделано
