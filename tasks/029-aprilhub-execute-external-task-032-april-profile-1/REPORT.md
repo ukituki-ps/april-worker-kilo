@@ -3,7 +3,7 @@
 - Статус: выполнено
 - Задача: исполнение внешней задачи 032 (`032-phase-4a-hub-conflicts-merge-host-rbac`) с двойным отчётом
 - Ветка: `feature/aprilhub-phase-4a4-conflicts-host-rbac`
-- Коммиты: `e5d1661`
+- Коммиты: `e5d1661`, `d73c509`
 - PR: не создавался из среды агента — черновик сравнения: `https://github.com/ukituki-ps/april-worker/compare/develop...feature/aprilhub-phase-4a4-conflicts-host-rbac`
 
 ## 2) Что сделано
@@ -28,7 +28,7 @@
 - `docs-site/docs/getting-started.md`, `docs-site/docs/task-stories-overview.md`, `docs-site/docs/task-story-032-phase-4a-hub-conflicts-merge-host-rbac.md`
 - `task_list.md`
 - `tasks/029-aprilhub-execute-external-task-032-april-profile-1/PLAN.md`, `tasks/029-aprilhub-execute-external-task-032-april-profile-1/REPORT.md`
-- В каталоге `april-profile-1` (соседний клон): `docs-site/docs/task-story-032-phase-4a-hub-conflicts-merge-host-rbac.md`, `docs-site/docs/task-stories-overview.md`, `task_list.md`, `tasks/032-phase-4a-hub-conflicts-merge-host-rbac/TASK.md`, `tasks/032-phase-4a-hub-conflicts-merge-host-rbac/REPORT.md`
+- В каталоге `april-profile-1` (соседний клон): `docs-site/docs/task-story-032-phase-4a-hub-conflicts-merge-host-rbac.md`, `docs-site/docs/task-stories-overview.md`, `task_list.md`, `tasks/032-phase-4a-hub-conflicts-merge-host-rbac/TASK.md`, `tasks/032-phase-4a-hub-conflicts-merge-host-rbac/REPORT.md` (коммиты `cdfb485`, `9fa3a34` — вынести на `feature/*` перед PR, если `develop` защищён)
 
 ## 4) Миграции и данные
 
