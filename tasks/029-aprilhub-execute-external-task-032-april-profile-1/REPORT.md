@@ -2,8 +2,8 @@
 
 - Статус: выполнено
 - Задача: исполнение внешней задачи 032 (`032-phase-4a-hub-conflicts-merge-host-rbac`) с двойным отчётом
-- Ветка: `feature/aprilhub-phase-4a4-conflicts-host-rbac` (создать перед PR)
-- Коммиты: см. `git log -1 --oneline` после push
+- Ветка: `feature/aprilhub-phase-4a4-conflicts-host-rbac`
+- Коммиты: `e5d1661`
 - PR: не создавался из среды агента — черновик сравнения: `https://github.com/ukituki-ps/april-worker/compare/develop...feature/aprilhub-phase-4a4-conflicts-host-rbac`
 
 ## 2) Что сделано
