@@ -76,7 +76,6 @@ services:
       VITE_ALLOWED_HOSTS: ${VITE_ALLOWED_HOSTS:-}
     volumes:
       - ./:/workspace
-      - ../april-profile-1:/april-profile-1:ro
     expose:
       - "4173"
     depends_on:

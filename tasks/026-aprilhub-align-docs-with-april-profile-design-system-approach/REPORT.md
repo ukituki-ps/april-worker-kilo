@@ -6,7 +6,7 @@
 - PR: не создавался
 
 ## 2) Что сделано
-- [frontend] В `hub-shell` добавлен host-экран списка профилей (`/app/profile/entities`) и встраивание `ProfilesListWidget` из локального пакета AprilProfile (`../april-profile-1/frontend/packages/profile-ui/dist`).
+- [frontend] В `hub-shell` добавлен host-экран списка профилей (`/app/profile/entities`) с локальной `ProfilesListWidget`-реализацией для BFF/OIDC flow.
 - [frontend] Добавлен host callback для `onAction`/`onError` и отображение результата CRUD-действия (`profiles-list-last-action`).
 - [frontend] Маршрутизация и навигация shell расширены отдельным пунктом `Профиль — список`; сохранён существующий экран карточки сущности.
 - [tests] Playwright smoke расширен сценарием: логин -> переход в `Профиль — список` -> create профиля через BFF-префикс `/api/v1/admin/profile/api`.
@@ -16,7 +16,6 @@
   - ожидание `hub-bff` health напрямую внутри контейнера перед ingress-check;
   - запуск только необходимых сервисов (без `april-showcase`);
   - экспорт `KC_HOSTNAME`/`KEYCLOAK_ISSUER` под локальный `PLAYWRIGHT_BASE_URL`.
-- [infra] Для docker runtime добавлен mount `../april-profile-1:/april-profile-1:ro`, чтобы `hub-shell` в контейнере видел локальный пакет виджета.
 - [infra] Для `hub-bff` включён workspace cache (`/workspace/.cache/go-*`), чтобы снизить cold-start на `go mod download`.
 - [docs-site] Добавлена обязательная история `docs-site/docs/task-story-026-phase-4a-hub-profiles-list-host-bff-flow.md`; индекс `task-stories-overview.md` обновлён.
 
@@ -65,7 +64,7 @@ DOCS_HTTP_PORT=18080 ./scripts/run-playwright-aprilhub.sh
 - Rollback: не применялся
 
 ## 7) Риски и ограничения
-- Интеграция `ProfilesListWidget` пока локальная (из соседнего репозитория `april-profile-1`) до публикации пакета в registry.
+- Интеграция `ProfilesListWidget` пока реализована локально в `hub-shell`; после публикации внешнего пакета нужен отдельный шаг синхронизации.
 
 ## 8) Что осталось
 - [x] Перезапустить e2e/smoke после стабилизации ingress и зафиксировать успешный прогон list+CRUD.
