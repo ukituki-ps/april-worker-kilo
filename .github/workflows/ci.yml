@@ -58,7 +58,7 @@ jobs:
           cache: false
 
       - name: Install oasdiff
-        run: go install github.com/oasdiff/oasdiff@v1.13.5
+        run: go install github.com/tufin/oasdiff@v1.10.29
 
       - name: Check OpenAPI backward compatibility
         run: |
@@ -249,10 +249,13 @@ jobs:
 
       - name: Run Hub Shell startup preflight in node:20-alpine
         run: |
+          mkdir -p "$HOME/.cache/aprilhub/corepack"
           docker run --rm \
             --user "$(id -u):$(id -g)" \
             -e npm_config_cache=/tmp/.npm \
+            -e COREPACK_HOME=/tmp/.corepack \
             -v "$PWD:/workspace" \
+            -v "$HOME/.cache/aprilhub/corepack:/tmp/.corepack" \
             -w /workspace/hub-shell \
             node:20-alpine \
             sh -lc "npm ci && npm run ds:prepare && npm run build"

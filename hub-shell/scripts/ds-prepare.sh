@@ -55,5 +55,8 @@ mkdir -p "${COREPACK_INSTALL_DIR}"
 export PATH="${COREPACK_INSTALL_DIR}:$PATH"
 corepack enable --install-directory "${COREPACK_INSTALL_DIR}"
 
-CI=true pnpm --dir "${DS_DIR}" install --frozen-lockfile
-pnpm --dir "${DS_DIR}" build
+(
+  cd "${DS_DIR}"
+  CI=true pnpm install --frozen-lockfile
+  pnpm build
+)
