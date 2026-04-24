@@ -3,8 +3,8 @@
 - Статус: ✅ выполнено
 - Задача: Исполнение внешней задачи 035 (shell IA, HostContext, smoke deep-link)
 - Ветка: `feature/025-aprilhub-shell-ia-035`
-- Коммиты: см. `git log feature/025-aprilhub-shell-ia-035` (основной функционал: `488ea51`)
-- PR: создать вручную в [`april-worker`](https://github.com/ukituki-ps/april-worker) (ветка указана выше); после merge обновить ссылки здесь и в `april-profile-1`
+- Коммиты: `488ea51` (основной функционал), `1c221c4`, `18b8bf2`, `6026abc`, `2140435`, `7e169de`, `fa9c125` (актуализация отчёта)
+- PR: [#46](https://github.com/ukituki-ps/april-worker/pull/46), статус: merged в `develop`
 
 ### Дублирование отчёта
 
@@ -62,5 +62,5 @@ cd hub-shell && npm run test
 
 ## 8) Что осталось
 
-- [ ] Создать PR из `feature/025-aprilhub-shell-ia-035`, прогнать обязательный контур CI и e2e на стенде.
-- [ ] При необходимости выровнять root path SPA (History API) с единым ingress — отдельное решение.
+- [x] Создать PR из `feature/025-aprilhub-shell-ia-035`, прогнать обязательный контур CI и e2e на стенде.
+- [ ] При необходимости выровнять root path SPA (History API) с единым ingress — отдельное решение (вне scope задачи 025).

@@ -1,55 +1,70 @@
 ## 1) Итого
 - Статус: ✅ выполнено
-- Задача: синхронизация документации AprilHub с frontend/DS-подходом `april-profile-1`
-- Ветка: `feature/task-026-ds-docs-alignment`
-- Коммиты: `не созданы (изменения подготовлены в рабочем дереве)`
+- Задача: исполнение внешней задачи 026 из `april-profile-1` с двойным отчётом
+- Ветка: `026-aprilhub-align-docs-with-april-profile-design-system-approach` (текущая рабочая)
+- Коммиты: не создавались в рамках этой сессии
 - PR: не создавался
 
 ## 2) Что сделано
-- [docs] Добавлен документ `docs/FRONTEND_STRATEGY.md` с унифицированной моделью `Host-driven` / `Widget-driven` / `API/BFF-first` для AprilHub.
-- [docs] Добавлен документ `docs/WIDGET_CONTRACTS.md` с контрактом `HostContext v1`, props/events и правилами границ host/widget/DS.
-- [docs] Обновлены entrypoints: `docs/README.md`, `docs-site/docs/intro.md`, `docs/guides/APRILHUB_DOCUMENTATION_MAP.md`, чтобы новые документы были discoverable.
-- [docs] Создан `tasks/026-aprilhub-align-docs-with-april-profile-design-system-approach/PLAN.md` по шаблону для нетривиальной задачи.
+- [frontend] В `hub-shell` добавлен host-экран списка профилей (`/app/profile/entities`) с локальной `ProfilesListWidget`-реализацией для BFF/OIDC flow.
+- [frontend] Добавлен host callback для `onAction`/`onError` и отображение результата CRUD-действия (`profiles-list-last-action`).
+- [frontend] Маршрутизация и навигация shell расширены отдельным пунктом `Профиль — список`; сохранён существующий экран карточки сущности.
+- [tests] Playwright smoke расширен сценарием: логин -> переход в `Профиль — список` -> create профиля через BFF-префикс `/api/v1/admin/profile/api`.
+- [docs] Обновлены runtime env и гайды: `.env.example`, `docker-compose.yml`, `scripts/run-playwright-aprilhub.sh`, `docs-site/docs/getting-started.md`.
+- [docs/tooling] В `scripts/run-playwright-aprilhub.sh` добавлены стабилизации smoke-run:
+  - fallback на `LOCAL_UID=0`, `LOCAL_GID=0` при `EACCES` в `hub-shell/node_modules`;
+  - ожидание `hub-bff` health напрямую внутри контейнера перед ingress-check;
+  - запуск только необходимых сервисов (без `april-showcase`);
+  - экспорт `KC_HOSTNAME`/`KEYCLOAK_ISSUER` под локальный `PLAYWRIGHT_BASE_URL`.
+- [docs-site] Добавлена обязательная история `docs-site/docs/task-story-026-phase-4a-hub-profiles-list-host-bff-flow.md`; индекс `task-stories-overview.md` обновлён.
 
 ## 3) Изменённые файлы
-- `docs/FRONTEND_STRATEGY.md`
-- `docs/WIDGET_CONTRACTS.md`
-- `docs/README.md`
-- `docs-site/docs/intro.md`
-- `docs/guides/APRILHUB_DOCUMENTATION_MAP.md`
-- `tasks/026-aprilhub-align-docs-with-april-profile-design-system-approach/PLAN.md`
+- `hub-shell/src/widgets.tsx`
+- `hub-shell/src/shell/shell-paths.ts`
+- `hub-shell/src/shell/shell-paths.test.ts`
+- `hub-shell/src/shell/shell-nav-config.ts`
+- `hub-shell/src/shell/ShellBreadcrumbs.tsx`
+- `hub-shell/src/shell/AuthorizedHubContent.tsx`
+- `hub-shell/src/vite-env.d.ts`
+- `hub-shell/tests/e2e/smoke.spec.ts`
+- `.env.example`
+- `docker-compose.yml`
+- `scripts/run-playwright-aprilhub.sh`
+- `docs-site/docs/getting-started.md`
+- `docs-site/docs/task-stories-overview.md`
+- `docs-site/docs/task-story-026-phase-4a-hub-profiles-list-host-bff-flow.md`
 - `tasks/026-aprilhub-align-docs-with-april-profile-design-system-approach/REPORT.md`
 
 ## 4) Миграции и данные
 - Миграции Atlas: нет
-- Какие таблицы/индексы изменены: не применялось
-- Обратимость: да, откат через `git revert`/удаление документационных изменений
+- Какие таблицы/индексы изменены: нет изменений
+- Обратимость: да (откат — удаление/реверт изменений shell/docs)
 
 ## 5) Проверка качества
-- Линтер: ok (изменения только в markdown)
-- Сборка: не запускалась (нет изменений runtime-кода)
-- Unit tests: не запускались (нет изменений runtime-кода)
-- Integration tests: не запускались (нет изменений runtime-кода)
-- E2E / smoke: не запускались (нет изменений runtime-кода)
+- Линтер: ok (`cd hub-shell && npm run lint`)
+- Сборка: не запускалась отдельно (в рамках сессии)
+- Unit tests: ok (`cd hub-shell && npm run test`)
+- Integration tests: не запускались
+- E2E / smoke: ok (`./scripts/run-playwright-aprilhub.sh` -> `6 passed`)
 
 Команды (фактически выполненные):
 ```bash
-git status --short
-rg "Host-driven|Widget-driven|API/BFF-first|HostContext" docs --files-with-matches
-rg "FRONTEND_STRATEGY|WIDGET_CONTRACTS" docs-site/docs/intro.md
+cd hub-shell && npm run lint
+cd hub-shell && npm run test
+./scripts/run-playwright-aprilhub.sh
+DOCS_HTTP_PORT=18080 ./scripts/run-playwright-aprilhub.sh
 ```
 
 ## 6) Деплой
 - Среда: нет
 - Согласовано с: `docs/DEPLOYMENT_STRATEGY.md`
 - Образы: не применялось
-- Health / readiness: не применялось
-- Rollback: нет
+- Health / readiness: проверка по ingress пройдена в финальном прогоне (`/healthz`, `/` доступны перед запуском Playwright)
+- Rollback: не применялся
 
 ## 7) Риски и ограничения
-- Документы синхронизированы на уровне терминов и контрактов, но не заменяют доменные детали AprilProfile (целенаправленно вне scope).
-- Для будущих интеграций конкретных виджетов потребуется отдельная фиксация semver-матрицы совместимости host × widget.
+- Интеграция `ProfilesListWidget` пока реализована локально в `hub-shell`; после публикации внешнего пакета нужен отдельный шаг синхронизации.
 
 ## 8) Что осталось
-- [ ] Создать коммит(ы) по подготовленным изменениям.
-- [ ] При необходимости открыть PR с test plan и рисками.
+- [x] Перезапустить e2e/smoke после стабилизации ingress и зафиксировать успешный прогон list+CRUD.
+- [x] Синхронизировать итоговый отчёт по задаче 026 в `april-profile-1/tasks/026-phase-4a-hub-profiles-list-host-bff-flow/REPORT.md`.

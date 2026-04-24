@@ -2,8 +2,9 @@
  * Информационная архитектура авторизованной зоны AprilHub (домен «Профиль» и платформа).
  * Канонические пути — без query; параметры сущностей — в сегменте пути.
  *
- * Политика: вкладки одной сущности — подпуть (`/card`, `/meta`); другая сущность или
- * список — отдельный маршрут (будущие задачи 026/028). Экземпляр профиля — отдельный
+ * Политика: список сущностей и вкладки одной сущности разведены по отдельным маршрутам;
+ * другая сущность или
+ * экземпляр профиля — отдельный
  * префикс `/app/profile/instances/:instanceId`.
  */
 
@@ -11,6 +12,7 @@ export const shellPaths = {
   overview: "/app/overview",
   roles: "/app/roles",
   adminControl: "/app/admin-control",
+  profilesList: "/app/profile/entities",
   profileEntity: (entityId: string, tab: ProfileEntityTab = "card") =>
     `/app/profile/entities/${encodeURIComponent(entityId)}/${tab}`,
   profileInstance: (instanceId: string) => `/app/profile/instances/${encodeURIComponent(instanceId)}`,
@@ -23,6 +25,7 @@ export type ShellRouteMatch =
   | { kind: "overview" }
   | { kind: "roles" }
   | { kind: "admin" }
+  | { kind: "profile-list" }
   | { kind: "profile-instance"; instanceId: string }
   | { kind: "profile-entity"; entityId: string; tab: ProfileEntityTab }
   | { kind: "not-found" };
@@ -47,6 +50,9 @@ export function matchShellRoute(pathname: string): ShellRouteMatch {
   }
   if (p === "/app/admin-control") {
     return { kind: "admin" };
+  }
+  if (p === "/app/profile/entities") {
+    return { kind: "profile-list" };
   }
 
   const instanceMatch = /^\/app\/profile\/instances\/([^/]+)\/?$/.exec(p);

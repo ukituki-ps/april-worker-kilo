@@ -9,6 +9,8 @@ interface ImportMetaEnv {
   readonly VITE_PROFILE_DEFAULT_ENTITY_TYPE_ID?: string;
   /** Опционально: заранее известный `entity_id` для демо/локальной отладки (если пусто — создаётся при первом сохранении). */
   readonly VITE_PROFILE_DEMO_ENTITY_ID?: string;
+  /** Опционально: CSV-список `entity_id` для загрузки виджета списка профилей. */
+  readonly VITE_PROFILE_LIST_ENTITY_IDS?: string;
   /** Опционально: получатель заявки с лендинга (mailto). Если не задан — открывается mailto: без адреса. */
   readonly VITE_LANDING_INQUIRY_EMAIL?: string;
 }

@@ -141,4 +141,11 @@ curl -i \
 - гостевой вход и redirect в Keycloak;
 - вход тестовым пользователем;
 - отображение profile widget в авторизованной зоне Hub;
-- успешный callback `onSaveSuccess` после сохранения.
+- успешный callback `onSaveSuccess` после сохранения;
+- загрузку `ProfilesListWidget` через BFF proxy и минимум одну CRUD-операцию (create).
+
+Для сценария списка профилей можно задать env:
+
+```bash
+VITE_PROFILE_LIST_ENTITY_IDS=00000000-0000-0000-0000-000000000001
+```

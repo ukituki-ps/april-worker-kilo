@@ -18,10 +18,16 @@ export function buildPrimaryShellNav(): ShellNavItem[] {
     { id: "overview", label: "Обзор платформы", href: toHash(shellPaths.overview), activePrefix: shellPaths.overview },
     { id: "roles", label: "Роли доступа", href: toHash(shellPaths.roles), activePrefix: shellPaths.roles },
     {
+      id: "profile-list",
+      label: "Профиль — список",
+      href: toHash(shellPaths.profilesList),
+      activePrefix: "/app/profile/entities",
+    },
+    {
       id: "profile-entity-card",
       label: "Профиль — карточка",
       href: toHash(shellPaths.profileEntity(entityId, "card")),
-      activePrefix: "/app/profile/entities",
+      activePrefix: shellPaths.profileEntity(entityId, "card"),
     },
     {
       id: "profile-instance-demo",

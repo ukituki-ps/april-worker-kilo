@@ -1,6 +1,6 @@
 import { Anchor, Breadcrumbs, Text } from "@mantine/core";
 import type { ShellRouteMatch } from "./shell-paths";
-import { defaultProfileEntityIdForNav, shellPaths } from "./shell-paths";
+import { shellPaths } from "./shell-paths";
 
 type Props = {
   match: ShellRouteMatch;
@@ -31,9 +31,15 @@ export function ShellBreadcrumbs({ match }: Props): JSX.Element {
         Админ-контур
       </Text>,
     );
+  } else if (match.kind === "profile-list") {
+    items.push(
+      <Text key="cur" size="sm">
+        Профиль / Список
+      </Text>,
+    );
   } else if (match.kind === "profile-entity") {
     items.push(
-      <Anchor key="prof" href={`#${shellPaths.profileEntity(defaultProfileEntityIdForNav(), "card")}`} size="sm">
+      <Anchor key="prof" href={`#${shellPaths.profilesList}`} size="sm">
         Профиль
       </Anchor>,
     );
@@ -44,7 +50,7 @@ export function ShellBreadcrumbs({ match }: Props): JSX.Element {
     );
   } else if (match.kind === "profile-instance") {
     items.push(
-      <Anchor key="prof" href={`#${shellPaths.profileEntity(defaultProfileEntityIdForNav(), "card")}`} size="sm">
+      <Anchor key="prof" href={`#${shellPaths.profilesList}`} size="sm">
         Профиль
       </Anchor>,
     );

@@ -5,6 +5,7 @@ describe("matchShellRoute", () => {
   it("matches overview and profile entity tabs", () => {
     expect(matchShellRoute("/")).toEqual({ kind: "redirect" });
     expect(matchShellRoute("/app/overview")).toEqual({ kind: "overview" });
+    expect(matchShellRoute("/app/profile/entities")).toEqual({ kind: "profile-list" });
     expect(matchShellRoute("/app/profile/entities/e1")).toEqual({
       kind: "profile-entity",
       entityId: "e1",
