@@ -338,4 +338,108 @@ test.describe("AprilHub smoke e2e", () => {
     await expect(page.getByTestId("instance-history-selected-version")).toContainText("v2");
     await expect(page.getByTestId("instance-history-diff-table")).toContainText("status");
   });
+
+  test("админ: очередь конфликтов, resolve и merge через BFF (stubs)", async ({ page }) => {
+    const conflictId = "cccccccc-cccc-cccc-cccc-cccccccccccc";
+    const entityId = "dddddddd-dddd-dddd-dddd-dddddddddddd";
+
+    const adminProfileApiUrl = (raw: string): boolean => {
+      try {
+        const u = new URL(raw);
+        return u.pathname.includes("/api/v1/admin/profile/api/v1/admin/");
+      } catch {
+        return false;
+      }
+    };
+
+    await page.route(adminProfileApiUrl, async (route) => {
+      const request = route.request();
+      const method = request.method();
+      const url = new URL(request.url());
+
+      if (method === "GET" && url.pathname.endsWith("/v1/admin/profile-conflicts")) {
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({
+            items: [
+              {
+                id: conflictId,
+                entity_id: entityId,
+                status: "open",
+                namespace: "default",
+                field_key: "status",
+                existing_value: "draft",
+                incoming_value: "approved",
+                existing_source: "a",
+                incoming_source: "b",
+                reason: "authority_mismatch",
+                created_at: "2026-04-24T12:00:00Z",
+              },
+            ],
+          }),
+        });
+        return;
+      }
+
+      if (method === "POST" && url.pathname.includes(`/v1/admin/profile-conflicts/${conflictId}/resolve`)) {
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({
+            entity_id: entityId,
+            version: 3,
+          }),
+        });
+        return;
+      }
+
+      if (method === "POST" && url.pathname.endsWith("/v1/admin/entities/merge")) {
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({
+            target_entity_id: "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+            target_version: 2,
+            source_entity_id: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+            document: {},
+          }),
+        });
+        return;
+      }
+
+      await route.continue();
+    });
+
+    await page.goto("/");
+    await startLoginFromGuestHeader(page);
+    await page.locator("#username").fill(process.env.PLAYWRIGHT_USER ?? "april-dev");
+    await page.locator("#password").fill(process.env.PLAYWRIGHT_PASSWORD ?? "april-dev-pass");
+    await page.locator("#kc-login").click();
+
+    await page.waitForURL("/");
+    await page.getByRole("link", { name: "Профиль — конфликты и merge" }).click();
+    await expect(page.getByTestId("conflicts-merge-host-card")).toBeVisible();
+    await expect(page.getByTestId("conflicts-merge-table")).toBeVisible();
+    await page.getByRole("button", { name: "Разрешить выбранный конфликт" }).click();
+    await expect(page.getByTestId("conflicts-merge-last-action")).toContainText("resolve:");
+    await page.getByRole("button", { name: "Выполнить merge" }).click();
+    await expect(page.getByTestId("conflicts-merge-last-action")).toContainText("merge:");
+  });
+
+  test("без роли admin: прямой переход на экран конфликтов показывает запрет", async ({ page }) => {
+    const restrictedUser = process.env.PLAYWRIGHT_RESTRICTED_USER ?? "april-user";
+    const restrictedPassword = process.env.PLAYWRIGHT_RESTRICTED_PASSWORD ?? "april-user-pass";
+
+    await page.goto("/");
+    await startLoginFromGuestHeader(page);
+    await page.locator("#username").fill(restrictedUser);
+    await page.locator("#password").fill(restrictedPassword);
+    await page.locator("#kc-login").click();
+
+    await page.waitForURL("/");
+    await page.goto("/#/app/profile/admin/conflicts");
+    await expect(page.getByRole("heading", { name: "Доступ запрещен" })).toBeVisible();
+    await expect(page.getByText(/роли admin/i)).toBeVisible();
+  });
 });

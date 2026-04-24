@@ -37,6 +37,17 @@ export function ShellBreadcrumbs({ match }: Props): JSX.Element {
         Профиль / Список
       </Text>,
     );
+  } else if (match.kind === "profile-admin-conflicts") {
+    items.push(
+      <Anchor key="prof" href={`#${shellPaths.profilesList}`} size="sm">
+        Профиль
+      </Anchor>,
+    );
+    items.push(
+      <Text key="cur" size="sm">
+        Конфликты и merge
+      </Text>,
+    );
   } else if (match.kind === "profile-entity") {
     items.push(
       <Anchor key="prof" href={`#${shellPaths.profilesList}`} size="sm">

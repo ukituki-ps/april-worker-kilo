@@ -98,6 +98,25 @@
       "attributes": {
         "tenant_id": ["tenant-dev"]
       },
+      "realmRoles": ["user", "admin"]
+    },
+    {
+      "username": "april-user",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "April",
+      "lastName": "UserOnly",
+      "email": "april-user@example.local",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "april-user-pass",
+          "temporary": false
+        }
+      ],
+      "attributes": {
+        "tenant_id": ["tenant-dev"]
+      },
       "realmRoles": ["user"]
     }
   ]

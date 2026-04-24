@@ -20,5 +20,6 @@ describe("matchShellRoute", () => {
       kind: "profile-instance",
       instanceId: "i1",
     });
+    expect(matchShellRoute("/app/profile/admin/conflicts")).toEqual({ kind: "profile-admin-conflicts" });
   });
 });

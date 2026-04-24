@@ -9,6 +9,7 @@ export type HubHostNavigationApi = {
   /** Семантический переход без прямого изменения URL виджетом. */
   goToProfileEntityCard: (entityId: string) => void;
   goToProfileEntityMeta: (entityId: string) => void;
+  goToProfileConflicts: () => void;
   goToOverview: () => void;
   goBack: () => void;
 };
@@ -77,6 +78,9 @@ export function HubHostContextProvider({ context, children }: ProviderProps): JS
       },
       goToProfileEntityMeta: (entityId: string) => {
         navigate(shellPaths.profileEntity(entityId, "meta"));
+      },
+      goToProfileConflicts: () => {
+        navigate(shellPaths.profileAdminConflicts);
       },
       goToOverview: () => {
         navigate(shellPaths.overview);

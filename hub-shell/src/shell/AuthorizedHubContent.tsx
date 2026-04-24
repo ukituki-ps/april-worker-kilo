@@ -7,6 +7,7 @@ import {
   ProfilesListHostWidget,
   ProfileInstancesHostWidget,
   InstanceHistoryHostWidget,
+  ConflictsMergeHostWidget,
 } from "../widgets";
 import type { ShellUserContext } from "../types";
 import { SharedState } from "../shared-ux";
@@ -99,6 +100,26 @@ export function AuthorizedHubContent({ context }: Props): JSX.Element {
       <RouteChrome>
         <CompositionErrorBoundary moduleName="Профиль (список)">
           <ProfilesListHostWidget context={context} />
+        </CompositionErrorBoundary>
+      </RouteChrome>
+    );
+  }
+
+  if (match.kind === "profile-admin-conflicts") {
+    if (!context.roles.includes("admin")) {
+      return (
+        <RouteChrome>
+          <SharedState
+            state="forbidden"
+            message="Раздел «Конфликты и merge» доступен только при наличии realm-роли admin в токене AprilHub."
+          />
+        </RouteChrome>
+      );
+    }
+    return (
+      <RouteChrome>
+        <CompositionErrorBoundary moduleName="Профиль (конфликты и merge)">
+          <ConflictsMergeHostWidget context={context} />
         </CompositionErrorBoundary>
       </RouteChrome>
     );
