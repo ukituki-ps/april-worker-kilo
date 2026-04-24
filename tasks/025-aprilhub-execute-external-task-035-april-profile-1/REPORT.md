@@ -3,12 +3,12 @@
 - Статус: ✅ выполнено
 - Задача: Исполнение внешней задачи 035 (shell IA, HostContext, smoke deep-link)
 - Ветка: `feature/025-aprilhub-shell-ia-035`
-- Коммиты: `488ea51`, `1c221c4`
+- Коммиты: `488ea51`, `1c221c4`, `18b8bf2`
 - PR: создать вручную в [`april-worker`](https://github.com/ukituki-ps/april-worker) (ветка указана выше); после merge обновить ссылки здесь и в `april-profile-1`
 
 ### Дублирование отчёта
 
-- [x] Копия с тем же содержанием: `april-profile-1/tasks/035-phase-4a-hub-ui-shell-information-architecture/REPORT.md` (ветка `feature/035-hub-shell-report`, коммит `cdafbc0` — после push)
+- [x] Копия с тем же содержанием: `april-profile-1/tasks/035-phase-4a-hub-ui-shell-information-architecture/REPORT.md` (ветка `feature/035-hub-shell-report`, коммит `4f94b52` — после push)
 
 ## 2) Что сделано
 
