@@ -3,7 +3,7 @@
 - Задача: исполнение внешней задачи 030 из `april-profile-1` с двойным отчётом
 - Ветка: `feature/aprilhub-phase-4a3-instance-history-host-e2e`
 - Коммиты: `ad08248` (реализация), `40d8b85` (актуализация REPORT для PR)
-- PR: не создавался (требуется отдельный PR в GitHub)
+- PR: черновик сравнения (GitHub): https://github.com/ukituki-ps/april-worker/compare/develop...feature/aprilhub-phase-4a3-instance-history-host-e2e
 
 ## 2) Что сделано
 - [frontend] Добавлен host-экран истории экземпляра `InstanceHistoryHostWidget` в `hub-shell` (таймлайн версий, snapshot, diff, read-only режим).
@@ -60,5 +60,5 @@ DOCS_HTTP_PORT=18080 ./scripts/run-playwright-aprilhub.sh
 - Первый прогон smoke мог падать из-за гонки: `hub-bff` стартовал до готовности Keycloak JWKS и уходил в restart loop с повторным `go mod download`; исправлено ожиданием JWKS в `scripts/run-playwright-aprilhub.sh`.
 
 ## 8) Что осталось
-- [ ] Создать PR в GitHub с test plan и рисками (ветка `feature/*`).
-- [x] Отчёт продублирован в `april-profile-1/tasks/030-phase-4a-hub-instance-history-host-e2e/REPORT.md`.
+- [x] Ветка запушена в origin; осталось оформить PR (черновик сравнения см. в §1) с test plan и рисками.
+- [x] Отчёт продублирован в `april-profile-1/tasks/030-phase-4a-hub-instance-history-host-e2e/REPORT.md` (ветка `feature/report-030-hub-instance-history` в репозитории `april-profile`).
