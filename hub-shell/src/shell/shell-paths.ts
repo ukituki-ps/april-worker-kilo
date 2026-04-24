@@ -13,6 +13,8 @@ export const shellPaths = {
   roles: "/app/roles",
   adminControl: "/app/admin-control",
   profilesList: "/app/profile/entities",
+  /** Админ-экран очереди конфликтов authority и merge дубликатов (BFF → AprilProfile admin API). */
+  profileAdminConflicts: "/app/profile/admin/conflicts",
   profileEntity: (entityId: string, tab: ProfileEntityTab = "card") =>
     `/app/profile/entities/${encodeURIComponent(entityId)}/${tab}`,
   profileInstance: (instanceId: string) => `/app/profile/instances/${encodeURIComponent(instanceId)}`,
@@ -27,6 +29,7 @@ export type ShellRouteMatch =
   | { kind: "roles" }
   | { kind: "admin" }
   | { kind: "profile-list" }
+  | { kind: "profile-admin-conflicts" }
   | { kind: "profile-instance"; instanceId: string }
   | { kind: "profile-instance-history"; instanceId: string }
   | { kind: "profile-entity"; entityId: string; tab: ProfileEntityTab }
@@ -55,6 +58,9 @@ export function matchShellRoute(pathname: string): ShellRouteMatch {
   }
   if (p === "/app/profile/entities") {
     return { kind: "profile-list" };
+  }
+  if (p === "/app/profile/admin/conflicts" || p === "/app/profile/admin/conflicts/") {
+    return { kind: "profile-admin-conflicts" };
   }
 
   const instanceHistoryMatch = /^\/app\/profile\/instances\/([^/]+)\/history\/?$/.exec(p);

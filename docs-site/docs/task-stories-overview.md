@@ -20,3 +20,5 @@ sidebar_position: 19
   источник постановки: `april-profile-1/tasks/028-phase-4a-hub-instances-host-routing-e2e/TASK.md`
 - `030`: [Hub instance history host + e2e (phase 4a.3)](./task-story-030-phase-4a-hub-instance-history-host-e2e)  
   источник постановки: `april-profile-1/tasks/030-phase-4a-hub-instance-history-host-e2e/TASK.md`
+- `032`: [Hub conflicts/merge host + RBAC + e2e (phase 4a.4)](./task-story-032-phase-4a-hub-conflicts-merge-host-rbac)  
+  источник постановки: `april-profile-1/tasks/032-phase-4a-hub-conflicts-merge-host-rbac/TASK.md`

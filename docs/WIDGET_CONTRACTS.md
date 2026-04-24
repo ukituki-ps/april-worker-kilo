@@ -94,9 +94,9 @@
 
 ### 8.1 Информационная архитектура (IA)
 
-- **Платформа (sidebar):** «Обзор», «Роли», далее блок **Профиль April** — «Карточка сущности» (deeplink на `entityId` по умолчанию из env или стаба), «Экземпляры» (маршрут `/app/profile/instances/:instanceId`), «История экземпляра» (маршрут `/app/profile/instances/:instanceId/history`), «Админ-контур» (только роль `admin`).
+- **Платформа (sidebar):** «Обзор», «Роли», далее блок **Профиль April** — «Карточка сущности» (deeplink на `entityId` по умолчанию из env или стаба), «Экземпляры» (маршрут `/app/profile/instances/:instanceId`), «История экземпляра» (маршрут `/app/profile/instances/:instanceId/history`), «Конфликты и merge» (маршрут `/app/profile/admin/conflicts`, только роль `admin`; host вызывает admin API AprilProfile через BFF), «Админ-контур» (только роль `admin`).
 - **Вкладки vs маршруты:** состояние одной сущности, не требующее отдельного deep-link, остаётся во **вкладках-подпутях** (`/card`, `/meta`). Списки профилей, другая сущность, экземпляр — **отдельный маршрут** (`/app/profile/entities/:entityId/...`, `/app/profile/instances/:instanceId`).
-- **Канонические пути:** заданы в `hub-shell/src/shell/shell-paths.ts` (`shellPaths`, `matchShellRoute`). Параметры: `entityId` (карточка), `instanceId` (экземпляры и история профиля).
+- **Канонические пути:** заданы в `hub-shell/src/shell/shell-paths.ts` (`shellPaths`, `matchShellRoute`). Параметры: `entityId` (карточка), `instanceId` (экземпляры и история профиля), фиксированный админ-маршрут `profileAdminConflicts` для очереди конфликтов/merge (фаза 4a.4 / задача 032).
 
 ### 8.2 Расширенный `HubHostContext` (host → виджет и страницы)
 

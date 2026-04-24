@@ -42,6 +42,7 @@
 - [x] `026`: Исполнение внешней задачи 026 из `april-profile-1` (анализ docs + реализация + двойной отчёт)
 - [ ] `027`: Исполнение внешней задачи 028 из `april-profile-1` (анализ docs + реализация + двойной отчёт)
 - [x] `028`: Исполнение внешней задачи 030 из `april-profile-1` (анализ docs + реализация + двойной отчёт)
+- [x] `029`: Исполнение внешней задачи 032 из `april-profile-1` (хостинг конфликтного UI, RBAC/e2e, двойной отчёт)
 
 ## Текущий фокус
 
@@ -71,6 +72,7 @@
 - [x] `026-aprilhub-align-docs-with-april-profile-design-system-approach`: изучить задачу 026 и документацию в `april-profile-1`, реализовать требования и оформить отчёт в обоих репозиториях
 - [ ] `027-aprilhub-execute-external-task-028-april-profile-1`: изучить задачу 028 и документацию в `april-profile-1`, реализовать требования и оформить отчёт в обоих репозиториях
 - [x] `028-aprilhub-execute-external-task-030-april-profile-1`: изучить задачу 030 и документацию в `april-profile-1`, реализовать требования и оформить отчёт в обоих репозиториях
+- [x] `029-aprilhub-execute-external-task-032-april-profile-1`: изучить задачу 032 и документацию в `april-profile-1`, реализовать хостинг конфликтного UI + RBAC/e2e в `april-worker`, оформить отчёт в обоих репозиториях и docs-site по внешней постановке
 
 ## План реализации AprilHub: статусы
 
@@ -102,3 +104,4 @@
 | `026` | Исполнение внешней задачи 026 из `april-profile-1` (анализ docs + реализация + двойной отчёт) | ⏳ В работе | [`tasks/026-aprilhub-align-docs-with-april-profile-design-system-approach/TASK.md`](./tasks/026-aprilhub-align-docs-with-april-profile-design-system-approach/TASK.md), [`tasks/026-aprilhub-align-docs-with-april-profile-design-system-approach/PLAN.md`](./tasks/026-aprilhub-align-docs-with-april-profile-design-system-approach/PLAN.md), [`tasks/026-aprilhub-align-docs-with-april-profile-design-system-approach/REPORT.md`](./tasks/026-aprilhub-align-docs-with-april-profile-design-system-approach/REPORT.md) |
 | `027` | Исполнение внешней задачи 028 из `april-profile-1` (анализ docs + реализация + двойной отчёт) | ⏳ В работе | [`tasks/027-aprilhub-execute-external-task-028-april-profile-1/TASK.md`](./tasks/027-aprilhub-execute-external-task-028-april-profile-1/TASK.md) |
 | `028` | Исполнение внешней задачи 030 из `april-profile-1` (анализ docs + реализация + двойной отчёт) | ✅ Выполнено | [`tasks/028-aprilhub-execute-external-task-030-april-profile-1/TASK.md`](./tasks/028-aprilhub-execute-external-task-030-april-profile-1/TASK.md), [`tasks/028-aprilhub-execute-external-task-030-april-profile-1/PLAN.md`](./tasks/028-aprilhub-execute-external-task-030-april-profile-1/PLAN.md), [`tasks/028-aprilhub-execute-external-task-030-april-profile-1/REPORT.md`](./tasks/028-aprilhub-execute-external-task-030-april-profile-1/REPORT.md) |
+| `029` | Исполнение внешней задачи 032 из `april-profile-1` (хостинг конфликтного UI, RBAC/e2e, двойной отчёт + docs-site в профиле) | ✅ Выполнено | [`tasks/029-aprilhub-execute-external-task-032-april-profile-1/TASK.md`](./tasks/029-aprilhub-execute-external-task-032-april-profile-1/TASK.md), [`tasks/029-aprilhub-execute-external-task-032-april-profile-1/PLAN.md`](./tasks/029-aprilhub-execute-external-task-032-april-profile-1/PLAN.md), [`tasks/029-aprilhub-execute-external-task-032-april-profile-1/REPORT.md`](./tasks/029-aprilhub-execute-external-task-032-april-profile-1/REPORT.md) |

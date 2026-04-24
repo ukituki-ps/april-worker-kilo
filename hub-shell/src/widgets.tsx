@@ -527,6 +527,273 @@ export function ProfileInstancesHostWidget({ context, routeEntityId }: WidgetPro
   );
 }
 
+/** BFF-префикс до OpenAPI AprilProfile (см. `docs/WIDGET_CONTRACTS.md`, задача 032). */
+const PROFILE_BFF_OPENAPI_PREFIX = "/api/v1/admin/profile/api";
+
+type ProfileFieldConflictRow = {
+  id: string;
+  entity_id: string;
+  status: string;
+  namespace: string;
+  field_key: string;
+  reason: string;
+  created_at: string;
+  existing_value?: unknown;
+  incoming_value?: unknown;
+};
+
+type ProfileConflictListPayload = {
+  items: ProfileFieldConflictRow[];
+};
+
+export function ConflictsMergeHostWidget({ context }: WidgetProps): JSX.Element {
+  const toast = useShellToast();
+  const [loading, setLoading] = useState(true);
+  const [items, setItems] = useState<ProfileFieldConflictRow[]>([]);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [lastAction, setLastAction] = useState<string>("");
+  const [lastError, setLastError] = useState("");
+  const [resolveLoading, setResolveLoading] = useState(false);
+  const [mergeLoading, setMergeLoading] = useState(false);
+  const [mergeSource, setMergeSource] = useState(
+    () => import.meta.env.VITE_PROFILE_MERGE_SOURCE_ENTITY_ID?.trim() || "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+  );
+  const [mergeTarget, setMergeTarget] = useState(
+    () => import.meta.env.VITE_PROFILE_MERGE_TARGET_ENTITY_ID?.trim() || "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+  );
+  const hostContext = useMemo<ProfileWidgetHostContext>(
+    () => ({
+      tenant: { id: context.orgScope },
+      auth: {
+        subject: context.user.sub,
+        roles: context.roles,
+        tokenRef: "keycloak",
+      },
+      locale: "ru-RU",
+      telemetry: {
+        requestId: context.correlationId,
+      },
+    }),
+    [context],
+  );
+
+  const conflictsUrl = `${PROFILE_BFF_OPENAPI_PREFIX}/v1/admin/profile-conflicts`;
+
+  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      setLoading(true);
+      setLastError("");
+      try {
+        const response = await fetch(conflictsUrl, {
+          headers: {
+            ...(keycloak.token ? { Authorization: `Bearer ${keycloak.token}` } : {}),
+            Accept: "application/json",
+          },
+        });
+        if (!response.ok) {
+          throw new Error(`Загрузка очереди: ${response.status}`);
+        }
+        const payload = (await response.json()) as ProfileConflictListPayload;
+        if (cancelled) {
+          return;
+        }
+        const list = Array.isArray(payload.items) ? payload.items : [];
+        setItems(list);
+        const firstOpen = list.find((row) => row.status === "open");
+        setSelectedId(firstOpen?.id ?? list[0]?.id ?? null);
+      } catch (error) {
+        if (cancelled) {
+          return;
+        }
+        const message = error instanceof Error ? error.message : "conflicts load failed";
+        setLastError(message);
+        toast.showError(message);
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+    void load();
+    return () => {
+      cancelled = true;
+    };
+  }, [toast]);
+
+  const selected = items.find((row) => row.id === selectedId) ?? null;
+
+  const handleResolve = async (): Promise<void> => {
+    if (!selected || selected.status !== "open") {
+      const message = "Выберите открытый конфликт для разрешения";
+      setLastError(message);
+      toast.showError(message);
+      return;
+    }
+    const resolution = selected.existing_value ?? selected.incoming_value ?? null;
+    setResolveLoading(true);
+    setLastError("");
+    try {
+      const response = await fetch(
+        `${PROFILE_BFF_OPENAPI_PREFIX}/v1/admin/profile-conflicts/${encodeURIComponent(selected.id)}/resolve`,
+        {
+          method: "POST",
+          headers: {
+            ...(keycloak.token ? { Authorization: `Bearer ${keycloak.token}` } : {}),
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            resolution,
+            notes: `hub-shell-resolve:${hostContext.telemetry?.requestId ?? context.correlationId}`,
+          }),
+        },
+      );
+      if (!response.ok) {
+        throw new Error(`Разрешение конфликта: ${response.status}`);
+      }
+      const snapshot = (await response.json()) as { entity_id?: string; version?: number };
+      setLastAction(`resolve:${snapshot.entity_id ?? selected.entity_id}:v${String(snapshot.version ?? "?")}`);
+      toast.showSuccess("Конфликт разрешён");
+      setItems((prev) => prev.filter((row) => row.id !== selected.id));
+      setSelectedId(null);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "resolve failed";
+      setLastError(message);
+      toast.showError(message);
+    } finally {
+      setResolveLoading(false);
+    }
+  };
+
+  const handleMerge = async (): Promise<void> => {
+    if (!mergeSource.trim() || !mergeTarget.trim()) {
+      const message = "Укажите UUID исходной и целевой сущности";
+      setLastError(message);
+      toast.showError(message);
+      return;
+    }
+    setMergeLoading(true);
+    setLastError("");
+    try {
+      const response = await fetch(`${PROFILE_BFF_OPENAPI_PREFIX}/v1/admin/entities/merge`, {
+        method: "POST",
+        headers: {
+          ...(keycloak.token ? { Authorization: `Bearer ${keycloak.token}` } : {}),
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          source_entity_id: mergeSource.trim(),
+          target_entity_id: mergeTarget.trim(),
+        }),
+      });
+      if (!response.ok) {
+        throw new Error(`Merge: ${response.status}`);
+      }
+      const body = (await response.json()) as {
+        target_entity_id?: string;
+        target_version?: number;
+        source_entity_id?: string;
+      };
+      setLastAction(
+        `merge:source=${body.source_entity_id ?? mergeSource}:target=${body.target_entity_id ?? mergeTarget}:v${String(body.target_version ?? "?")}`,
+      );
+      toast.showSuccess("Merge выполнен");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "merge failed";
+      setLastError(message);
+      toast.showError(message);
+    } finally {
+      setMergeLoading(false);
+    }
+  };
+
+  return (
+    <div>
+      <article className="widget-card" data-testid="conflicts-merge-host-card">
+        <h3>Очередь конфликтов и merge дубликатов</h3>
+        <p>Tenant: {hostContext.tenant.id}</p>
+        <p>
+          Запросы идут через Hub BFF (`{PROFILE_BFF_OPENAPI_PREFIX}/v1/admin/...`). На стороне AprilProfile дополнительно
+          проверяется realm-роль из `KEYCLOAK_ADMIN_REALM_ROLE` (часто <code>april-profile-admin</code>) — см. отчёт
+          задачи 032.
+        </p>
+        {loading ? <p data-testid="conflicts-merge-loading">Загрузка очереди…</p> : null}
+        {!loading && items.length === 0 ? (
+          <p data-testid="conflicts-merge-empty">Открытых конфликтов нет.</p>
+        ) : null}
+        {items.length > 0 ? (
+          <table data-testid="conflicts-merge-table">
+            <thead>
+              <tr>
+                <th>Выбор</th>
+                <th>Сущность</th>
+                <th>Поле</th>
+                <th>Статус</th>
+                <th>Причина</th>
+              </tr>
+            </thead>
+            <tbody>
+              {items.map((row) => (
+                <tr key={row.id}>
+                  <td>
+                    <input
+                      type="radio"
+                      name="conflict-row"
+                      checked={selectedId === row.id}
+                      onChange={() => setSelectedId(row.id)}
+                      aria-label={`Конфликт ${row.id}`}
+                    />
+                  </td>
+                  <td>{row.entity_id}</td>
+                  <td>
+                    {row.namespace}/{row.field_key}
+                  </td>
+                  <td>{row.status}</td>
+                  <td>{row.reason}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : null}
+        <div style={{ marginTop: "1rem" }}>
+          <button
+            type="button"
+            data-testid="conflicts-merge-resolve-btn"
+            onClick={() => void handleResolve()}
+            disabled={resolveLoading || !selected || selected.status !== "open"}
+          >
+            Разрешить выбранный конфликт
+          </button>
+        </div>
+        <h4 style={{ marginTop: "1.5rem" }}>Merge дубликатов (source → target)</h4>
+        <label htmlFor="conflicts-merge-source">Source entity_id</label>
+        <input
+          id="conflicts-merge-source"
+          aria-label="Source entity_id"
+          value={mergeSource}
+          onChange={(e) => setMergeSource(e.currentTarget.value)}
+        />
+        <label htmlFor="conflicts-merge-target">Target entity_id</label>
+        <input
+          id="conflicts-merge-target"
+          aria-label="Target entity_id"
+          value={mergeTarget}
+          onChange={(e) => setMergeTarget(e.currentTarget.value)}
+        />
+        <button type="button" data-testid="conflicts-merge-submit-btn" onClick={() => void handleMerge()} disabled={mergeLoading}>
+          Выполнить merge
+        </button>
+        {lastAction ? <p data-testid="conflicts-merge-last-action">{lastAction}</p> : null}
+        {lastError ? (
+          <Alert color="red" data-testid="conflicts-merge-last-error">
+            {lastError}
+          </Alert>
+        ) : null}
+      </article>
+    </div>
+  );
+}
+
 export function InstanceHistoryHostWidget({ context, routeEntityId }: WidgetProps): JSX.Element {
   const toast = useShellToast();
   const [loading, setLoading] = useState(true);

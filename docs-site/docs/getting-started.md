@@ -105,7 +105,7 @@ curl -i -H "Authorization: Bearer $TOKEN" http://localhost:8081/api/v1/me
 # 401: отсутствует Bearer token
 curl -i http://localhost:8081/api/v1/overview
 
-# 403: недостаточная роль (dev-user имеет только роль user)
+# 403: недостаточная роль (возьмите токен пользователя без роли admin, например `april-user` из dev-realm)
 curl -i -H "Authorization: Bearer $TOKEN" http://localhost:8081/api/v1/admin/ping
 ```
 
@@ -128,6 +128,8 @@ curl -i \
   -H "X-Tenant-Id: demo-tenant" \
   http://localhost:8081/api/v1/admin/profile/api/v1/admin/users
 ```
+
+Очередь конфликтов authority и merge дубликатов в shell: маршрут `#/app/profile/admin/conflicts` (роль `admin` в Hub JWT). API: `GET /api/v1/admin/profile/api/v1/admin/profile-conflicts`, `POST .../resolve`, `POST .../v1/admin/entities/merge`. На стороне AprilProfile дополнительно действует `KEYCLOAK_ADMIN_REALM_ROLE` (см. задачу 032 в `april-profile-1`). Для негативного RBAC-smoke в dev-realm добавлен пользователь `april-user` / `april-user-pass` (только роль `user`).
 
 ## Widget host e2e smoke (task 023)
 

@@ -42,6 +42,13 @@ export function buildPrimaryShellNav(): ShellNavItem[] {
       activePrefix: shellPaths.profileInstanceHistory("demo-instance"),
     },
     {
+      id: "profile-admin-conflicts",
+      label: "Профиль — конфликты и merge",
+      href: toHash(shellPaths.profileAdminConflicts),
+      activePrefix: shellPaths.profileAdminConflicts,
+      requiresRole: "admin",
+    },
+    {
       id: "admin-control",
       label: "Админ-контур",
       href: toHash(shellPaths.adminControl),
