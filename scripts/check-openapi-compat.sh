@@ -13,8 +13,8 @@ if ! command -v oasdiff >/dev/null 2>&1; then
   exit 1
 fi
 
-echo "[openapi-compat] fetch base reference"
-git fetch --no-tags origin develop
+echo "[openapi-compat] fetch base reference (shallow)"
+git fetch --no-tags --depth=1 origin develop:refs/remotes/origin/develop
 
 if ! git cat-file -e "${BASE_REF}:${SPEC_PATH}" 2>/dev/null; then
   echo "[openapi-compat] ${SPEC_PATH} is absent in ${BASE_REF}; skipping breaking-change check"

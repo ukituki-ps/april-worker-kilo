@@ -92,12 +92,10 @@ jobs:
       - name: Init git submodules (public DisignApril; avoid GITHUB_TOKEN 404)
         run: ./scripts/ci-init-git-submodules.sh
 
-      - name: Enable Corepack (pnpm for design-system build)
-        run: corepack enable
-
       - uses: actions/setup-go@v5
         with:
           go-version-file: hub-bff/go.mod
+          cache: false
 
       - name: Hub BFF tests
         working-directory: hub-bff

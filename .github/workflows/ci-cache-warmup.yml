@@ -55,15 +55,22 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version-file: hub-bff/go.mod
+          cache: false
 
       - name: Warm Go dependencies
         working-directory: hub-bff
-        run: go mod download
+        run: |
+          go mod download
+          go install github.com/oasdiff/oasdiff@v1.13.6
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "20"
+
+      - name: Warm Corepack/pnpm (DisignApril pinned version)
+        working-directory: design-system/DisignApril
+        run: corepack pnpm --version
 
       - name: Warm npm cache
         working-directory: hub-shell
@@ -84,4 +91,10 @@ jobs:
         run: |
           docker pull "${APRIL_DOCKER_MIRROR}/library/alpine:3.20" || true
           docker pull "${APRIL_DOCKER_MIRROR}/library/node:20-alpine" || true
+          docker pull "${APRIL_DOCKER_MIRROR}/library/nginx:1.27-alpine" || true
+          docker pull "${APRIL_DOCKER_MIRROR}/library/postgres:17-alpine" || true
+          docker pull "${APRIL_DOCKER_MIRROR}/library/redis:7-alpine" || true
+          docker pull "${APRIL_DOCKER_MIRROR}/curlimages/curl:8.12.1" || true
+          docker pull "${APRIL_DOCKER_MIRROR}/grafana/k6:0.53.0" || true
+          docker pull "${APRIL_DOCKER_MIRROR}/swaggerapi/swagger-ui:v5.17.14" || true
           docker pull "${APRIL_GCR_MIRROR}/distroless/static:nonroot" || true

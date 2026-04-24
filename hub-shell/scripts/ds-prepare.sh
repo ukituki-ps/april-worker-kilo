@@ -48,9 +48,7 @@ if [ -d "${DS_DIR}/packages/tokens/dist" ] && [ ! -w "${DS_DIR}/packages/tokens/
   exit 0
 fi
 
-COREPACK_INSTALL_DIR="${COREPACK_INSTALL_DIR:-/tmp/.local/bin}"
-mkdir -p "${COREPACK_INSTALL_DIR}"
-export PATH="${COREPACK_INSTALL_DIR}:$PATH"
-corepack enable --install-directory "${COREPACK_INSTALL_DIR}"
-CI=true pnpm --dir "${DS_DIR}" install --frozen-lockfile
-pnpm --dir "${DS_DIR}" build
+# Use packageManager from DisignApril/package.json to keep pnpm version
+# synchronized across all microservices and CI jobs.
+CI=true corepack pnpm --dir "${DS_DIR}" install --frozen-lockfile
+corepack pnpm --dir "${DS_DIR}" build
