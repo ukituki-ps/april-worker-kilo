@@ -295,6 +295,8 @@ jobs:
         run: mkdir -p artifacts/smoke
 
       - name: Run AprilHub smoke checks
+        env:
+          COMPOSE_PROJECT_NAME: aprilhub-smoke-${{ github.run_id }}-${{ github.run_attempt }}
         run: |
           set -o pipefail
           ./scripts/smoke-aprilhub.sh | tee artifacts/smoke/smoke.log
@@ -345,6 +347,7 @@ jobs:
 
       - name: Run AprilHub k6 baseline
         env:
+          COMPOSE_PROJECT_NAME: aprilhub-k6-${{ github.run_id }}-${{ github.run_attempt }}
           K6_SUMMARY_EXPORT: artifacts/k6/summary.json
         run: |
           set -o pipefail
