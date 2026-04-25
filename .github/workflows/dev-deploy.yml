@@ -32,6 +32,10 @@ jobs:
           echo "Commit: ${{ github.sha }}"
           test -d "${ROOT}/.git"
           cd "${ROOT}"
+          # Self-hosted deploy root may contain local drift from previous runs.
+          # Ensure deterministic checkout of the target commit.
+          git reset --hard
+          git clean -fd
           git fetch origin
           git checkout "${{ github.sha }}"
           test -x ./deploy.sh
