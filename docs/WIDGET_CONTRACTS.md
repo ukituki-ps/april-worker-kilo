@@ -28,7 +28,7 @@
 | `auth` | `{ subject?: string; roles?: string[]; tokenRef?: string }` | Идентификация и роли из Keycloak. |
 | `theme` | `'light' \| 'dark' \| 'system'` | Согласование темы между host и widget. |
 | `locale` | `string` (BCP 47) | Локаль UI. |
-| `telemetry` | `{ requestId: string; traceId?: string; spanId?: string }` | Сквозная корреляция запросов и ошибок. |
+| `telemetry` | `{ requestId: string; correlationId: string; route: string; module: string; widget?: string; traceId?: string; spanId?: string }` | Сквозная корреляция запросов и ошибок host/widget. |
 
 Расширения допустимы только как backward-compatible поля или новая версия контракта.
 
@@ -77,6 +77,12 @@
 - Роли и права определяются **Keycloak** и backend-политиками.
 - Виджет не вводит альтернативную модель authorisation.
 - Tenant берётся из trusted контекста токена/BFF; query/body/header от клиента не источник tenant.
+
+## 6a. Observability и redaction для widget-layer
+
+- Runtime-ошибки виджета (`render crash`, `unhandledrejection`) маршрутизируются в incident-layer (Sentry) с полями `requestId`/`correlationId`/`route`/`module`/`widget`.
+- Операционные признаки (`httpStatus`, `source`, `degraded`) подтверждаются через host/BFF логи и метрики в Loki/Prometheus.
+- Виджет не отправляет в telemetry токены, cookies и PII; перед отправкой применяется redaction policy host-а.
 
 ---
 

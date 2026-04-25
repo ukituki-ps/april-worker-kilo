@@ -4,6 +4,8 @@
 
 Документ описывает, как использовать центральный `ObservabilityStack` для нескольких микросервисов и стендов (локальные, dev-хосты, дополнительные инфраструктуры).
 
+Для frontend runtime-инцидентов применяется дополнительный incident-layer (Sentry) по модели `docs/architecture/ERROR_TELEMETRY_MODEL.md`; текущий документ описывает операционный слой Loki/Prometheus/Grafana.
+
 Базовые артефакты:
 
 - `infra/observability/README.md`
@@ -97,6 +99,7 @@ Prometheus rules:
 
 - Не использовать динамические идентификаторы (`requestId`, `correlationId`, `userId`) как labels.
 - Для поиска по `requestId/correlationId` использовать full-text фильтрацию в Loki (`|=`).
+- Для triage runtime/UI ошибок использовать цепочку `Sentry issue -> Loki logs -> Prometheus alerts` (см. `docs/runbooks/APRIL_ERROR_TELEMETRY_TRIAGE.md`).
 - Для новых стендов достаточно:
   - нового файла targets;
   - env для `promtail-agent`;

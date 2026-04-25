@@ -15,6 +15,7 @@
 ## Core artifacts
 
 - Stack root: `infra/observability/`
+- Error telemetry architecture: `docs/architecture/ERROR_TELEMETRY_MODEL.md`
 - Compose: `infra/observability/docker-compose.yml`
 - Prometheus config: `infra/observability/config/prometheus/prometheus.yml`
 - Alert rules:
@@ -77,6 +78,8 @@ Reference:
 
 ## Incident quick links
 
+- Error telemetry triage (`Sentry -> Loki -> Prometheus -> RCA`):
+  - `docs/runbooks/APRIL_ERROR_TELEMETRY_TRIAGE.md`
 - Deploy and health troubleshooting:
   - `docs/runbooks/OBSERVABILITY_STACK_DEPLOY.md`
 - Onboarding and query troubleshooting:
