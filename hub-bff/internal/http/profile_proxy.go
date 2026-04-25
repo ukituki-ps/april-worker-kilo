@@ -29,6 +29,12 @@ func NewProfileAdminProxy(baseURL string) (http.Handler, error) {
 		if remainder == "" {
 			remainder = "/"
 		}
+		// hub-shell openAPI-префикс даёт сегмент /api, из-за чего остаётся /api/v1/...;
+		// AprilProfile слушает /v1/... — снимаем ведущий /api, если он есть.
+		remainder, _ = strings.CutPrefix(remainder, "/api")
+		if remainder == "" {
+			remainder = "/"
+		}
 		req.URL.Scheme = upstreamURL.Scheme
 		req.URL.Host = upstreamURL.Host
 		req.URL.Path = singleSlashPath(upstreamURL.Path, remainder)

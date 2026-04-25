@@ -22,7 +22,8 @@ type ProfilesListItem = {
 
 type ProfilesListAction =
   | { type: "created"; item: ProfilesListItem }
-  | { type: "loaded"; count: number };
+  | { type: "loaded"; count: number }
+  | { type: "deleted"; entityId: string };
 
 const DEFAULT_PROFILE_INSTANCE_IDS = ["demo-instance"];
 type ProfileInstanceItem = {
@@ -35,7 +36,8 @@ type ProfileInstanceItem = {
 type ProfileInstancesAction =
   | { type: "created"; item: ProfileInstanceItem }
   | { type: "updated"; item: ProfileInstanceItem }
-  | { type: "loaded"; count: number };
+  | { type: "loaded"; count: number }
+  | { type: "deleted"; entityId: string };
 
 type InstanceHistoryVersion = {
   version: number;
@@ -131,7 +133,7 @@ const buildDiff = (beforeDoc: unknown, afterDoc: unknown): InstanceHistoryDiffRo
 
 export function OverviewWidget({ context }: WidgetProps) {
   return (
-    <article className="widget-card">
+    <article className="widget-card" data-testid="shell-overview-widget">
       <h3 id="overview">Обзор</h3>
       <p>Добро пожаловать, {context.user.name || context.user.username}.</p>
       <p>Корреляция запроса: {context.correlationId}</p>
@@ -141,9 +143,9 @@ export function OverviewWidget({ context }: WidgetProps) {
 
 export function RolesWidget({ context }: WidgetProps) {
   return (
-    <article className="widget-card">
+    <article className="widget-card" data-testid="shell-roles-widget">
       <h3 id="roles">Роли доступа</h3>
-      <p>{context.roles.join(", ") || "Роли отсутствуют"}</p>
+      <p data-testid="shell-roles-text">{context.roles.join(", ") || "Роли отсутствуют"}</p>
     </article>
   );
 }
@@ -158,7 +160,7 @@ export function ProfilesListHostWidget({ context }: WidgetProps): JSX.Element {
   const [lastError, setLastError] = useState("");
   const [items, setItems] = useState<ProfilesListItem[]>([]);
   const [entityTypeId, setEntityTypeId] = useState(import.meta.env.VITE_PROFILE_DEFAULT_ENTITY_TYPE_ID?.trim() || "");
-  const [createLoading, setCreateLoading] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false);
   const entityIds = useMemo(() => readProfileListIds(), []);
   const hostContext = useMemo<ProfileWidgetHostContext>(
     () => ({
@@ -232,7 +234,7 @@ export function ProfilesListHostWidget({ context }: WidgetProps): JSX.Element {
       toast.showError(message);
       return;
     }
-    setCreateLoading(true);
+    setActionLoading(true);
     setLastError("");
     try {
       const response = await fetch("/api/v1/admin/profile/api/v1/entities", {
@@ -272,7 +274,39 @@ export function ProfilesListHostWidget({ context }: WidgetProps): JSX.Element {
       setLastError(message);
       toast.showError(message);
     } finally {
-      setCreateLoading(false);
+      setActionLoading(false);
+    }
+  };
+
+  const handleDeleteFirstProfile = async (): Promise<void> => {
+    const target = items[0];
+    if (!target) {
+      const message = "Нет профиля для удаления";
+      setLastError(message);
+      toast.showError(message);
+      return;
+    }
+    setActionLoading(true);
+    setLastError("");
+    try {
+      const response = await fetch(`/api/v1/admin/profile/api/v1/entities/${encodeURIComponent(target.entityId)}`, {
+        method: "DELETE",
+        headers: {
+          ...(keycloak.token ? { Authorization: `Bearer ${keycloak.token}` } : {}),
+        },
+      });
+      if (!response.ok) {
+        throw new Error(`delete failed: ${response.status}`);
+      }
+      setItems((prev) => prev.filter((item) => item.entityId !== target.entityId));
+      setLastAction({ type: "deleted", entityId: target.entityId });
+      toast.showSuccess("Profiles list action: deleted");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "profiles list delete failed";
+      setLastError(message);
+      toast.showError(message);
+    } finally {
+      setActionLoading(false);
     }
   };
 
@@ -288,8 +322,11 @@ export function ProfilesListHostWidget({ context }: WidgetProps): JSX.Element {
           value={entityTypeId}
           onChange={(event) => setEntityTypeId(event.currentTarget.value)}
         />
-        <button type="button" onClick={() => void handleCreate()} disabled={createLoading}>
+        <button type="button" onClick={() => void handleCreate()} disabled={actionLoading}>
           Create profile
+        </button>
+        <button type="button" onClick={() => void handleDeleteFirstProfile()} disabled={actionLoading}>
+          Delete first profile
         </button>
         <ul>
           {items.map((item) => (
@@ -313,7 +350,7 @@ export function ProfileInstancesHostWidget({ context, routeEntityId }: WidgetPro
   const [lastError, setLastError] = useState("");
   const [items, setItems] = useState<ProfileInstanceItem[]>([]);
   const [entityTypeId, setEntityTypeId] = useState(import.meta.env.VITE_PROFILE_DEFAULT_ENTITY_TYPE_ID?.trim() || "");
-  const [createLoading, setCreateLoading] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false);
   const profileId = useMemo(
     () => import.meta.env.VITE_PROFILE_DEMO_ENTITY_ID?.trim() || "00000000-0000-0000-0000-000000000001",
     [],
@@ -391,7 +428,7 @@ export function ProfileInstancesHostWidget({ context, routeEntityId }: WidgetPro
       toast.showError(message);
       return;
     }
-    setCreateLoading(true);
+    setActionLoading(true);
     setLastError("");
     try {
       const response = await fetch("/api/v1/admin/profile/api/v1/entities", {
@@ -432,7 +469,39 @@ export function ProfileInstancesHostWidget({ context, routeEntityId }: WidgetPro
       setLastError(message);
       toast.showError(message);
     } finally {
-      setCreateLoading(false);
+      setActionLoading(false);
+    }
+  };
+
+  const handleDeleteFirstInstance = async (): Promise<void> => {
+    const target = items[0];
+    if (!target) {
+      const message = "Нет экземпляра для удаления";
+      setLastError(message);
+      toast.showError(message);
+      return;
+    }
+    setActionLoading(true);
+    setLastError("");
+    try {
+      const response = await fetch(`/api/v1/admin/profile/api/v1/entities/${encodeURIComponent(target.entityId)}`, {
+        method: "DELETE",
+        headers: {
+          ...(keycloak.token ? { Authorization: `Bearer ${keycloak.token}` } : {}),
+        },
+      });
+      if (!response.ok) {
+        throw new Error(`delete failed: ${response.status}`);
+      }
+      setItems((prev) => prev.filter((item) => item.entityId !== target.entityId));
+      setLastAction({ type: "deleted", entityId: target.entityId });
+      toast.showSuccess("Instances action: deleted");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "instances delete failed";
+      setLastError(message);
+      toast.showError(message);
+    } finally {
+      setActionLoading(false);
     }
   };
 
@@ -445,7 +514,7 @@ export function ProfileInstancesHostWidget({ context, routeEntityId }: WidgetPro
       toast.showError(message);
       return;
     }
-    setCreateLoading(true);
+    setActionLoading(true);
     setLastError("");
     try {
       const response = await fetch(`/api/v1/admin/profile/api/v1/entities/${targetEntityId}`, {
@@ -486,7 +555,7 @@ export function ProfileInstancesHostWidget({ context, routeEntityId }: WidgetPro
       setLastError(message);
       toast.showError(message);
     } finally {
-      setCreateLoading(false);
+      setActionLoading(false);
     }
   };
 
@@ -503,11 +572,14 @@ export function ProfileInstancesHostWidget({ context, routeEntityId }: WidgetPro
           value={entityTypeId}
           onChange={(event) => setEntityTypeId(event.currentTarget.value)}
         />
-        <button type="button" onClick={() => void handleCreate()} disabled={createLoading}>
+        <button type="button" onClick={() => void handleCreate()} disabled={actionLoading}>
           Create instance
         </button>
-        <button type="button" onClick={() => void handleUpdateFirst()} disabled={createLoading}>
+        <button type="button" onClick={() => void handleUpdateFirst()} disabled={actionLoading}>
           Update first instance
+        </button>
+        <button type="button" onClick={() => void handleDeleteFirstInstance()} disabled={actionLoading}>
+          Delete first instance
         </button>
         <ul>
           {items.map((item) => (
@@ -559,7 +631,9 @@ export function ConflictsMergeHostWidget({ context }: WidgetProps): JSX.Element 
     () => import.meta.env.VITE_PROFILE_MERGE_SOURCE_ENTITY_ID?.trim() || "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
   );
   const [mergeTarget, setMergeTarget] = useState(
-    () => import.meta.env.VITE_PROFILE_MERGE_TARGET_ENTITY_ID?.trim() || "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+    () =>
+      import.meta.env.VITE_PROFILE_MERGE_TARGET_ENTITY_ID?.trim() ||
+      "00000000-0000-0000-0000-000000000001",
   );
   const hostContext = useMemo<ProfileWidgetHostContext>(
     () => ({

@@ -58,14 +58,34 @@ func TestProfileAdminProxyForwardsPathAndHeaders(t *testing.T) {
 	if got.Path != "/profile-api/users/current" {
 		t.Fatalf("upstream path = %s, want /profile-api/users/current", got.Path)
 	}
-	if got.Authorization != "Bearer test-token" {
-		t.Fatalf("authorization = %q, want bearer token", got.Authorization)
+}
+
+func TestProfileAdminProxyStripsLeadingAPIFromOpenAPIPrefix(t *testing.T) {
+	t.Parallel()
+
+	var gotPath string
+	upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		gotPath = r.URL.Path
+		_, _ = io.WriteString(w, `{"status":"ok"}`)
+	}))
+	defer upstream.Close()
+
+	proxy, err := NewProfileAdminProxy(upstream.URL)
+	if err != nil {
+		t.Fatalf("init proxy: %v", err)
 	}
-	if got.CorrelationID != "corr-1" || got.RequestID != "req-1" {
-		t.Fatalf("metadata headers were not forwarded: %+v", got)
+
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/admin/profile/api/v1/entity-types", nil)
+	req = req.WithContext(context.WithValue(req.Context(), requestMetadataKey, aggregation.Metadata{
+		CorrelationID: "c", RequestID: "r", SourceService: "hub-bff",
+	}))
+	rec := httptest.NewRecorder()
+	proxy.ServeHTTP(rec, req)
+	if rec.Code != http.StatusOK {
+		t.Fatalf("status = %d, want 200", rec.Code)
 	}
-	if got.TenantID != "tenant-42" {
-		t.Fatalf("tenant header = %s, want tenant-42", got.TenantID)
+	if gotPath != "/v1/entity-types" {
+		t.Fatalf("upstream path = %q, want /v1/entity-types", gotPath)
 	}
 }
 

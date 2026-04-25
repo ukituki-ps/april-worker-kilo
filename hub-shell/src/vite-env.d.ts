@@ -11,6 +11,10 @@ interface ImportMetaEnv {
   readonly VITE_PROFILE_DEMO_ENTITY_ID?: string;
   /** Опционально: CSV-список `entity_id` для загрузки виджета списка профилей. */
   readonly VITE_PROFILE_LIST_ENTITY_IDS?: string;
+  /** Опционально: `entity_id` сценария merge (виджет конфликтов/merge). */
+  readonly VITE_PROFILE_MERGE_SOURCE_ENTITY_ID?: string;
+  /** Опционально: `entity_id` сценария merge (виджет конфликтов/merge). */
+  readonly VITE_PROFILE_MERGE_TARGET_ENTITY_ID?: string;
   /** Опционально: получатель заявки с лендинга (mailto). Если не задан — открывается mailto: без адреса. */
   readonly VITE_LANDING_INQUIRY_EMAIL?: string;
 }
