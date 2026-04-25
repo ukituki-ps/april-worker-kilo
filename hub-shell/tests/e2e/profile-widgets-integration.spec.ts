@@ -20,4 +20,13 @@ test.describe("@integration BFF без network-stub", () => {
     const error = page.getByTestId("profile-widget-save-error");
     await expect(success.or(error)).toBeVisible({ timeout: 30_000 });
   });
+
+  test("список профилей: реальный BFF — loaded, создание или штатная ошибка", async ({ page }) => {
+    await loginThroughKeycloak(page, privilegedUser, privilegedPass);
+    await page.goto("/#/app/profile/entities");
+    await expect(page.getByRole("heading", { name: "Profiles list widget" })).toBeVisible();
+    const action = page.getByTestId("profiles-list-last-action");
+    const listErr = page.getByTestId("profiles-list-last-error");
+    await expect(action.or(listErr)).toBeVisible({ timeout: 45_000 });
+  });
 });

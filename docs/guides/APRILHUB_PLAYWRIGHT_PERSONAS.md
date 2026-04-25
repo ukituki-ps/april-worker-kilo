@@ -66,6 +66,8 @@ cd hub-shell && npm run e2e:smoke
 | `tests/e2e/rbac-matrix.spec.ts` | RBAC restricted |
 | `tests/e2e/profile-widgets-restricted.spec.ts` | 403 без stubs |
 | `tests/e2e/profile-widgets-integration.spec.ts` | Реальный BFF |
+| `tests/e2e/profile-widgets-crud-and-errors.spec.ts` | CRUD (delete), read/loaded, ошибки BFF (422/409/502), пустые состояния, клиентская валидация merge |
+| `tests/e2e/profile-coverage-extended.spec.ts` | Расширенная матрица: коды ошибок карточки (authority, type), new→create, meta-вкладка, роли, admin error boundary, history diff/сравнение, негативы list/instances/conflicts |
 | `tests/e2e/helpers/login.ts` | `loginThroughKeycloak`, гостевой CTA |
 
 **Follow-up:** при стабильном прогреве Vite в CI можно снова ввести `globalSetup` + `storageState` по персонам, чтобы не дублировать OIDC в каждом тесте.

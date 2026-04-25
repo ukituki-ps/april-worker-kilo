@@ -39,7 +39,23 @@
       ],
       "attributes": {
         "pkce.code.challenge.method": "S256"
-      }
+      },
+      "protocolMappers": [
+        {
+          "name": "tenant_id",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "userinfo.token.claim": "true",
+            "user.attribute": "tenant_id",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "tenant_id",
+            "jsonType.label": "String"
+          }
+        }
+      ]
     },
     {
       "clientId": "aprilhub-bff",
@@ -96,7 +112,7 @@
         }
       ],
       "attributes": {
-        "tenant_id": ["tenant-dev"]
+        "tenant_id": ["00000000-0000-0000-0000-000000000001"]
       },
       "realmRoles": ["user", "admin"]
     },
@@ -115,7 +131,7 @@
         }
       ],
       "attributes": {
-        "tenant_id": ["tenant-dev"]
+        "tenant_id": ["00000000-0000-0000-0000-000000000001"]
       },
       "realmRoles": ["user"]
     }

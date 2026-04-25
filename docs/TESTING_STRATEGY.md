@@ -90,7 +90,8 @@ cd hub-shell && npm ci && npm run check:profile-ui-semver && npm run lint && npm
   2. Редирект на страницу логина Keycloak.
   3. Вход привилегированной и ограниченной персон (явный OIDC в спеках).
   4. Виджеты профиля 4a: быстрый слой со `page.route` и отдельный файл **`profile-widgets-integration.spec.ts`** без перехвата сети для реального BFF.
-- Доп. команды: `npm run e2e:smoke` (без integration-файла), `npm run e2e:integration`.
+  5. Расширенные спеки: **`profile-widgets-crud-and-errors.spec.ts`**, **`profile-coverage-extended.spec.ts`** — CRUD, негативы BFF, вкладка meta, shell (роли, admin boundary, история версий).
+- Доп. команды: `npm run e2e:smoke` (включает расширенные spec-файлы, без `e2e:integration`), `npm run e2e:integration` (только `profile-widgets-integration.spec.ts`).
 - Артефакты при падениях: trace/screenshot/video (Playwright `retain-on-failure`), HTML report (`hub-shell/playwright-report`).
 
 ### 5.2 Integration suite (`hub-bff`, P1)

@@ -51,6 +51,12 @@ services:
       KEYCLOAK_ISSUER: ${KEYCLOAK_ISSUER:-http://127.0.0.1/auth/realms/april}
       KEYCLOAK_AUDIENCE: ${KEYCLOAK_AUDIENCE:-aprilhub-shell}
       KEYCLOAK_JWKS_URL: ${KEYCLOAK_JWKS_URL:-http://keycloak:8080/auth/realms/april/protocol/openid-connect/certs}
+      APRIL_PROFILE_ADMIN_URL: ${APRIL_PROFILE_ADMIN_URL:-}
+      APRIL_PROFIL_URL: ${APRIL_PROFIL_URL:-}
+      APRIL_WORKFLOW_URL: ${APRIL_WORKFLOW_URL:-}
+      APRIL_NFLOW_URL: ${APRIL_NFLOW_URL:-}
+      APRIL_ORGFLOW_URL: ${APRIL_ORGFLOW_URL:-}
+      APRIL_REPORT_URL: ${APRIL_REPORT_URL:-}
     volumes:
       - ./:/workspace
     expose:
@@ -64,8 +70,30 @@ services:
     profiles: ["aprilhub"]
     user: "${LOCAL_UID:-1000}:${LOCAL_GID:-1000}"
     working_dir: /workspace/hub-shell
-    command: sh -c "npm ci && npm run dev -- --host 0.0.0.0 --port ${HUB_SHELL_PORT:-4173}"
+    # Без жесткого `npm ci` на каждый старт: при длинной установке nginx даст 502 (upstream не поднят).
+    # `npm ci` снова, если нет node_modules, нет стампа, или `package-lock.json` новее стампа.
+    command:
+      - sh
+      - -ec
+      - |
+        STAMP=node_modules/.aprilhub-ci-stamp
+        if [ ! -d node_modules ] || [ ! -f "$$STAMP" ] || [ package-lock.json -nt "$$STAMP" ]; then
+          npm ci
+          touch "$$STAMP"
+        fi
+        exec npm run dev -- --host 0.0.0.0 --port $${HUB_SHELL_PORT}
+    healthcheck:
+      # Host должен совпадать с `VITE_ALLOWED_HOSTS` (см. hub-shell on dev).
+      test: ["CMD-SHELL", "wget -q -T2 -O /dev/null --header=Host:localhost http://127.0.0.1:$${HUB_SHELL_PORT}/ || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 3m
     environment:
+      # Не / (root), иначе npm пишет в `/.npm` с правами, несовместимыми с `user:`
+      HOME: /tmp
+      NPM_CONFIG_CACHE: /tmp/npm-cache
+      HUB_SHELL_PORT: "${HUB_SHELL_PORT:-4173}"
       VITE_API_BASE_URL: ${VITE_API_BASE_URL:-/api}
       VITE_KEYCLOAK_URL: ${VITE_KEYCLOAK_URL:-/auth}
       VITE_KEYCLOAK_REALM: ${VITE_KEYCLOAK_REALM:-april}
@@ -74,6 +102,8 @@ services:
       VITE_PROFILE_DEMO_ENTITY_ID: ${VITE_PROFILE_DEMO_ENTITY_ID:-}
       VITE_PROFILE_LIST_ENTITY_IDS: ${VITE_PROFILE_LIST_ENTITY_IDS:-}
       VITE_PROFILE_INSTANCE_IDS: ${VITE_PROFILE_INSTANCE_IDS:-}
+      VITE_PROFILE_MERGE_SOURCE_ENTITY_ID: ${VITE_PROFILE_MERGE_SOURCE_ENTITY_ID:-}
+      VITE_PROFILE_MERGE_TARGET_ENTITY_ID: ${VITE_PROFILE_MERGE_TARGET_ENTITY_ID:-}
       VITE_ALLOWED_HOSTS: ${VITE_ALLOWED_HOSTS:-}
     volumes:
       - ./:/workspace
@@ -88,6 +118,8 @@ services:
     profiles: ["aprilhub"]
     user: "${LOCAL_UID:-1000}:${LOCAL_GID:-1000}"
     working_dir: /workspace/design-system/DisignApril
+    environment:
+      HOME: /tmp
     command: >-
       sh -c "mkdir -p /tmp/.local/bin &&
       export PATH=/tmp/.local/bin:$PATH &&
