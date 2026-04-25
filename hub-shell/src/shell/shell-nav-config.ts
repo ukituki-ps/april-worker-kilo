@@ -14,6 +14,7 @@ const toHash = (path: string): string => `#${path}`;
 
 export function buildPrimaryShellNav(): ShellNavItem[] {
   const entityId = defaultProfileEntityIdForNav();
+  const instanceId = entityId;
   return [
     { id: "overview", label: "Обзор платформы", href: toHash(shellPaths.overview), activePrefix: shellPaths.overview },
     { id: "roles", label: "Роли доступа", href: toHash(shellPaths.roles), activePrefix: shellPaths.roles },
@@ -32,14 +33,14 @@ export function buildPrimaryShellNav(): ShellNavItem[] {
     {
       id: "profile-instance-demo",
       label: "Профиль — экземпляры",
-      href: toHash(shellPaths.profileInstance("demo-instance")),
-      activePrefix: shellPaths.profileInstance("demo-instance"),
+      href: toHash(shellPaths.profileInstance(instanceId)),
+      activePrefix: shellPaths.profileInstance(instanceId),
     },
     {
       id: "profile-instance-history-demo",
       label: "Профиль — история экземпляра",
-      href: toHash(shellPaths.profileInstanceHistory("demo-instance")),
-      activePrefix: shellPaths.profileInstanceHistory("demo-instance"),
+      href: toHash(shellPaths.profileInstanceHistory(instanceId)),
+      activePrefix: shellPaths.profileInstanceHistory(instanceId),
     },
     {
       id: "profile-admin-conflicts",

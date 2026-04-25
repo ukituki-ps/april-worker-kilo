@@ -25,7 +25,7 @@ type ProfilesListAction =
   | { type: "loaded"; count: number }
   | { type: "deleted"; entityId: string };
 
-const DEFAULT_PROFILE_INSTANCE_IDS = ["demo-instance"];
+const DEFAULT_PROFILE_INSTANCE_IDS = ["00000000-0000-0000-0000-000000000001"];
 type ProfileInstanceItem = {
   entityId: string;
   entityTypeId: string;
