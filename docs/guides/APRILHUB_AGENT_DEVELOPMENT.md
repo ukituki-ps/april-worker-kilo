@@ -14,6 +14,8 @@
 - План: `docs/AGENT_PLAN_TEMPLATE.md`
 - Отчёт: `docs/AGENT_REPORT_TEMPLATE.md`
 
+Инциденты и triage ошибок UI/API (корреляция Sentry → Loki → Prometheus): [`docs/AGENT_ERROR_TRIAGE_PROMPT.md`](../AGENT_ERROR_TRIAGE_PROMPT.md).
+
 ## Service map (экосистема April)
 
 - UI и UX-композиция: `hub-shell`

@@ -13,6 +13,8 @@
 - `docs/runbooks/OBSERVABILITY_STACK_ONBOARDING.md`
 - `infra/observability/config/prometheus/prometheus.yml`
 - `infra/observability/config/prometheus/rules/aprilhub-alerts.yml`
+- UI/API incidents (агентный промпт + чеклисты): `docs/AGENT_ERROR_TRIAGE_PROMPT.md`
+- Детальный triage-runbook: `docs/runbooks/APRIL_ERROR_TELEMETRY_TRIAGE.md`
 
 ## Standard workflow
 

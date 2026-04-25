@@ -10,6 +10,7 @@
   - `docs/runbooks/OBSERVABILITY_STACK_ONBOARDING.md`
 - Agent:
   - `docs/guides/OBSERVABILITY_AGENT_PLAYBOOK.md`
+  - `docs/AGENT_ERROR_TRIAGE_PROMPT.md` (incident: UI/API; корреляция Sentry → Loki → Prometheus)
   - `infra/observability/README.md`
 
 ## Core artifacts

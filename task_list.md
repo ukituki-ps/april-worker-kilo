@@ -47,11 +47,12 @@
 - [ ] `031`: Исполнение внешней задачи 035 из `april-profile-1` (shell/IA/HostContext по 4a.0 + docs-site во внешнем репо + двойной отчёт)
 - [x] `032`: Полноценный тестовый контур AprilHub + виджеты AprilProfile (матрица ролей Keycloak, сценарии e2e, регрессия UI, дифф stub vs реальный BFF)
 - [ ] `033`: Наблюдаемость ошибок фронтенда/API: архитектурное решение и документационный контур (AprilHub + AprilProfile)
-- [ ] `034`: Агентный промпт и чеклист triage/fix для ошибок 400/404/503 и frontend runtime (Sentry + Loki/Grafana)
+- [x] `034`: Агентный промпт и чеклист triage/fix для ошибок 400/404/503 и frontend runtime (Sentry + Loki/Grafana)
 - [ ] `035`: Подготовка внедрения Sentry в AprilHub (`april-worker`): env, безопасность, операционный runbook
 - [ ] `036`: Подготовка внедрения Sentry в AprilProfile (`april-profile-1`): env, безопасность, операционный runbook
 - [ ] `037`: Реализация Sentry и error telemetry в AprilHub (`hub-shell`/`hub-bff`)
 - [ ] `038`: Реализация Sentry и error telemetry в AprilProfile (`april-profile-1`)
+- [ ] `039`: Аналог задачи 033 для AprilProfile: архитектура и документация error telemetry (Sentry + Loki/Prometheus)
 
 ## Текущий фокус
 
@@ -86,11 +87,12 @@
 - [ ] `031-aprilhub-execute-external-task-035-april-profile-1`: изучить задачу 035 (фаза 4a.0) и документацию в `april-profile-1`, реализовать shell/IA/`HostContext`/smoke/docs в `april-worker`, оформить отчёт в обоих репозиториях (в т.ч. docs-site по внешней постановке)
 - [x] `032-aprilhub-aprilprofile-widgets-rbac-e2e-suite`: матрица ролей Keycloak + Playwright-сценарии для AprilHub и хостинга виджетов AprilProfile (RBAC, негативные кейсы, слой без network-stub для happy-path); см. [`tasks/032-aprilhub-aprilprofile-widgets-rbac-e2e-suite/TASK.md`](./tasks/032-aprilhub-aprilprofile-widgets-rbac-e2e-suite/TASK.md), [`REPORT.md`](./tasks/032-aprilhub-aprilprofile-widgets-rbac-e2e-suite/REPORT.md)
 - [ ] `033-observability-error-telemetry-architecture-docs`: зафиксировать архитектурное решение по сбору/корреляции ошибок (Sentry + Loki/Prometheus) и обновить docs/архитектурные артефакты
-- [ ] `034-agent-error-triage-master-prompt`: подготовить отдельный агентный промпт и чеклист анализа/исправления ошибок UI/API с обязательной корреляцией `requestId`
+- [x] `034-agent-error-triage-master-prompt`: подготовить отдельный агентный промпт и чеклист анализа/исправления ошибок UI/API с обязательной корреляцией `requestId`
 - [ ] `035-aprilhub-sentry-rollout-preparation`: подготовить внедрение Sentry в `april-worker` (конфиг env, redaction policy, runbook, alert routing)
 - [ ] `036-aprilprofile-sentry-rollout-preparation`: подготовить внедрение Sentry в `april-profile-1` с зеркальным документационным контуром и двойным отчётом
 - [ ] `037-aprilhub-sentry-implementation`: реализовать frontend/runtime error capture в `hub-shell` и интеграцию с текущим observability-контуром AprilHub
 - [ ] `038-aprilprofile-sentry-implementation`: реализовать error capture и операционную интеграцию в `april-profile-1` (внешняя постановка + двойной отчёт)
+- [ ] `039-aprilprofile-observability-error-telemetry-architecture-docs`: отдельная внешняя задача (аналог `033`) на архитектурное решение и документационный контур error telemetry в `april-profile-1` с двойным отчётом
 
 ## План реализации AprilHub: статусы
 
@@ -126,3 +128,4 @@
 | `030` | Исполнение внешней задачи 034 из `april-profile-1` (анализ docs + реализация в Hub + двойной отчёт) | ✅ Выполнено | [`tasks/030-aprilhub-execute-external-task-034-april-profile-1/TASK.md`](./tasks/030-aprilhub-execute-external-task-034-april-profile-1/TASK.md), [`tasks/030-aprilhub-execute-external-task-034-april-profile-1/REPORT.md`](./tasks/030-aprilhub-execute-external-task-034-april-profile-1/REPORT.md) |
 | `031` | Исполнение внешней задачи 035 из `april-profile-1` (shell/IA/навигационный контракт 4a.0 + двойной отчёт) | ⏳ Не начато | [`tasks/031-aprilhub-execute-external-task-035-april-profile-1/TASK.md`](./tasks/031-aprilhub-execute-external-task-035-april-profile-1/TASK.md), [`tasks/031-aprilhub-execute-external-task-035-april-profile-1/REPORT.md`](./tasks/031-aprilhub-execute-external-task-035-april-profile-1/REPORT.md) |
 | `032` | Тесты AprilHub + AprilProfile: матрица ролей, e2e/regression UI, stub vs интеграция | ✅ Выполнено | [`tasks/032-aprilhub-aprilprofile-widgets-rbac-e2e-suite/TASK.md`](./tasks/032-aprilhub-aprilprofile-widgets-rbac-e2e-suite/TASK.md), [`tasks/032-aprilhub-aprilprofile-widgets-rbac-e2e-suite/REPORT.md`](./tasks/032-aprilhub-aprilprofile-widgets-rbac-e2e-suite/REPORT.md) |
+| `034` | Агентный промпт triage/fix ошибок UI/API (Sentry → Loki → Prometheus) | ✅ Выполнено | [`tasks/034-agent-error-triage-master-prompt/TASK.md`](./tasks/034-agent-error-triage-master-prompt/TASK.md), [`tasks/034-agent-error-triage-master-prompt/PLAN.md`](./tasks/034-agent-error-triage-master-prompt/PLAN.md), [`tasks/034-agent-error-triage-master-prompt/REPORT.md`](./tasks/034-agent-error-triage-master-prompt/REPORT.md) |

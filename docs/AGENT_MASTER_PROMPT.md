@@ -13,6 +13,7 @@
 5) [`docs/AGENT_TASK_TEMPLATE.md`](./AGENT_TASK_TEMPLATE.md)
 6) [`docs/AGENT_PLAN_TEMPLATE.md`](./AGENT_PLAN_TEMPLATE.md) — шаблон **`PLAN.md`** в папке задачи (для нетривиальных задач)
 7) [`docs/AGENT_REPORT_TEMPLATE.md`](./AGENT_REPORT_TEMPLATE.md)
+8) Для **incident / triage / fix** ошибок UI/API (`400/404/503`, React, `unhandledrejection`, интеграция AprilHub ↔ AprilProfile): [`docs/AGENT_ERROR_TRIAGE_PROMPT.md`](./AGENT_ERROR_TRIAGE_PROMPT.md) — обязательная корреляция Sentry → Loki → Prometheus и чеклисты до/после фикса.
 
 По задаче дополнительно смотри при необходимости: [`docs/DEPLOYMENT_STRATEGY.md`](./DEPLOYMENT_STRATEGY.md), [`docs/TESTING_STRATEGY.md`](./TESTING_STRATEGY.md), [`docs/auth-jwt-keycloak-adapted.md`](./auth-jwt-keycloak-adapted.md).
 
@@ -40,3 +41,5 @@
 [ВСТАВЬ ЗАДАЧУ В ФОРМАТЕ docs/AGENT_TASK_TEMPLATE.md]
 --- TASK END ---
 ```
+
+Специализированный режим расследования и исправления ошибок без смены общих правил выше: см. [`AGENT_ERROR_TRIAGE_PROMPT.md`](./AGENT_ERROR_TRIAGE_PROMPT.md) (копируемый блок промпта и формат incident-отчёта).
