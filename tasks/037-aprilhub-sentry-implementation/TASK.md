@@ -41,11 +41,11 @@
 - Не ломать текущие smoke/e2e сценарии.
 
 ## Критерии готовности (acceptance)
-- [ ] Ошибки `ErrorBoundary`, `window.onerror`, `unhandledrejection` уходят в Sentry с нужными tag/context.
-- [ ] HTTP ошибки `400/404/503` фиксируются в едином error telemetry слое с маршрутом/виджетом/корреляцией.
-- [ ] Redaction/filtering применяются и проверены.
-- [ ] Документация по triage и runbook обновлены.
-- [ ] Релевантные тесты и проверки зелёные; артефакты приложены в `REPORT.md`.
+- [x] Ошибки `ErrorBoundary`, `window.onerror`, `unhandledrejection` уходят в Sentry с нужными tag/context.
+- [x] HTTP ошибки `400/404/503` фиксируются в едином error telemetry слое с маршрутом/виджетом/корреляцией.
+- [x] Redaction/filtering применяются и проверены.
+- [x] Документация по triage и runbook обновлены.
+- [ ] Релевантные тесты и проверки зелёные; артефакты приложены в `REPORT.md` (Playwright blocked: ingress `502` в локальном compose-контуре).
 
 ## Проверка (команды)
 ```bash

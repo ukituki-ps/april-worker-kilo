@@ -37,11 +37,11 @@
 - Документация должна быть пригодна для локального стенда и CI.
 
 ## Критерии готовности (acceptance)
-- [ ] Определён и задокументирован env-контур для Sentry в AprilHub.
-- [ ] Зафиксирована redaction/filtering политика для frontend ошибок.
-- [ ] Подготовлен runbook rollout/rollback и smoke-проверок.
-- [ ] Сформирован implementation checklist для задачи `037`.
-- [ ] Создан `REPORT.md` с готовыми артефактами к реализации.
+- [x] Определён и задокументирован env-контур для Sentry в AprilHub.
+- [x] Зафиксирована redaction/filtering политика для frontend ошибок.
+- [x] Подготовлен runbook rollout/rollback и smoke-проверок.
+- [x] Сформирован implementation checklist для задачи `037`.
+- [x] Создан `REPORT.md` с готовыми артефактами к реализации.
 
 ## Проверка (команды)
 ```bash

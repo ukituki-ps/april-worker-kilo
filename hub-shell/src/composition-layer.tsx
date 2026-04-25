@@ -23,7 +23,12 @@ export function CompositionLayer({ context }: Props) {
   return (
     <section className="composition-grid">
       {allowedModules.map((module) => (
-        <CompositionErrorBoundary key={module.id} moduleName={module.title}>
+        <CompositionErrorBoundary
+          key={module.id}
+          moduleName={module.title}
+          tenant={context.orgScope}
+          correlationId={context.correlationId}
+        >
           <CompositionLoader module={module} context={context} />
         </CompositionErrorBoundary>
       ))}

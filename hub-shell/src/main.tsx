@@ -4,8 +4,12 @@ import "@mantine/core/styles.css";
 import { AprilProviders } from "@april/ui";
 import App from "./App";
 import { initializeAuth } from "./keycloak";
+import { initializeSentry, installGlobalRuntimeHandlers } from "./sentry";
 
 void (async () => {
+  initializeSentry();
+  installGlobalRuntimeHandlers();
+
   let authInitError = "";
   try {
     await initializeAuth();

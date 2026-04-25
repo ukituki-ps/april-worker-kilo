@@ -48,7 +48,7 @@
 - [x] `032`: Полноценный тестовый контур AprilHub + виджеты AprilProfile (матрица ролей Keycloak, сценарии e2e, регрессия UI, дифф stub vs реальный BFF)
 - [ ] `033`: Наблюдаемость ошибок фронтенда/API: архитектурное решение и документационный контур (AprilHub + AprilProfile)
 - [x] `034`: Агентный промпт и чеклист triage/fix для ошибок 400/404/503 и frontend runtime (Sentry + Loki/Grafana)
-- [ ] `035`: Подготовка внедрения Sentry в AprilHub (`april-worker`): env, безопасность, операционный runbook
+- [x] `035`: Подготовка внедрения Sentry в AprilHub (`april-worker`): env, безопасность, операционный runbook
 - [ ] `036`: Подготовка внедрения Sentry в AprilProfile (`april-profile-1`): env, безопасность, операционный runbook
 - [ ] `037`: Реализация Sentry и error telemetry в AprilHub (`hub-shell`/`hub-bff`)
 - [ ] `038`: Реализация Sentry и error telemetry в AprilProfile (`april-profile-1`)
@@ -88,7 +88,7 @@
 - [x] `032-aprilhub-aprilprofile-widgets-rbac-e2e-suite`: матрица ролей Keycloak + Playwright-сценарии для AprilHub и хостинга виджетов AprilProfile (RBAC, негативные кейсы, слой без network-stub для happy-path); см. [`tasks/032-aprilhub-aprilprofile-widgets-rbac-e2e-suite/TASK.md`](./tasks/032-aprilhub-aprilprofile-widgets-rbac-e2e-suite/TASK.md), [`REPORT.md`](./tasks/032-aprilhub-aprilprofile-widgets-rbac-e2e-suite/REPORT.md)
 - [ ] `033-observability-error-telemetry-architecture-docs`: зафиксировать архитектурное решение по сбору/корреляции ошибок (Sentry + Loki/Prometheus) и обновить docs/архитектурные артефакты
 - [x] `034-agent-error-triage-master-prompt`: подготовить отдельный агентный промпт и чеклист анализа/исправления ошибок UI/API с обязательной корреляцией `requestId`
-- [ ] `035-aprilhub-sentry-rollout-preparation`: подготовить внедрение Sentry в `april-worker` (конфиг env, redaction policy, runbook, alert routing)
+- [x] `035-aprilhub-sentry-rollout-preparation`: подготовить внедрение Sentry в `april-worker` (конфиг env, redaction policy, runbook, alert routing)
 - [ ] `036-aprilprofile-sentry-rollout-preparation`: подготовить внедрение Sentry в `april-profile-1` с зеркальным документационным контуром и двойным отчётом
 - [ ] `037-aprilhub-sentry-implementation`: реализовать frontend/runtime error capture в `hub-shell` и интеграцию с текущим observability-контуром AprilHub
 - [ ] `038-aprilprofile-sentry-implementation`: реализовать error capture и операционную интеграцию в `april-profile-1` (внешняя постановка + двойной отчёт)

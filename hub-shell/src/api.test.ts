@@ -6,6 +6,7 @@ const keycloakState = vi.hoisted(() => ({
   token: "token-1",
   loginMock: vi.fn(async () => undefined),
   updateTokenMock: vi.fn(async () => true),
+  captureHttpErrorMock: vi.fn(),
 }));
 
 vi.mock("./keycloak", () => ({
@@ -21,6 +22,10 @@ vi.mock("./keycloak", () => ({
   },
 }));
 
+vi.mock("./sentry", () => ({
+  captureHttpError: keycloakState.captureHttpErrorMock,
+}));
+
 describe("apiRequest", () => {
   const originalFetch = globalThis.fetch;
 
@@ -29,6 +34,7 @@ describe("apiRequest", () => {
     keycloakState.token = "token-1";
     keycloakState.loginMock.mockClear();
     keycloakState.updateTokenMock.mockClear();
+    keycloakState.captureHttpErrorMock.mockClear();
     globalThis.fetch = vi.fn();
   });
 
@@ -63,5 +69,13 @@ describe("apiRequest", () => {
 
     await expect(apiRequest("/v1/me")).rejects.toThrow("Token refresh failed");
     expect(keycloakState.loginMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("captures telemetry on 404 response", async () => {
+    (globalThis.fetch as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(new Response(null, { status: 404 }));
+
+    await apiRequest("/v1/me");
+
+    expect(keycloakState.captureHttpErrorMock).toHaveBeenCalledTimes(1);
   });
 });

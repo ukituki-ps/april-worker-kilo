@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Alert, Button, Stack, Text } from "@mantine/core";
+import { authorizedFetch } from "./api";
 
 export type ProfileWidgetHostContext = {
   tenant: { id: string };
@@ -105,9 +106,16 @@ export function EntityProfileWidget({
     ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
     ...(hostContext.telemetry?.requestId ? { "X-Request-Id": hostContext.telemetry.requestId } : {}),
   });
+  const fetchWithTelemetry = (input: string, init: RequestInit = {}) =>
+    authorizedFetch(input, init, {
+      moduleName: "EntityProfileWidget",
+      widget: "profile-widget",
+      tenant: hostContext.tenant.id,
+      requestId: hostContext.telemetry?.requestId,
+    });
 
   const createEntity = async (): Promise<string> => {
-    const response = await fetch(`${apiBaseUrl}/v1/entities`, {
+    const response = await fetchWithTelemetry(`${apiBaseUrl}/v1/entities`, {
       method: "POST",
       headers: authHeaders(),
       body: JSON.stringify({
@@ -126,7 +134,7 @@ export function EntityProfileWidget({
   const putEntity = async (
     targetEntityId: string,
   ): Promise<{ ok: true; snapshot: Snapshot } | { ok: false; status: number; payload: ApiErrorPayload }> => {
-    const response = await fetch(`${apiBaseUrl}/v1/entities/${targetEntityId}`, {
+    const response = await fetchWithTelemetry(`${apiBaseUrl}/v1/entities/${targetEntityId}`, {
       method: "PUT",
       headers: authHeaders(),
       body: JSON.stringify({ document }),

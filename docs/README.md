@@ -23,6 +23,7 @@
 - Deploy strategy: [`DEPLOYMENT_STRATEGY.md`](./DEPLOYMENT_STRATEGY.md)
 - Testing strategy: [`TESTING_STRATEGY.md`](./TESTING_STRATEGY.md)
 - Observability index: [`guides/OBSERVABILITY_INDEX.md`](./guides/OBSERVABILITY_INDEX.md)
+- Sentry rollout prep (AprilHub, task `035`): [`runbooks/APRILHUB_SENTRY_ROLLOUT_PREPARATION.md`](./runbooks/APRILHUB_SENTRY_ROLLOUT_PREPARATION.md)
 
 ## Architecture / Contracts
 
