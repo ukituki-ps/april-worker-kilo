@@ -34,10 +34,10 @@
 - Не вводить несовместимые с AprilHub соглашения по `requestId/correlationId`.
 
 ## Критерии готовности (acceptance)
-- [ ] Во внешнем репозитории создана и согласована задача подготовки Sentry для AprilProfile.
-- [ ] Подготовлены env/redaction/runbook артефакты AprilProfile.
-- [ ] Определены cross-repo поля корреляции и ownership.
-- [ ] В `april-worker` зафиксирован дублирующий отчёт со ссылками на внешний PR/коммиты.
+- [x] Во внешнем репозитории создана и согласована задача подготовки Sentry для AprilProfile.
+- [x] Подготовлены env/redaction/runbook артефакты AprilProfile.
+- [x] Определены cross-repo поля корреляции и ownership.
+- [x] В `april-worker` зафиксирован дублирующий отчёт (`tasks/036-aprilprofile-sentry-rollout-preparation/REPORT.md`); внешний PR не создавался (документационный prep-only scope).
 
 ## Проверка (команды)
 ```bash
