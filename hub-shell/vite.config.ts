@@ -26,6 +26,7 @@ export default defineConfig(({ mode }) => {
     : undefined;
 
   return {
+    envPrefix: ["VITE_", "SENTRY_"],
     plugins: [react()],
     resolve: {
       // @april/ui из submodule тянет @mantine/* из pnpm внутри DS → второй React и invalid hook call в Vitest.

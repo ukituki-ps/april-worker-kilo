@@ -10,11 +10,14 @@
   - `docs/runbooks/OBSERVABILITY_STACK_ONBOARDING.md`
 - Agent:
   - `docs/guides/OBSERVABILITY_AGENT_PLAYBOOK.md`
+  - `docs/AGENT_ERROR_TRIAGE_PROMPT.md` (incident: UI/API; корреляция Sentry → Loki → Prometheus)
   - `infra/observability/README.md`
 
 ## Core artifacts
 
 - Stack root: `infra/observability/`
+- Error telemetry architecture: `docs/architecture/ERROR_TELEMETRY_MODEL.md`
+- Sentry rollout preparation (AprilHub): `docs/runbooks/APRILHUB_SENTRY_ROLLOUT_PREPARATION.md`
 - Compose: `infra/observability/docker-compose.yml`
 - Prometheus config: `infra/observability/config/prometheus/prometheus.yml`
 - Alert rules:
@@ -77,6 +80,10 @@ Reference:
 
 ## Incident quick links
 
+- Error telemetry triage (`Sentry -> Loki -> Prometheus -> RCA`):
+  - `docs/runbooks/APRIL_ERROR_TELEMETRY_TRIAGE.md`
+- Sentry rollout/rollback preparation for implementation task `037`:
+  - `docs/runbooks/APRILHUB_SENTRY_ROLLOUT_PREPARATION.md`
 - Deploy and health troubleshooting:
   - `docs/runbooks/OBSERVABILITY_STACK_DEPLOY.md`
 - Onboarding and query troubleshooting:

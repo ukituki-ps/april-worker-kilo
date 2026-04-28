@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { Alert } from "@mantine/core";
+import { authorizedFetch } from "./api";
+import { keycloak } from "./keycloak";
 import { EntityProfileWidget } from "./profile-widget";
 import type { ProfileWidgetHostContext, SaveSuccessPayload } from "./profile-widget";
 import { useShellToast } from "./shell/shell-toast-context";
 import type { ShellUserContext } from "./types";
-import { keycloak } from "./keycloak";
 
 type WidgetProps = {
   context: ShellUserContext;
@@ -25,7 +26,7 @@ type ProfilesListAction =
   | { type: "loaded"; count: number }
   | { type: "deleted"; entityId: string };
 
-const DEFAULT_PROFILE_INSTANCE_IDS = ["demo-instance"];
+const DEFAULT_PROFILE_INSTANCE_IDS = ["00000000-0000-0000-0000-000000000001"];
 type ProfileInstanceItem = {
   entityId: string;
   entityTypeId: string;
@@ -177,6 +178,13 @@ export function ProfilesListHostWidget({ context }: WidgetProps): JSX.Element {
     }),
     [context],
   );
+  const fetchWithTelemetry = (input: string, init: RequestInit = {}) =>
+    authorizedFetch(input, init, {
+      moduleName: "ProfilesListHostWidget",
+      widget: "profiles-list",
+      tenant: context.orgScope,
+      correlationId: context.correlationId,
+    });
 
   useEffect(() => {
     let cancelled = false;
@@ -184,9 +192,8 @@ export function ProfilesListHostWidget({ context }: WidgetProps): JSX.Element {
       try {
         const loaded = await Promise.all(
           entityIds.map(async (entityId) => {
-            const response = await fetch(`/api/v1/admin/profile/api/v1/entities/${entityId}`, {
+            const response = await fetchWithTelemetry(`/api/v1/admin/profile/api/v1/entities/${entityId}`, {
               headers: {
-                ...(keycloak.token ? { Authorization: `Bearer ${keycloak.token}` } : {}),
                 "Content-Type": "application/json",
               },
             });
@@ -237,10 +244,9 @@ export function ProfilesListHostWidget({ context }: WidgetProps): JSX.Element {
     setActionLoading(true);
     setLastError("");
     try {
-      const response = await fetch("/api/v1/admin/profile/api/v1/entities", {
+      const response = await fetchWithTelemetry("/api/v1/admin/profile/api/v1/entities", {
         method: "POST",
         headers: {
-          ...(keycloak.token ? { Authorization: `Bearer ${keycloak.token}` } : {}),
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -289,11 +295,8 @@ export function ProfilesListHostWidget({ context }: WidgetProps): JSX.Element {
     setActionLoading(true);
     setLastError("");
     try {
-      const response = await fetch(`/api/v1/admin/profile/api/v1/entities/${encodeURIComponent(target.entityId)}`, {
+      const response = await fetchWithTelemetry(`/api/v1/admin/profile/api/v1/entities/${encodeURIComponent(target.entityId)}`, {
         method: "DELETE",
-        headers: {
-          ...(keycloak.token ? { Authorization: `Bearer ${keycloak.token}` } : {}),
-        },
       });
       if (!response.ok) {
         throw new Error(`delete failed: ${response.status}`);
@@ -371,6 +374,13 @@ export function ProfileInstancesHostWidget({ context, routeEntityId }: WidgetPro
     }),
     [context],
   );
+  const fetchWithTelemetry = (input: string, init: RequestInit = {}) =>
+    authorizedFetch(input, init, {
+      moduleName: "ProfileInstancesHostWidget",
+      widget: "profile-instances",
+      tenant: context.orgScope,
+      correlationId: context.correlationId,
+    });
 
   useEffect(() => {
     let cancelled = false;
@@ -378,9 +388,8 @@ export function ProfileInstancesHostWidget({ context, routeEntityId }: WidgetPro
       try {
         const loaded = await Promise.all(
           instanceIds.map(async (entityId) => {
-            const response = await fetch(`/api/v1/admin/profile/api/v1/entities/${entityId}`, {
+            const response = await fetchWithTelemetry(`/api/v1/admin/profile/api/v1/entities/${entityId}`, {
               headers: {
-                ...(keycloak.token ? { Authorization: `Bearer ${keycloak.token}` } : {}),
                 "Content-Type": "application/json",
               },
             });
@@ -431,10 +440,9 @@ export function ProfileInstancesHostWidget({ context, routeEntityId }: WidgetPro
     setActionLoading(true);
     setLastError("");
     try {
-      const response = await fetch("/api/v1/admin/profile/api/v1/entities", {
+      const response = await fetchWithTelemetry("/api/v1/admin/profile/api/v1/entities", {
         method: "POST",
         headers: {
-          ...(keycloak.token ? { Authorization: `Bearer ${keycloak.token}` } : {}),
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -484,11 +492,8 @@ export function ProfileInstancesHostWidget({ context, routeEntityId }: WidgetPro
     setActionLoading(true);
     setLastError("");
     try {
-      const response = await fetch(`/api/v1/admin/profile/api/v1/entities/${encodeURIComponent(target.entityId)}`, {
+      const response = await fetchWithTelemetry(`/api/v1/admin/profile/api/v1/entities/${encodeURIComponent(target.entityId)}`, {
         method: "DELETE",
-        headers: {
-          ...(keycloak.token ? { Authorization: `Bearer ${keycloak.token}` } : {}),
-        },
       });
       if (!response.ok) {
         throw new Error(`delete failed: ${response.status}`);
@@ -517,10 +522,9 @@ export function ProfileInstancesHostWidget({ context, routeEntityId }: WidgetPro
     setActionLoading(true);
     setLastError("");
     try {
-      const response = await fetch(`/api/v1/admin/profile/api/v1/entities/${targetEntityId}`, {
+      const response = await fetchWithTelemetry(`/api/v1/admin/profile/api/v1/entities/${targetEntityId}`, {
         method: "PUT",
         headers: {
-          ...(keycloak.token ? { Authorization: `Bearer ${keycloak.token}` } : {}),
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -650,6 +654,13 @@ export function ConflictsMergeHostWidget({ context }: WidgetProps): JSX.Element 
     }),
     [context],
   );
+  const fetchWithTelemetry = (input: string, init: RequestInit = {}) =>
+    authorizedFetch(input, init, {
+      moduleName: "ConflictsMergeHostWidget",
+      widget: "conflicts-merge",
+      tenant: context.orgScope,
+      correlationId: context.correlationId,
+    });
 
   const conflictsUrl = `${PROFILE_BFF_OPENAPI_PREFIX}/v1/admin/profile-conflicts`;
 
@@ -659,9 +670,8 @@ export function ConflictsMergeHostWidget({ context }: WidgetProps): JSX.Element 
       setLoading(true);
       setLastError("");
       try {
-        const response = await fetch(conflictsUrl, {
+        const response = await fetchWithTelemetry(conflictsUrl, {
           headers: {
-            ...(keycloak.token ? { Authorization: `Bearer ${keycloak.token}` } : {}),
             Accept: "application/json",
           },
         });
@@ -708,12 +718,11 @@ export function ConflictsMergeHostWidget({ context }: WidgetProps): JSX.Element 
     setResolveLoading(true);
     setLastError("");
     try {
-      const response = await fetch(
+      const response = await fetchWithTelemetry(
         `${PROFILE_BFF_OPENAPI_PREFIX}/v1/admin/profile-conflicts/${encodeURIComponent(selected.id)}/resolve`,
         {
           method: "POST",
           headers: {
-            ...(keycloak.token ? { Authorization: `Bearer ${keycloak.token}` } : {}),
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
@@ -749,10 +758,9 @@ export function ConflictsMergeHostWidget({ context }: WidgetProps): JSX.Element 
     setMergeLoading(true);
     setLastError("");
     try {
-      const response = await fetch(`${PROFILE_BFF_OPENAPI_PREFIX}/v1/admin/entities/merge`, {
+      const response = await fetchWithTelemetry(`${PROFILE_BFF_OPENAPI_PREFIX}/v1/admin/entities/merge`, {
         method: "POST",
         headers: {
-          ...(keycloak.token ? { Authorization: `Bearer ${keycloak.token}` } : {}),
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -891,6 +899,13 @@ export function InstanceHistoryHostWidget({ context, routeEntityId }: WidgetProp
     }),
     [context],
   );
+  const fetchWithTelemetry = (input: string, init: RequestInit = {}) =>
+    authorizedFetch(input, init, {
+      moduleName: "InstanceHistoryHostWidget",
+      widget: "instance-history",
+      tenant: context.orgScope,
+      correlationId: context.correlationId,
+    });
 
   useEffect(() => {
     let cancelled = false;
@@ -898,9 +913,8 @@ export function InstanceHistoryHostWidget({ context, routeEntityId }: WidgetProp
       setLoading(true);
       setLastError("");
       try {
-        const currentResponse = await fetch(`/api/v1/admin/profile/api/v1/entities/${instanceId}`, {
+        const currentResponse = await fetchWithTelemetry(`/api/v1/admin/profile/api/v1/entities/${instanceId}`, {
           headers: {
-            ...(keycloak.token ? { Authorization: `Bearer ${keycloak.token}` } : {}),
             "Content-Type": "application/json",
           },
         });
@@ -912,9 +926,8 @@ export function InstanceHistoryHostWidget({ context, routeEntityId }: WidgetProp
         };
         const requests = Array.from({ length: current.version }, (_, index) => {
           const version = index + 1;
-          return fetch(`/api/v1/admin/profile/api/v1/entities/${instanceId}/versions/${version}`, {
+          return fetchWithTelemetry(`/api/v1/admin/profile/api/v1/entities/${instanceId}/versions/${version}`, {
             headers: {
-              ...(keycloak.token ? { Authorization: `Bearer ${keycloak.token}` } : {}),
               "Content-Type": "application/json",
             },
           }).then(async (response) => {

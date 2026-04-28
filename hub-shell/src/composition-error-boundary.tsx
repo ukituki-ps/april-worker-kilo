@@ -1,8 +1,11 @@
 import { Component, type ErrorInfo, type ReactNode } from "react";
 import { SharedState } from "./shared-ux";
+import { captureRuntimeError } from "./sentry";
 
 type Props = {
   moduleName: string;
+  tenant?: string;
+  correlationId?: string;
   children: ReactNode;
 };
 
@@ -17,8 +20,17 @@ export class CompositionErrorBoundary extends Component<Props, State> {
     return { hasError: true };
   }
 
-  public componentDidCatch(error: Error, _errorInfo: ErrorInfo): void {
-    // Keep logging local for now, observability hooks will be added in stage 006.
+  public componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
+    captureRuntimeError(error, {
+      mechanism: "boundary",
+      moduleName: this.props.moduleName,
+      widget: this.props.moduleName,
+      tenant: this.props.tenant,
+      correlationId: this.props.correlationId,
+      extra: {
+        componentStack: errorInfo.componentStack,
+      },
+    });
     console.error(`Widget "${this.props.moduleName}" failed`, error);
   }
 

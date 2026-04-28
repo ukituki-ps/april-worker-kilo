@@ -11,7 +11,7 @@
 - **DB**: PostgreSQL 17
 - **Queue**: Redis + Asynq
 - **Notifications**: собственный микросервис AprilNflow (Go + React Flow)
-- **Observability**: Promtail + Loki + Grafana, Prometheus (operating model: [`guides/OBSERVABILITY_MULTI_STAND_OPERATING_MODEL.md`](./guides/OBSERVABILITY_MULTI_STAND_OPERATING_MODEL.md), index: [`guides/OBSERVABILITY_INDEX.md`](./guides/OBSERVABILITY_INDEX.md))
+- **Observability**: Promtail + Loki + Grafana, Prometheus (operational layer) + Sentry (frontend runtime incident-layer); operating model: [`guides/OBSERVABILITY_MULTI_STAND_OPERATING_MODEL.md`](./guides/OBSERVABILITY_MULTI_STAND_OPERATING_MODEL.md), index: [`guides/OBSERVABILITY_INDEX.md`](./guides/OBSERVABILITY_INDEX.md), error telemetry architecture: [`architecture/ERROR_TELEMETRY_MODEL.md`](./architecture/ERROR_TELEMETRY_MODEL.md)
 - **Нагрузочное тестирование**: k6 (сценарии API, baseline; детали в [`./TESTING_STRATEGY.md`](./TESTING_STRATEGY.md))
 - **Documentation**: Structurizr (C4 Model) + Docusaurus + ADR + OpenAPI
 - **Infra**: Debian 13, Docker Compose, Nginx reverse proxy

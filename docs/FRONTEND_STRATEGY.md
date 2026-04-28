@@ -59,7 +59,7 @@ Host работает через API/BFF без развитого слоя ви
 2. **Виджет не владеет глобальной навигацией**: прямой `navigate`/`window.location` заменяется событиями в host.
 3. **HostContext обязателен**: минимум `tenant`, `auth`, `theme`, `locale`, `telemetry.requestId`.
 4. **RBAC/ABAC не дублируется во frontend**: права определяются Keycloak и backend-политиками.
-5. **Наблюдаемость сквозная**: `requestId` должен проходить цепочку host -> BFF -> downstream API.
+5. **Наблюдаемость сквозная**: `requestId` + `correlationId` + `tenant` + `route` + `module/widget` проходят цепочку host -> BFF -> downstream API; runtime incidents UI фиксируются в Sentry, операционный слой — Loki/Prometheus.
 
 Подробный формат контракта: [`WIDGET_CONTRACTS.md`](./WIDGET_CONTRACTS.md).
 

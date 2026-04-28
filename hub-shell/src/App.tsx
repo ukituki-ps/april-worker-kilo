@@ -8,6 +8,7 @@ import { keycloak } from "./keycloak";
 import { AuthorizedShellGate } from "./shell/AuthorizedShellGate";
 import { buildPrimaryShellNav } from "./shell/shell-nav-config";
 import { SharedState } from "./shared-ux";
+import { updateTelemetryContext } from "./sentry";
 import type { ShellUserContext, UserProfile } from "./types";
 import { buildShellUserContext } from "./user-context";
 import "./app.css";
@@ -68,6 +69,20 @@ export default function App({ authInitError = "" }: AppProps) {
   }, []);
 
   const context: ShellUserContext | null = useMemo(() => (me ? buildShellUserContext(me) : null), [me]);
+
+  useEffect(() => {
+    if (!context) {
+      return;
+    }
+    updateTelemetryContext({
+      tenant: context.orgScope,
+      correlationId: context.correlationId,
+      route: window.location.pathname,
+      roleSet: context.roles.join(","),
+      moduleName: "hub-shell",
+      widget: "shell-host",
+    });
+  }, [context]);
 
   if (zone === "guest") {
     return (

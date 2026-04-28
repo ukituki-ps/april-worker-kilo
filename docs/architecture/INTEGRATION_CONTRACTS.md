@@ -22,6 +22,18 @@
 - **Трассировка**: обязательны технические метаданные (`requestId`, `sourceService`); `timestamp` рекомендуется, если контракт это поддерживает.
 - **Degraded policy**: для BFF-агрегации допускается partial response без повторной эскалации в UI-оркестрацию.
 
+### Error telemetry contract (AprilHub + AprilProfile)
+
+- Для ошибок `400/404/503` и frontend runtime событий применяется единый baseline из `docs/architecture/ERROR_TELEMETRY_MODEL.md`.
+- Обязательные поля корреляции в telemetry-событиях и диагностических логах:
+  - `requestId`
+  - `correlationId`
+  - `tenant`
+  - `route`
+  - `module`/`widget`
+- Для frontend runtime incident-layer используется Sentry; для операционного расследования и метрик используются Loki/Prometheus/Grafana.
+- В контрактах обмена запрещено логировать/передавать секреты и PII без redaction.
+
 ## Hub BFF -> downstream (agreed baseline)
 
 Контракты ниже описывают фактический runtime `hub-bff/internal/aggregation` и являются baseline для этапов `006/008`.

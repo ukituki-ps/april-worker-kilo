@@ -1,6 +1,12 @@
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
+  readonly SENTRY_DSN?: string;
+  readonly SENTRY_ENVIRONMENT?: string;
+  readonly SENTRY_RELEASE?: string;
+  readonly SENTRY_TRACES_SAMPLE_RATE?: string;
+  readonly SENTRY_REPLAYS_SESSION_SAMPLE_RATE?: string;
+  readonly SENTRY_REPLAYS_ON_ERROR_SAMPLE_RATE?: string;
   readonly VITE_KEYCLOAK_URL: string;
   readonly VITE_KEYCLOAK_REALM: string;
   readonly VITE_KEYCLOAK_CLIENT_ID: string;

@@ -29,6 +29,7 @@
 | Deployment/dev flow | `docs/DEPLOYMENT_STRATEGY.md` |
 | Тестовый контур | `docs/TESTING_STRATEGY.md`, `docs/runbooks/APRILHUB_TESTING_TRIAGE.md` |
 | Observability | [`OBSERVABILITY_INDEX.md`](./OBSERVABILITY_INDEX.md), [`OBSERVABILITY_MULTI_STAND_OPERATING_MODEL.md`](./OBSERVABILITY_MULTI_STAND_OPERATING_MODEL.md) |
+| Incident / error triage (агент) | [`AGENT_ERROR_TRIAGE_PROMPT.md`](../AGENT_ERROR_TRIAGE_PROMPT.md), [`runbooks/APRIL_ERROR_TELEMETRY_TRIAGE.md`](../runbooks/APRIL_ERROR_TELEMETRY_TRIAGE.md) |
 | ADR решения | `/adr/` |
 
 ## Обязательный минимум для нового участника

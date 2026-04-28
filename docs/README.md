@@ -16,12 +16,14 @@
 - Архитектурный контекст и границы: [`AGENT_ARCHITECTURE_CONTEXT.md`](./AGENT_ARCHITECTURE_CONTEXT.md)
 - Пошаговый процесс работы: [`AGENT_STEP_BY_STEP_PLAN.md`](./AGENT_STEP_BY_STEP_PLAN.md)
 - Agent-first карта: [`guides/APRILHUB_AGENT_DEVELOPMENT.md`](./guides/APRILHUB_AGENT_DEVELOPMENT.md)
+- Triage/fix ошибок UI/API (Sentry → Loki → Prometheus): [`AGENT_ERROR_TRIAGE_PROMPT.md`](./AGENT_ERROR_TRIAGE_PROMPT.md)
 
 ## Runtime / Ops / Quality
 
 - Deploy strategy: [`DEPLOYMENT_STRATEGY.md`](./DEPLOYMENT_STRATEGY.md)
 - Testing strategy: [`TESTING_STRATEGY.md`](./TESTING_STRATEGY.md)
 - Observability index: [`guides/OBSERVABILITY_INDEX.md`](./guides/OBSERVABILITY_INDEX.md)
+- Sentry rollout prep (AprilHub, task `035`): [`runbooks/APRILHUB_SENTRY_ROLLOUT_PREPARATION.md`](./runbooks/APRILHUB_SENTRY_ROLLOUT_PREPARATION.md)
 
 ## Architecture / Contracts
 
