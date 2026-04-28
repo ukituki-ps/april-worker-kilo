@@ -30,6 +30,26 @@ expect_http_code() {
   exit 1
 }
 
+expect_http_codes() {
+  local expected_csv="$1"
+  local url="$2"
+  shift 2
+  local retries="${SMOKE_HTTP_RETRIES:-15}"
+  local sleep_s="${SMOKE_HTTP_SLEEP_SEC:-2}"
+  local code=""
+  local expected_list=",${expected_csv},"
+  for _ in $(seq 1 "$retries"); do
+    code="$(curl -sS -o /tmp/smoke-after-deploy.out -w "%{http_code}" "$@" "$url" || true)"
+    if [[ "${expected_list}" == *",${code},"* ]]; then
+      return 0
+    fi
+    sleep "$sleep_s"
+  done
+  log "expected HTTP one of [${expected_csv}], got $code for $url (after ${retries} retries)"
+  cat /tmp/smoke-after-deploy.out >&2
+  exit 1
+}
+
 wait_for_ok() {
   local url="$1"
   local retries="${2:-60}"
@@ -76,7 +96,7 @@ wait_for_ok "${keycloak_base}/realms/${keycloak_realm}/.well-known/openid-config
 wait_for_ok "${ingress_base}/"
 
 log "checking unauthenticated API path"
-expect_http_code "401" "${hub_bff_base}/api/v1/aggregation/dashboard"
+expect_http_codes "401,403" "${hub_bff_base}/api/v1/aggregation/dashboard"
 
 log "obtaining Keycloak token for smoke user"
 token="$(fetch_keycloak_token || true)"

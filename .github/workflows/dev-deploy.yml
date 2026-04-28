@@ -49,3 +49,4 @@ jobs:
           path: |
             ${{ env.APRIL_DEPLOY_ROOT }}/.deploy-artifacts/**
           if-no-files-found: warn
+          include-hidden-files: true

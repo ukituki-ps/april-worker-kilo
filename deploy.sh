@@ -521,7 +521,11 @@ run_smoke() {
     return 0
   fi
   log "запуск smoke-after-deploy"
-  "${ROOT}/scripts/smoke-after-deploy.sh" >"${deploy_artifacts_dir}/smoke.log" 2>&1
+  if ! "${ROOT}/scripts/smoke-after-deploy.sh" >"${deploy_artifacts_dir}/smoke.log" 2>&1; then
+    log "smoke-after-deploy завершился с ошибкой, содержимое smoke.log:"
+    sed 's/^/[smoke-after-deploy] /' "${deploy_artifacts_dir}/smoke.log" >&2 || true
+    return 1
+  fi
 }
 
 run_observability_onboarding() {
