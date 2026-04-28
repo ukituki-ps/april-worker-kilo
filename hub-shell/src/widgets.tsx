@@ -13,7 +13,7 @@ type WidgetProps = {
   routeEntityId?: string | null;
 };
 
-const DEFAULT_PROFILE_LIST_IDS = ["00000000-0000-0000-0000-000000000001"];
+const DEFAULT_PROFILE_LIST_IDS: string[] = [];
 type ProfilesListItem = {
   entityId: string;
   entityTypeId: string;
@@ -26,7 +26,7 @@ type ProfilesListAction =
   | { type: "loaded"; count: number }
   | { type: "deleted"; entityId: string };
 
-const DEFAULT_PROFILE_INSTANCE_IDS = ["00000000-0000-0000-0000-000000000001"];
+const DEFAULT_PROFILE_INSTANCE_IDS: string[] = [];
 type ProfileInstanceItem = {
   entityId: string;
   entityTypeId: string;
@@ -74,11 +74,11 @@ const readProfileInstanceIds = (routeInstanceId?: string): string[] => {
         .map((value: string) => value.trim())
         .filter(Boolean)
     : [];
-  const fallback = routeInstanceId?.trim() || DEFAULT_PROFILE_INSTANCE_IDS[0];
-  if (parsed.length === 0) {
-    return [fallback];
+  const routeId = routeInstanceId?.trim();
+  if (routeId) {
+    return parsed.includes(routeId) ? parsed : [routeId, ...parsed];
   }
-  return parsed.includes(fallback) ? parsed : [fallback, ...parsed];
+  return parsed.length > 0 ? parsed : DEFAULT_PROFILE_INSTANCE_IDS;
 };
 
 const safeStringify = (value: unknown): string => {
@@ -189,6 +189,11 @@ export function ProfilesListHostWidget({ context }: WidgetProps): JSX.Element {
   useEffect(() => {
     let cancelled = false;
     const load = async () => {
+      if (entityIds.length === 0) {
+        setItems([]);
+        setLastAction({ type: "loaded", count: 0 });
+        return;
+      }
       try {
         const loaded = await Promise.all(
           entityIds.map(async (entityId) => {
@@ -354,10 +359,7 @@ export function ProfileInstancesHostWidget({ context, routeEntityId }: WidgetPro
   const [items, setItems] = useState<ProfileInstanceItem[]>([]);
   const [entityTypeId, setEntityTypeId] = useState(import.meta.env.VITE_PROFILE_DEFAULT_ENTITY_TYPE_ID?.trim() || "");
   const [actionLoading, setActionLoading] = useState(false);
-  const profileId = useMemo(
-    () => import.meta.env.VITE_PROFILE_DEMO_ENTITY_ID?.trim() || "00000000-0000-0000-0000-000000000001",
-    [],
-  );
+  const profileId = useMemo(() => import.meta.env.VITE_PROFILE_DEMO_ENTITY_ID?.trim() || "", []);
   const instanceIds = useMemo(() => readProfileInstanceIds(routeEntityId ?? undefined), [routeEntityId]);
   const hostContext = useMemo<ProfileWidgetHostContext>(
     () => ({
@@ -385,6 +387,11 @@ export function ProfileInstancesHostWidget({ context, routeEntityId }: WidgetPro
   useEffect(() => {
     let cancelled = false;
     const load = async () => {
+      if (instanceIds.length === 0) {
+        setItems([]);
+        setLastAction({ type: "loaded", count: 0 });
+        return;
+      }
       try {
         const loaded = await Promise.all(
           instanceIds.map(async (entityId) => {
@@ -883,7 +890,7 @@ export function InstanceHistoryHostWidget({ context, routeEntityId }: WidgetProp
   const [selectedVersion, setSelectedVersion] = useState<number | null>(null);
   const [compareMode, setCompareMode] = useState<"current" | "previous">("previous");
   const [lastError, setLastError] = useState("");
-  const instanceId = routeEntityId?.trim() || "demo-instance";
+  const instanceId = routeEntityId?.trim() || import.meta.env.VITE_PROFILE_DEMO_ENTITY_ID?.trim() || "";
   const hostContext = useMemo<ProfileWidgetHostContext>(
     () => ({
       tenant: { id: context.orgScope },
@@ -910,6 +917,12 @@ export function InstanceHistoryHostWidget({ context, routeEntityId }: WidgetProp
   useEffect(() => {
     let cancelled = false;
     const load = async () => {
+      if (!instanceId) {
+        setVersions([]);
+        setSelectedVersion(null);
+        setLoading(false);
+        return;
+      }
       setLoading(true);
       setLastError("");
       try {

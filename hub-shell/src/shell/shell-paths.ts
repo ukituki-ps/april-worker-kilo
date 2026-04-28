@@ -97,11 +97,11 @@ export function subscribeShellPath(listener: () => void): () => void {
   return () => window.removeEventListener("hashchange", listener);
 }
 
-/** Дефолтный entityId для пункта меню «Карточка» и smoke (совместимо с e2e-стабом). */
-export function defaultProfileEntityIdForNav(): string {
+/** Опциональный demo entityId для пунктов навигации, где нужен конкретный UUID сущности. */
+export function defaultProfileEntityIdForNav(): string | undefined {
   const fromEnv = import.meta.env.VITE_PROFILE_DEMO_ENTITY_ID?.trim();
   if (fromEnv) {
     return fromEnv;
   }
-  return "00000000-0000-0000-0000-000000000001";
+  return undefined;
 }
