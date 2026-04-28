@@ -29,6 +29,7 @@
   - `infra/observability/grafana/dashboards/multi-stand-overview.json`
   - `infra/observability/grafana/dashboards/multi-stand-logs-overview.json`
   - `infra/observability/grafana/dashboards/april-profile-service-overview.json` (AprilProfile; UID `april-profile-service-overview`)
+  - `infra/observability/grafana/dashboards/aprilhub-unified-error-overview.json` (UID `aprilhub-unified-error-overview`)
 
 ## Quick scenarios
 
@@ -72,6 +73,7 @@ Reference:
   - `Multi Stand Service Overview`
   - `Multi Stand Logs Overview`
   - `AprilProfile Service Overview`
+  - `AprilHub Unified Error Overview`
 - Loki explore query:
 
 ```logql
@@ -88,6 +90,8 @@ Reference:
   - `docs/runbooks/OBSERVABILITY_STACK_DEPLOY.md`
 - Onboarding and query troubleshooting:
   - `docs/runbooks/OBSERVABILITY_STACK_ONBOARDING.md`
+- Unified errors dashboard usage:
+  - `docs/runbooks/APRILHUB_UNIFIED_ERROR_DASHBOARD.md`
 - AprilProfile SLO (черновик) и алерты:
   - `docs/runbooks/APRILPROFILE_SLO_DRAFT.md`
 - Agent execution checklist:

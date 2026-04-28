@@ -97,3 +97,4 @@ docker compose --env-file env/.env up -d prometheus
 - `Infra Runtime`
 - `Multi Stand Service Overview`
 - `Multi Stand Logs Overview`
+- `AprilHub Unified Error Overview`

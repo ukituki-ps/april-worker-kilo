@@ -54,6 +54,7 @@
 - [ ] `037`: Реализация Sentry и error telemetry в AprilHub (`hub-shell`/`hub-bff`)
 - [ ] `038`: Реализация Sentry и error telemetry в AprilProfile (`april-profile-1`)
 - [ ] `039`: Аналог задачи 033 для AprilProfile: архитектура и документация error telemetry (Sentry + Loki/Prometheus)
+- [ ] `040`: Единый Grafana-дэшборд ошибок frontend/backend для dev-стенда (панели, фильтры, drill-down, runbook)
 
 ## Текущий фокус
 
@@ -95,6 +96,7 @@
 - [ ] `037-aprilhub-sentry-implementation`: реализовать frontend/runtime error capture в `hub-shell` и интеграцию с текущим observability-контуром AprilHub
 - [ ] `038-aprilprofile-sentry-implementation`: реализовать error capture и операционную интеграцию в `april-profile-1` (внешняя постановка + двойной отчёт)
 - [ ] `039-aprilprofile-observability-error-telemetry-architecture-docs`: отдельная внешняя задача (аналог `033`) на архитектурное решение и документационный контур error telemetry в `april-profile-1` с двойным отчётом
+- [ ] `040-aprilhub-unified-error-dashboard`: собрать полноценный Grafana-дэшборд ошибок всех уровней (`frontend` + `hub-bff` + downstream) для dev-стенда и задокументировать triage-поток
 
 ## План реализации AprilHub: статусы
 
@@ -138,3 +140,4 @@
 | `037` | Реализация Sentry и error telemetry в AprilHub (`hub-shell`/`hub-bff`) | ⏳ В работе | [`tasks/037-aprilhub-sentry-implementation/TASK.md`](./tasks/037-aprilhub-sentry-implementation/TASK.md), [`tasks/037-aprilhub-sentry-implementation/PLAN.md`](./tasks/037-aprilhub-sentry-implementation/PLAN.md), [`tasks/037-aprilhub-sentry-implementation/REPORT.md`](./tasks/037-aprilhub-sentry-implementation/REPORT.md) |
 | `038` | Реализация Sentry и error telemetry в AprilProfile (`april-profile-1`) | ⏳ Не начато | [`tasks/038-aprilprofile-sentry-implementation/TASK.md`](./tasks/038-aprilprofile-sentry-implementation/TASK.md) |
 | `039` | Аналог задачи 033 для AprilProfile: архитектура и документация error telemetry (Sentry + Loki/Prometheus) | ⏳ Не начато | [`tasks/039-aprilprofile-observability-error-telemetry-architecture-docs/TASK.md`](./tasks/039-aprilprofile-observability-error-telemetry-architecture-docs/TASK.md) |
+| `040` | Единый Grafana-дэшборд ошибок frontend/backend для dev-стенда | ⏳ Не начато | [`tasks/040-aprilhub-unified-error-dashboard/TASK.md`](./tasks/040-aprilhub-unified-error-dashboard/TASK.md) |
