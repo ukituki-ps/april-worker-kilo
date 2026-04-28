@@ -103,7 +103,7 @@ export default function App({ authInitError = "" }: AppProps) {
     return (
       <AppShell
         navigationItems={buildPrimaryShellNav()}
-        activeNavId="overview"
+        activeNavId="profile-list"
         title="Рабочая зона AprilHub"
         subtitle="Стандартный каркас авторизованной зоны для модульного расширения."
         statusBadgeLabel="Идет инициализация"

@@ -1,25 +1,19 @@
 import { createContext, useContext, useMemo, type ReactNode } from "react";
 import type { ProfileWidgetHostContext } from "../profile-widget";
 import type { ShellUserContext } from "../types";
-import { matchShellRoute, shellPaths, type ProfileEntityTab, type ShellRouteMatch } from "./shell-paths";
+import { matchShellRoute, shellPaths, type ShellRouteMatch } from "./shell-paths";
 import { useShellNavigate, useShellPathname } from "./use-shell-pathname";
 
 /** Расширение контракта host → виджет (см. docs/WIDGET_CONTRACTS.md): навигация и маршрут. */
 export type HubHostNavigationApi = {
-  /** Семантический переход без прямого изменения URL виджетом. */
-  goToProfileEntityCard: (entityId: string) => void;
-  goToProfileEntityMeta: (entityId: string) => void;
-  goToProfileConflicts: () => void;
-  goToOverview: () => void;
+  /** Возврат к базовому экрану профилей. */
+  goToProfilesList: () => void;
   goBack: () => void;
 };
 
 export type HubHostRouteSlice = {
   pathname: string;
   match: ShellRouteMatch;
-  profileEntityId?: string;
-  profileInstanceId?: string;
-  profileEntityTab?: ProfileEntityTab;
 };
 
 export type HubHostContextValue = ProfileWidgetHostContext & {
@@ -41,17 +35,6 @@ export function HubHostContextProvider({ context, children }: ProviderProps): JS
   const match = useMemo(() => matchShellRoute(pathname), [pathname]);
 
   const routeSlice = useMemo<HubHostRouteSlice>(() => {
-    if (match.kind === "profile-entity") {
-      return {
-        pathname,
-        match,
-        profileEntityId: match.entityId,
-        profileEntityTab: match.tab,
-      };
-    }
-    if (match.kind === "profile-instance" || match.kind === "profile-instance-history") {
-      return { pathname, match, profileInstanceId: match.instanceId };
-    }
     return { pathname, match };
   }, [match, pathname]);
 
@@ -73,17 +56,8 @@ export function HubHostContextProvider({ context, children }: ProviderProps): JS
 
   const navigation = useMemo<HubHostNavigationApi>(
     () => ({
-      goToProfileEntityCard: (entityId: string) => {
-        navigate(shellPaths.profileEntity(entityId, "card"));
-      },
-      goToProfileEntityMeta: (entityId: string) => {
-        navigate(shellPaths.profileEntity(entityId, "meta"));
-      },
-      goToProfileConflicts: () => {
-        navigate(shellPaths.profileAdminConflicts);
-      },
-      goToOverview: () => {
-        navigate(shellPaths.overview);
+      goToProfilesList: () => {
+        navigate(shellPaths.profilesList);
       },
       goBack: () => {
         window.history.back();

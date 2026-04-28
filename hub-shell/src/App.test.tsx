@@ -113,10 +113,9 @@ describe("App", () => {
       expect(screen.getByText("Рабочая зона AprilHub")).toBeInTheDocument();
       expect(screen.getByTestId("theme-scheme-control")).toBeInTheDocument();
       expect(screen.getByRole("navigation", { name: "Основная навигация" })).toBeInTheDocument();
-      expect(screen.getByText("Обзор платформы")).toBeInTheDocument();
-      expect(screen.getAllByText("Роли доступа").length).toBeGreaterThan(0);
-      expect(screen.getByText("Добро пожаловать, Demo User.")).toBeInTheDocument();
-      expect(screen.getByText(/Корреляция запроса:/)).toBeInTheDocument();
+      expect(screen.getByText("Профиль — список")).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: "Profiles list widget" })).toBeInTheDocument();
+      expect(screen.getByText(/Tenant:/)).toBeInTheDocument();
     });
   });
 
