@@ -15,13 +15,19 @@ expect_http_code() {
   local expected="$1"
   local url="$2"
   shift 2
-  local code
-  code="$(curl -sS -o /tmp/smoke-after-deploy.out -w "%{http_code}" "$@" "$url")"
-  if [[ "$code" != "$expected" ]]; then
-    log "expected HTTP $expected, got $code for $url"
-    cat /tmp/smoke-after-deploy.out >&2
-    exit 1
-  fi
+  local retries="${SMOKE_HTTP_RETRIES:-15}"
+  local sleep_s="${SMOKE_HTTP_SLEEP_SEC:-2}"
+  local code=""
+  for _ in $(seq 1 "$retries"); do
+    code="$(curl -sS -o /tmp/smoke-after-deploy.out -w "%{http_code}" "$@" "$url" || true)"
+    if [[ "$code" == "$expected" ]]; then
+      return 0
+    fi
+    sleep "$sleep_s"
+  done
+  log "expected HTTP $expected, got $code for $url (after ${retries} retries)"
+  cat /tmp/smoke-after-deploy.out >&2
+  exit 1
 }
 
 wait_for_ok() {
