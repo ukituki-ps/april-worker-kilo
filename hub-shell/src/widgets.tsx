@@ -63,7 +63,7 @@ const readProfileListIds = (): string[] => {
   const parsed = raw
     .split(",")
     .map((value) => value.trim())
-    .filter(Boolean);
+    .filter((value: string) => Boolean(value) && value !== LEGACY_DEMO_ENTITY_ID);
   return parsed.length > 0 ? parsed : DEFAULT_PROFILE_LIST_IDS;
 };
 
@@ -73,7 +73,7 @@ const readProfileInstanceIds = (routeInstanceId?: string): string[] => {
     ? raw
         .split(",")
         .map((value: string) => value.trim())
-        .filter(Boolean)
+        .filter((value: string) => Boolean(value) && value !== LEGACY_DEMO_ENTITY_ID)
     : [];
   const routeIdRaw = routeInstanceId?.trim();
   const routeId = routeIdRaw && routeIdRaw !== LEGACY_DEMO_ENTITY_ID ? routeIdRaw : undefined;
