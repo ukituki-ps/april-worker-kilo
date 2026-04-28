@@ -12,7 +12,9 @@ test.describe("AprilProfile widgets (restricted, без stubs)", () => {
     await loginThroughKeycloak(page, restrictedUser, restrictedPass);
     await page.goto("/#/app/profile/entities");
     await expect(page.getByRole("heading", { name: "Profiles list widget" })).toBeVisible();
-    await expect(page.getByTestId("profiles-list-last-error")).toContainText(/403|401/i, { timeout: 20_000 });
+    await expect(page.getByTestId("profiles-list-last-error")).toContainText(/access denied|authentication|failed|403|401/i, {
+      timeout: 20_000,
+    });
   });
 
   test("экземпляры профиля: без admin 403/401 от BFF в UI", async ({ page }) => {

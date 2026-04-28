@@ -129,9 +129,8 @@ test.describe("AprilProfile widgets в Hub (@smoke, stubs)", () => {
     await expect(page.getByRole("heading", { name: "Профиль (виджет)" })).toBeVisible();
   });
 
-  test("рендерит profiles list widget и выполняет create через BFF префикс", async ({ page }) => {
+  test("сайдбар: Профиль — список открывает внешний profiles-widget", async ({ page }) => {
     const listEntityId = "00000000-0000-0000-0000-000000000001";
-    const createdEntityId = "22222222-2222-2222-2222-222222222222";
     const entityTypeId = "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb";
 
     await page.route("**/api/v1/admin/profile/api/v1/entities**", async (route) => {
@@ -155,17 +154,7 @@ test.describe("AprilProfile widgets в Hub (@smoke, stubs)", () => {
       }
 
       if (method === "POST" && url.pathname.endsWith("/v1/entities")) {
-        await route.fulfill({
-          status: 201,
-          contentType: "application/json",
-          body: JSON.stringify({
-            entity_id: createdEntityId,
-            entity_type_id: entityTypeId,
-            version: 1,
-            created_at: "2026-04-24T00:01:00Z",
-            document: { name: "Created from hub shell" },
-          }),
-        });
+        await route.fulfill({ status: 405, contentType: "application/json", body: JSON.stringify({ code: "method_not_allowed" }) });
         return;
       }
 
@@ -175,10 +164,31 @@ test.describe("AprilProfile widgets в Hub (@smoke, stubs)", () => {
     await loginThroughKeycloak(page, privilegedUser, privilegedPass);
     await page.goto("/#/app/overview");
     await page.getByRole("link", { name: "Профиль — список" }).click();
+    await expect(page).toHaveURL(/#\/app\/profile\/entities$/);
     await expect(page.getByRole("heading", { name: "Profiles list widget" })).toBeVisible();
-    await page.getByLabel("Entity type ID").fill(entityTypeId);
-    await page.getByRole("button", { name: "Create profile" }).click();
-    await expect(page.getByTestId("profiles-list-last-action")).toContainText("created");
+    await expect(page.getByText("Tenant:", { exact: false })).toBeVisible();
+  });
+
+  test("сайдбар: Профиль — список показывает error-state при 503", async ({ page }) => {
+    await page.route("**/api/v1/admin/profile/api/v1/entities**", async (route) => {
+      if (route.request().method() === "GET") {
+        await route.fulfill({
+          status: 503,
+          contentType: "application/json",
+          body: JSON.stringify({ code: "upstream_unavailable", message: "stub unavailable" }),
+        });
+        return;
+      }
+      await route.continue();
+    });
+
+    await loginThroughKeycloak(page, privilegedUser, privilegedPass);
+    await page.goto("/#/app/overview");
+    await page.getByRole("link", { name: "Профиль — список" }).click();
+    await expect(page.getByRole("heading", { name: "Profiles list widget" })).toBeVisible();
+    await expect(page.getByTestId("profiles-list-last-error")).toContainText(/operation failed|failed|ошибка/i, {
+      timeout: 30_000,
+    });
   });
 
   test("выполняет update экземпляра и проверяет историю версий через host", async ({ page }) => {

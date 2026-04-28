@@ -20,6 +20,7 @@
     "preview": "vite preview --host 0.0.0.0 --port 4173"
   },
   "dependencies": {
+    "@april/profile-ui": "file:../../april-profile-1/frontend/packages/profile-ui",
     "@april/tokens": "file:../design-system/DisignApril/packages/tokens",
     "@april/ui": "file:../design-system/DisignApril/packages/ui",
     "@emotion/react": "^11.14.0",

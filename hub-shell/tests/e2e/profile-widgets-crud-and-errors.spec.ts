@@ -17,35 +17,18 @@ const entityStubJson = (entityId: string, version: number, document: Record<stri
  * Дополнения к матрице CRUD и негативные сценарии BFF (stubs).
  */
 test.describe("AprilProfile CRUD и ошибки (@smoke, stubs)", () => {
-  test("список профилей: загрузка (read) затем create и delete первой строки", async ({ page }) => {
-    const seedId = "00000000-0000-0000-0000-000000000001";
-    const createdId = "eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee";
-
+  test("список профилей: загрузка через внешний profiles-widget", async ({ page }) => {
     await page.route("**/api/v1/admin/profile/api/v1/entities**", async (route) => {
       const request = route.request();
       const method = request.method();
       const url = new URL(request.url());
 
-      if (method === "GET" && url.pathname.endsWith(`/v1/entities/${seedId}`)) {
+      if (method === "GET" && url.pathname.includes("/v1/entities/")) {
         await route.fulfill({
           status: 200,
           contentType: "application/json",
-          body: entityStubJson(seedId, 1, { name: "seed" }),
+          body: entityStubJson("00000000-0000-0000-0000-000000000001", 1, { name: "seed" }),
         });
-        return;
-      }
-
-      if (method === "POST" && url.pathname.endsWith("/v1/entities")) {
-        await route.fulfill({
-          status: 201,
-          contentType: "application/json",
-          body: entityStubJson(createdId, 1, { name: "new row" }),
-        });
-        return;
-      }
-
-      if (method === "DELETE" && url.pathname.endsWith(`/v1/entities/${createdId}`)) {
-        await route.fulfill({ status: 204 });
         return;
       }
 
@@ -55,15 +38,8 @@ test.describe("AprilProfile CRUD и ошибки (@smoke, stubs)", () => {
     await loginThroughKeycloak(page, privilegedUser, privilegedPass);
     await page.goto("/#/app/profile/entities");
     await expect(page.getByRole("heading", { name: "Profiles list widget" })).toBeVisible();
-    await expect(page.getByTestId("profiles-list-last-action")).toContainText("loaded", { timeout: 30_000 });
-    await expect(page.locator("li").filter({ hasText: seedId })).toBeVisible();
-
-    await page.getByLabel("Entity type ID").fill("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb");
-    await page.getByRole("button", { name: "Create profile" }).click();
-    await expect(page.getByTestId("profiles-list-last-action")).toContainText("created", { timeout: 30_000 });
-
-    await page.getByRole("button", { name: "Delete first profile" }).click();
-    await expect(page.getByTestId("profiles-list-last-action")).toContainText("deleted", { timeout: 30_000 });
+    await expect(page.getByTestId("profiles-widget-card")).toBeVisible();
+    await expect(page.getByTestId("profiles-list-last-error")).toHaveCount(0);
   });
 
   test("экземпляры: create затем delete первого экземпляра", async ({ page }) => {
