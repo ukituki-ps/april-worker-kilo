@@ -57,12 +57,17 @@ export function ProfilesWidget({ hostContext, apiBaseUrl, entityIds, onError }: 
           }
           return;
         }
+        const skippedNotFound: string[] = [];
         const loaded = await Promise.all(
           entityIds.map(async (entityId) => {
             const response = await authorizedFetch(`${apiBaseUrl}/v1/entities/${entityId}`, {
               headers: { "Content-Type": "application/json" },
             });
             if (!response.ok) {
+              if (response.status === 404) {
+                skippedNotFound.push(entityId);
+                return null;
+              }
               throw new Error(`profile operation failed: ${response.status}`);
             }
             const snapshot = (await response.json()) as {
@@ -82,7 +87,13 @@ export function ProfilesWidget({ hostContext, apiBaseUrl, entityIds, onError }: 
           }),
         );
         if (!cancelled) {
-          setItems(loaded);
+          setItems(loaded.filter((item): item is ExternalProfilesListItem => item !== null));
+        }
+        if (skippedNotFound.length > 0) {
+          onError?.({
+            message: `Некоторые профили не найдены (404): ${skippedNotFound.join(", ")}`,
+            requestId: hostContext.telemetry?.requestId,
+          });
         }
       } catch (loadError) {
         const message = loadError instanceof Error ? loadError.message : "profile operation failed";
