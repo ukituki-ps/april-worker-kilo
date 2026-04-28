@@ -11,6 +11,7 @@ keycloak_client_id="${SMOKE_KEYCLOAK_CLIENT_ID:-aprilhub-shell}"
 keycloak_user="${SMOKE_KEYCLOAK_USERNAME:-april-dev}"
 keycloak_password="${SMOKE_KEYCLOAK_PASSWORD:-april-dev-pass}"
 smoke_token_error_desc=""
+smoke_token=""
 
 expect_http_code() {
   local expected="$1"
@@ -71,6 +72,8 @@ fetch_keycloak_token() {
   local response_file="/tmp/smoke-after-deploy-token.json"
   local parsed=""
   local err_desc=""
+  smoke_token=""
+  smoke_token_error_desc=""
   for _ in $(seq 1 "$retries"); do
     curl -sS -X POST "${keycloak_base}/realms/${keycloak_realm}/protocol/openid-connect/token" \
       -H "Content-Type: application/x-www-form-urlencoded" \
@@ -81,8 +84,7 @@ fetch_keycloak_token() {
       >"${response_file}" || true
     parsed="$(python3 -c 'import json,sys; print(json.load(sys.stdin).get("access_token",""))' <"${response_file}" 2>/dev/null || true)"
     if [[ -n "${parsed}" ]]; then
-      smoke_token_error_desc=""
-      printf '%s\n' "${parsed}"
+      smoke_token="${parsed}"
       return 0
     fi
     err_desc="$(python3 -c 'import json,sys; print(json.load(sys.stdin).get("error_description",""))' <"${response_file}" 2>/dev/null || true)"
@@ -106,8 +108,8 @@ log "checking unauthenticated API path"
 expect_http_codes "401,403" "${hub_bff_base}/api/v1/aggregation/dashboard"
 
 log "obtaining Keycloak token for smoke user"
-token="$(fetch_keycloak_token || true)"
-if [[ -z "$token" ]]; then
+fetch_keycloak_token || true
+if [[ -z "$smoke_token" ]]; then
   if [[ "${smoke_token_error_desc}" == *"Account is not fully set up"* ]]; then
     log "skip authenticated checks: ${smoke_token_error_desc}"
     log "smoke checks passed (unauthenticated contour only)"
@@ -117,10 +119,10 @@ if [[ -z "$token" ]]; then
 fi
 
 log "checking authenticated API and role guard"
-expect_http_code "200" "${hub_bff_base}/api/v1/me" -H "Authorization: Bearer ${token}"
-expect_http_code "403" "${hub_bff_base}/api/v1/admin/ping" -H "Authorization: Bearer ${token}"
+expect_http_code "200" "${hub_bff_base}/api/v1/me" -H "Authorization: Bearer ${smoke_token}"
+expect_http_code "403" "${hub_bff_base}/api/v1/admin/ping" -H "Authorization: Bearer ${smoke_token}"
 expect_http_code "200" "${hub_bff_base}/api/v1/aggregation/dashboard" \
-  -H "Authorization: Bearer ${token}" \
+  -H "Authorization: Bearer ${smoke_token}" \
   -H "X-Correlation-Id: corr-smoke-deploy" \
   -H "X-Request-Id: req-smoke-deploy"
 
