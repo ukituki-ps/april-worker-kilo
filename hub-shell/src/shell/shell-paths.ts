@@ -100,7 +100,7 @@ export function subscribeShellPath(listener: () => void): () => void {
 /** Опциональный demo entityId для пунктов навигации, где нужен конкретный UUID сущности. */
 export function defaultProfileEntityIdForNav(): string | undefined {
   const fromEnv = import.meta.env.VITE_PROFILE_DEMO_ENTITY_ID?.trim();
-  if (fromEnv) {
+  if (fromEnv && fromEnv !== "00000000-0000-0000-0000-000000000001") {
     return fromEnv;
   }
   return undefined;

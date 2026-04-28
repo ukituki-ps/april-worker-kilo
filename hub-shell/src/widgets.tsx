@@ -13,6 +13,7 @@ type WidgetProps = {
   routeEntityId?: string | null;
 };
 
+const LEGACY_DEMO_ENTITY_ID = "00000000-0000-0000-0000-000000000001";
 const DEFAULT_PROFILE_LIST_IDS: string[] = [];
 type ProfilesListItem = {
   entityId: string;
@@ -74,7 +75,8 @@ const readProfileInstanceIds = (routeInstanceId?: string): string[] => {
         .map((value: string) => value.trim())
         .filter(Boolean)
     : [];
-  const routeId = routeInstanceId?.trim();
+  const routeIdRaw = routeInstanceId?.trim();
+  const routeId = routeIdRaw && routeIdRaw !== LEGACY_DEMO_ENTITY_ID ? routeIdRaw : undefined;
   if (routeId) {
     return parsed.includes(routeId) ? parsed : [routeId, ...parsed];
   }
@@ -359,7 +361,10 @@ export function ProfileInstancesHostWidget({ context, routeEntityId }: WidgetPro
   const [items, setItems] = useState<ProfileInstanceItem[]>([]);
   const [entityTypeId, setEntityTypeId] = useState(import.meta.env.VITE_PROFILE_DEFAULT_ENTITY_TYPE_ID?.trim() || "");
   const [actionLoading, setActionLoading] = useState(false);
-  const profileId = useMemo(() => import.meta.env.VITE_PROFILE_DEMO_ENTITY_ID?.trim() || "", []);
+  const profileId = useMemo(() => {
+    const configured = import.meta.env.VITE_PROFILE_DEMO_ENTITY_ID?.trim() || "";
+    return configured === LEGACY_DEMO_ENTITY_ID ? "" : configured;
+  }, []);
   const instanceIds = useMemo(() => readProfileInstanceIds(routeEntityId ?? undefined), [routeEntityId]);
   const hostContext = useMemo<ProfileWidgetHostContext>(
     () => ({
@@ -890,7 +895,17 @@ export function InstanceHistoryHostWidget({ context, routeEntityId }: WidgetProp
   const [selectedVersion, setSelectedVersion] = useState<number | null>(null);
   const [compareMode, setCompareMode] = useState<"current" | "previous">("previous");
   const [lastError, setLastError] = useState("");
-  const instanceId = routeEntityId?.trim() || import.meta.env.VITE_PROFILE_DEMO_ENTITY_ID?.trim() || "";
+  const instanceId = useMemo(() => {
+    const routeId = routeEntityId?.trim();
+    if (routeId && routeId !== LEGACY_DEMO_ENTITY_ID) {
+      return routeId;
+    }
+    const configured = import.meta.env.VITE_PROFILE_DEMO_ENTITY_ID?.trim() || "";
+    if (configured && configured !== LEGACY_DEMO_ENTITY_ID) {
+      return configured;
+    }
+    return "";
+  }, [routeEntityId]);
   const hostContext = useMemo<ProfileWidgetHostContext>(
     () => ({
       tenant: { id: context.orgScope },
