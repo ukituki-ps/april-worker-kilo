@@ -14,8 +14,7 @@ type WidgetProps = {
   routeEntityId?: string | null;
 };
 
-const LEGACY_DEMO_ENTITY_ID = "00000000-0000-0000-0000-000000000001";
-const DEFAULT_PROFILE_LIST_IDS: string[] = [LEGACY_DEMO_ENTITY_ID];
+const DEFAULT_PROFILE_LIST_IDS: string[] = [];
 
 const DEFAULT_PROFILE_INSTANCE_IDS: string[] = [];
 type ProfileInstanceItem = {
@@ -53,7 +52,7 @@ const readProfileListIds = (): string[] => {
   const parsed = raw
     .split(",")
     .map((value) => value.trim())
-    .filter((value: string) => Boolean(value) && value !== LEGACY_DEMO_ENTITY_ID);
+    .filter((value: string) => Boolean(value));
   return parsed.length > 0 ? parsed : DEFAULT_PROFILE_LIST_IDS;
 };
 
@@ -63,10 +62,10 @@ const readProfileInstanceIds = (routeInstanceId?: string): string[] => {
     ? raw
         .split(",")
         .map((value: string) => value.trim())
-        .filter((value: string) => Boolean(value) && value !== LEGACY_DEMO_ENTITY_ID)
+        .filter((value: string) => Boolean(value))
     : [];
   const routeIdRaw = routeInstanceId?.trim();
-  const routeId = routeIdRaw && routeIdRaw !== LEGACY_DEMO_ENTITY_ID ? routeIdRaw : undefined;
+  const routeId = routeIdRaw || undefined;
   if (routeId) {
     return parsed.includes(routeId) ? parsed : [routeId, ...parsed];
   }
@@ -203,8 +202,7 @@ export function ProfileInstancesHostWidget({ context, routeEntityId }: WidgetPro
   const [entityTypeId, setEntityTypeId] = useState(import.meta.env.VITE_PROFILE_DEFAULT_ENTITY_TYPE_ID?.trim() || "");
   const [actionLoading, setActionLoading] = useState(false);
   const profileId = useMemo(() => {
-    const configured = import.meta.env.VITE_PROFILE_DEMO_ENTITY_ID?.trim() || "";
-    return configured === LEGACY_DEMO_ENTITY_ID ? "" : configured;
+    return import.meta.env.VITE_PROFILE_DEMO_ENTITY_ID?.trim() || "";
   }, []);
   const instanceIds = useMemo(() => readProfileInstanceIds(routeEntityId ?? undefined), [routeEntityId]);
   const hostContext = useMemo<ProfileWidgetHostContext>(
@@ -484,14 +482,8 @@ export function ConflictsMergeHostWidget({ context }: WidgetProps): JSX.Element 
   const [lastError, setLastError] = useState("");
   const [resolveLoading, setResolveLoading] = useState(false);
   const [mergeLoading, setMergeLoading] = useState(false);
-  const [mergeSource, setMergeSource] = useState(
-    () => import.meta.env.VITE_PROFILE_MERGE_SOURCE_ENTITY_ID?.trim() || "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
-  );
-  const [mergeTarget, setMergeTarget] = useState(
-    () =>
-      import.meta.env.VITE_PROFILE_MERGE_TARGET_ENTITY_ID?.trim() ||
-      "00000000-0000-0000-0000-000000000001",
-  );
+  const [mergeSource, setMergeSource] = useState(() => import.meta.env.VITE_PROFILE_MERGE_SOURCE_ENTITY_ID?.trim() || "");
+  const [mergeTarget, setMergeTarget] = useState(() => import.meta.env.VITE_PROFILE_MERGE_TARGET_ENTITY_ID?.trim() || "");
   const hostContext = useMemo<ProfileWidgetHostContext>(
     () => ({
       tenant: { id: context.orgScope },
@@ -738,11 +730,11 @@ export function InstanceHistoryHostWidget({ context, routeEntityId }: WidgetProp
   const [lastError, setLastError] = useState("");
   const instanceId = useMemo(() => {
     const routeId = routeEntityId?.trim();
-    if (routeId && routeId !== LEGACY_DEMO_ENTITY_ID) {
+    if (routeId) {
       return routeId;
     }
     const configured = import.meta.env.VITE_PROFILE_DEMO_ENTITY_ID?.trim() || "";
-    if (configured && configured !== LEGACY_DEMO_ENTITY_ID) {
+    if (configured) {
       return configured;
     }
     return "";
