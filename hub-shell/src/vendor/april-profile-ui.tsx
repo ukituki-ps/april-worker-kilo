@@ -58,7 +58,7 @@ export function ProfilesWidget({ hostContext, apiBaseUrl, entityIds, onError }: 
           return;
         }
         const skippedNotFound: string[] = [];
-        const loaded = await Promise.all(
+        const loaded = await Promise.all<ExternalProfilesListItem | null>(
           entityIds.map(async (entityId) => {
             const response = await authorizedFetch(`${apiBaseUrl}/v1/entities/${entityId}`, {
               headers: { "Content-Type": "application/json" },
@@ -77,13 +77,16 @@ export function ProfilesWidget({ hostContext, apiBaseUrl, entityIds, onError }: 
               created_at?: string;
               document?: Record<string, unknown>;
             };
-            return {
+            const item: ExternalProfilesListItem = {
               entityId: snapshot.entity_id,
               entityTypeId: snapshot.entity_type_id ?? "unknown",
               version: snapshot.version,
-              updatedAt: snapshot.created_at,
               preview: JSON.stringify(snapshot.document ?? {}),
-            } satisfies ExternalProfilesListItem;
+            };
+            if (snapshot.created_at) {
+              item.updatedAt = snapshot.created_at;
+            }
+            return item;
           }),
         );
         if (!cancelled) {
