@@ -31,6 +31,13 @@ VITE_PROFILE_LIST_ENTITY_IDS=00000000-0000-0000-0000-000000000001
 - Реализация списка профилей в Hub пока локальная и должна быть синхронизирована с внешним пакетом при его публикации в registry.
 - Для стабильного smoke используются сетевые перехваты Playwright на BFF-префиксе, чтобы детерминированно подтвердить create flow.
 
+## Актуализация после phase 5 (task 040 во внешнем repo)
+
+- Во внешнем `april-profile-1` выполнена модернизация карточного layout для `Profiles list widget` (задача `040-phase-5-widget-card-layout-modernization`).
+- Для `april-worker` это изменение трактуется как актуализация документационного слоя host-интеграции: маршрут `/app/profile/entities`, BFF-префикс и host-контекст остаются опорными точками.
+- Детали phase 5, относящиеся к визуальному устройству карточки, фиксируются в отдельной истории: `task-story-040-phase-5-widget-card-layout-modernization-profiles-list`.
+- Если реализация в `hub-shell` и внешний пакет расходятся по UI-поведению, приоритет у внешнего контракта `april-profile-1`; в `april-worker` такие расхождения выносятся в follow-up без несогласованного расширения scope.
+
 ## Ссылки
 
 - Постановка: `april-profile-1/tasks/026-phase-4a-hub-profiles-list-host-bff-flow/TASK.md`

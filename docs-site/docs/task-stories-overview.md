@@ -22,3 +22,5 @@ sidebar_position: 19
   источник постановки: `april-profile-1/tasks/030-phase-4a-hub-instance-history-host-e2e/TASK.md`
 - `032`: [Hub conflicts/merge host + RBAC + e2e (phase 4a.4)](./task-story-032-phase-4a-hub-conflicts-merge-host-rbac)  
   источник постановки: `april-profile-1/tasks/032-phase-4a-hub-conflicts-merge-host-rbac/TASK.md`
+- `040`: [Profiles list widget card layout modernization (phase 5)](./task-story-040-phase-5-widget-card-layout-modernization-profiles-list)  
+  источник постановки: `april-profile-1/tasks/040-phase-5-widget-card-layout-modernization/TASK.md`
