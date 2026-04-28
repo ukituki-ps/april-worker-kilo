@@ -1,0 +1,118 @@
+import { useEffect, useState } from "react";
+import { Alert } from "@mantine/core";
+import { authorizedFetch } from "../api";
+
+export type ExternalProfilesListItem = {
+  entityId: string;
+  entityTypeId: string;
+  version: number;
+  updatedAt?: string;
+  preview: string;
+};
+
+export type ProfilesListAction =
+  | { type: "created"; item: ExternalProfilesListItem }
+  | { type: "updated"; item: ExternalProfilesListItem }
+  | { type: "deleted"; entityId: string };
+
+export type ProfileWidgetHostContext = {
+  tenant: { id: string };
+  auth?: {
+    subject?: string;
+    roles?: string[];
+    tokenRef?: string;
+  };
+  locale?: string;
+  telemetry?: {
+    requestId: string;
+    traceId?: string;
+    spanId?: string;
+  };
+};
+
+export type ProfilesWidgetProps = {
+  hostContext: ProfileWidgetHostContext;
+  apiBaseUrl: string;
+  accessToken?: string;
+  entityIds: string[];
+  pageSize?: number;
+  onAction?: (action: ProfilesListAction) => void;
+  onError?: (payload: { message: string; requestId?: string }) => void;
+};
+
+export function ProfilesWidget({ hostContext, apiBaseUrl, entityIds, onError }: ProfilesWidgetProps): JSX.Element {
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [items, setItems] = useState<ExternalProfilesListItem[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const run = async () => {
+      setLoading(true);
+      setError("");
+      try {
+        if (entityIds.length === 0) {
+          if (!cancelled) {
+            setItems([]);
+          }
+          return;
+        }
+        const loaded = await Promise.all(
+          entityIds.map(async (entityId) => {
+            const response = await authorizedFetch(`${apiBaseUrl}/v1/entities/${entityId}`, {
+              headers: { "Content-Type": "application/json" },
+            });
+            if (!response.ok) {
+              throw new Error(`profile operation failed: ${response.status}`);
+            }
+            const snapshot = (await response.json()) as {
+              entity_id: string;
+              entity_type_id?: string;
+              version: number;
+              created_at?: string;
+              document?: Record<string, unknown>;
+            };
+            return {
+              entityId: snapshot.entity_id,
+              entityTypeId: snapshot.entity_type_id ?? "unknown",
+              version: snapshot.version,
+              updatedAt: snapshot.created_at,
+              preview: JSON.stringify(snapshot.document ?? {}),
+            } satisfies ExternalProfilesListItem;
+          }),
+        );
+        if (!cancelled) {
+          setItems(loaded);
+        }
+      } catch (loadError) {
+        const message = loadError instanceof Error ? loadError.message : "profile operation failed";
+        if (!cancelled) {
+          setError(message);
+        }
+        onError?.({ message, requestId: hostContext.telemetry?.requestId });
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+    void run();
+    return () => {
+      cancelled = true;
+    };
+  }, [apiBaseUrl, entityIds, hostContext.telemetry?.requestId, onError]);
+
+  return (
+    <article className="widget-card" data-testid="profiles-widget-card">
+      <h3>Profiles list widget</h3>
+      <p>Tenant: {hostContext.tenant.id}</p>
+      {loading ? <p data-testid="profiles-widget-loading">Loading profiles...</p> : null}
+      {error ? <Alert color="red">{error}</Alert> : null}
+      <ul>
+        {items.map((item) => (
+          <li key={item.entityId}>{item.entityId}</li>
+        ))}
+      </ul>
+    </article>
+  );
+}

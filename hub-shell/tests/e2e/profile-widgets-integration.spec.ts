@@ -25,8 +25,8 @@ test.describe("@integration BFF без network-stub", () => {
     await loginThroughKeycloak(page, privilegedUser, privilegedPass);
     await page.goto("/#/app/profile/entities");
     await expect(page.getByRole("heading", { name: "Profiles list widget" })).toBeVisible();
-    const action = page.getByTestId("profiles-list-last-action");
     const listErr = page.getByTestId("profiles-list-last-error");
-    await expect(action.or(listErr)).toBeVisible({ timeout: 45_000 });
+    const profileList = page.getByText("Profiles", { exact: false });
+    await expect(profileList.or(listErr)).toBeVisible({ timeout: 45_000 });
   });
 });

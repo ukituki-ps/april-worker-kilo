@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Alert } from "@mantine/core";
+import { ProfilesWidget, type ProfilesListAction as ExternalProfilesListAction } from "@april/profile-ui";
 import { authorizedFetch } from "./api";
 import { keycloak } from "./keycloak";
 import { EntityProfileWidget } from "./profile-widget";
@@ -14,18 +15,7 @@ type WidgetProps = {
 };
 
 const LEGACY_DEMO_ENTITY_ID = "00000000-0000-0000-0000-000000000001";
-const DEFAULT_PROFILE_LIST_IDS: string[] = [];
-type ProfilesListItem = {
-  entityId: string;
-  entityTypeId: string;
-  version: number;
-  preview: string;
-};
-
-type ProfilesListAction =
-  | { type: "created"; item: ProfilesListItem }
-  | { type: "loaded"; count: number }
-  | { type: "deleted"; entityId: string };
+const DEFAULT_PROFILE_LIST_IDS: string[] = [LEGACY_DEMO_ENTITY_ID];
 
 const DEFAULT_PROFILE_INSTANCE_IDS: string[] = [];
 type ProfileInstanceItem = {
@@ -159,11 +149,8 @@ export function BrokenWidget(_props: WidgetProps): JSX.Element {
 
 export function ProfilesListHostWidget({ context }: WidgetProps): JSX.Element {
   const toast = useShellToast();
-  const [lastAction, setLastAction] = useState<ProfilesListAction | null>(null);
+  const [lastAction, setLastAction] = useState<ExternalProfilesListAction | null>(null);
   const [lastError, setLastError] = useState("");
-  const [items, setItems] = useState<ProfilesListItem[]>([]);
-  const [entityTypeId, setEntityTypeId] = useState(import.meta.env.VITE_PROFILE_DEFAULT_ENTITY_TYPE_ID?.trim() || "");
-  const [actionLoading, setActionLoading] = useState(false);
   const entityIds = useMemo(() => readProfileListIds(), []);
   const hostContext = useMemo<ProfileWidgetHostContext>(
     () => ({
@@ -180,170 +167,24 @@ export function ProfilesListHostWidget({ context }: WidgetProps): JSX.Element {
     }),
     [context],
   );
-  const fetchWithTelemetry = (input: string, init: RequestInit = {}) =>
-    authorizedFetch(input, init, {
-      moduleName: "ProfilesListHostWidget",
-      widget: "profiles-list",
-      tenant: context.orgScope,
-      correlationId: context.correlationId,
-    });
-
-  useEffect(() => {
-    let cancelled = false;
-    const load = async () => {
-      if (entityIds.length === 0) {
-        setItems([]);
-        setLastAction({ type: "loaded", count: 0 });
-        return;
-      }
-      try {
-        const loaded = await Promise.all(
-          entityIds.map(async (entityId) => {
-            const response = await fetchWithTelemetry(`/api/v1/admin/profile/api/v1/entities/${entityId}`, {
-              headers: {
-                "Content-Type": "application/json",
-              },
-            });
-            if (!response.ok) {
-              throw new Error(`load failed: ${response.status}`);
-            }
-            const snapshot = (await response.json()) as {
-              entity_id: string;
-              entity_type_id?: string;
-              version: number;
-              document?: Record<string, unknown>;
-            };
-            return {
-              entityId: snapshot.entity_id,
-              entityTypeId: snapshot.entity_type_id ?? "unknown",
-              version: snapshot.version,
-              preview: JSON.stringify(snapshot.document ?? {}),
-            } satisfies ProfilesListItem;
-          }),
-        );
-        if (cancelled) {
-          return;
-        }
-        setItems(loaded);
-        setLastAction({ type: "loaded", count: loaded.length });
-      } catch (error) {
-        if (cancelled) {
-          return;
-        }
-        const message = error instanceof Error ? error.message : "profiles list load failed";
-        setLastError(message);
-        toast.showError(message);
-      }
-    };
-    void load();
-    return () => {
-      cancelled = true;
-    };
-  }, [entityIds, toast]);
-
-  const handleCreate = async (): Promise<void> => {
-    if (!entityTypeId.trim()) {
-      const message = "Entity type ID is required";
-      setLastError(message);
-      toast.showError(message);
-      return;
-    }
-    setActionLoading(true);
-    setLastError("");
-    try {
-      const response = await fetchWithTelemetry("/api/v1/admin/profile/api/v1/entities", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          entity_type_id: entityTypeId.trim(),
-          document: {
-            tenant_id: hostContext.tenant.id,
-            source: "hub-shell-list",
-          },
-        }),
-      });
-      if (!response.ok) {
-        throw new Error(`create failed: ${response.status}`);
-      }
-      const snapshot = (await response.json()) as {
-        entity_id: string;
-        entity_type_id?: string;
-        version: number;
-        document?: Record<string, unknown>;
-      };
-      const createdItem: ProfilesListItem = {
-        entityId: snapshot.entity_id,
-        entityTypeId: snapshot.entity_type_id ?? entityTypeId.trim(),
-        version: snapshot.version,
-        preview: JSON.stringify(snapshot.document ?? {}),
-      };
-      setItems((prev) => [createdItem, ...prev]);
-      setLastAction({ type: "created", item: createdItem });
-      toast.showSuccess("Profiles list action: created");
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "profiles list create failed";
-      setLastError(message);
-      toast.showError(message);
-    } finally {
-      setActionLoading(false);
-    }
-  };
-
-  const handleDeleteFirstProfile = async (): Promise<void> => {
-    const target = items[0];
-    if (!target) {
-      const message = "Нет профиля для удаления";
-      setLastError(message);
-      toast.showError(message);
-      return;
-    }
-    setActionLoading(true);
-    setLastError("");
-    try {
-      const response = await fetchWithTelemetry(`/api/v1/admin/profile/api/v1/entities/${encodeURIComponent(target.entityId)}`, {
-        method: "DELETE",
-      });
-      if (!response.ok) {
-        throw new Error(`delete failed: ${response.status}`);
-      }
-      setItems((prev) => prev.filter((item) => item.entityId !== target.entityId));
-      setLastAction({ type: "deleted", entityId: target.entityId });
-      toast.showSuccess("Profiles list action: deleted");
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "profiles list delete failed";
-      setLastError(message);
-      toast.showError(message);
-    } finally {
-      setActionLoading(false);
-    }
-  };
 
   return (
     <div>
-      <article className="widget-card">
-        <h3>Profiles list widget</h3>
-        <p>Tenant: {hostContext.tenant.id}</p>
-        <label htmlFor="profiles-list-entity-type-id">Entity type ID</label>
-        <input
-          id="profiles-list-entity-type-id"
-          aria-label="Entity type ID"
-          value={entityTypeId}
-          onChange={(event) => setEntityTypeId(event.currentTarget.value)}
-        />
-        <button type="button" onClick={() => void handleCreate()} disabled={actionLoading}>
-          Create profile
-        </button>
-        <button type="button" onClick={() => void handleDeleteFirstProfile()} disabled={actionLoading}>
-          Delete first profile
-        </button>
-        <ul>
-          {items.map((item) => (
-            <li key={item.entityId}>{item.entityId}</li>
-          ))}
-        </ul>
-      </article>
+      <ProfilesWidget
+        hostContext={hostContext}
+        entityIds={entityIds}
+        apiBaseUrl="/api/v1/admin/profile/api"
+        accessToken={keycloak.token}
+        onAction={(action: ExternalProfilesListAction) => {
+          setLastAction(action);
+          setLastError("");
+          toast.showSuccess(`Profiles list action: ${action.type}`);
+        }}
+        onError={({ message }: { message: string }) => {
+          setLastError(message);
+          toast.showError(message);
+        }}
+      />
       {lastAction ? <p data-testid="profiles-list-last-action">Последнее действие: {lastAction.type}</p> : null}
       {lastError ? (
         <Alert color="red" data-testid="profiles-list-last-error">
