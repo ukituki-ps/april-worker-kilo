@@ -44,6 +44,31 @@ wait_for_ok() {
   return 1
 }
 
+fetch_keycloak_token() {
+  local retries="${SMOKE_TOKEN_RETRIES:-20}"
+  local sleep_s="${SMOKE_TOKEN_SLEEP_SEC:-2}"
+  local response_file="/tmp/smoke-after-deploy-token.json"
+  local parsed=""
+  for _ in $(seq 1 "$retries"); do
+    curl -sS -X POST "${keycloak_base}/realms/${keycloak_realm}/protocol/openid-connect/token" \
+      -H "Content-Type: application/x-www-form-urlencoded" \
+      -d "grant_type=password" \
+      -d "client_id=${keycloak_client_id}" \
+      -d "username=${keycloak_user}" \
+      -d "password=${keycloak_password}" \
+      >"${response_file}" || true
+    parsed="$(python3 -c 'import json,sys; print(json.load(sys.stdin).get("access_token",""))' <"${response_file}" 2>/dev/null || true)"
+    if [[ -n "${parsed}" ]]; then
+      printf '%s\n' "${parsed}"
+      return 0
+    fi
+    sleep "${sleep_s}"
+  done
+  log "empty token from Keycloak after ${retries} retries"
+  [[ -f "${response_file}" ]] && cat "${response_file}" >&2 || true
+  return 1
+}
+
 log "waiting for health/readiness endpoints"
 wait_for_ok "${hub_bff_base}/healthz"
 wait_for_ok "${hub_bff_base}/readyz"
@@ -54,17 +79,8 @@ log "checking unauthenticated API path"
 expect_http_code "401" "${hub_bff_base}/api/v1/aggregation/dashboard"
 
 log "obtaining Keycloak token for smoke user"
-token="$(
-  curl -sS -X POST "${keycloak_base}/realms/${keycloak_realm}/protocol/openid-connect/token" \
-    -H "Content-Type: application/x-www-form-urlencoded" \
-    -d "grant_type=password" \
-    -d "client_id=${keycloak_client_id}" \
-    -d "username=${keycloak_user}" \
-    -d "password=${keycloak_password}" \
-  | python3 -c 'import json,sys; print(json.load(sys.stdin).get("access_token",""))'
-)"
+token="$(fetch_keycloak_token || true)"
 if [[ -z "$token" ]]; then
-  log "empty token from Keycloak"
   exit 1
 fi
 
