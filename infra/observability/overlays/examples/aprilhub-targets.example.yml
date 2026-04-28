@@ -1,6 +1,7 @@
 - labels:
     env: dev
     host: 192.168.1.29
+    stand: stand-192-168-1-29
     service: hub-bff
   targets:
     - "192.168.1.29:8081"
