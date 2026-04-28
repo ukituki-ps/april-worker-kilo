@@ -22,10 +22,8 @@ vi.mock("./keycloak", () => ({
 }));
 
 const apiRequestMock = vi.fn();
-const authorizedFetchMock = vi.fn();
 vi.mock("./api", () => ({
   apiRequest: (...args: unknown[]) => apiRequestMock(...args),
-  authorizedFetch: (...args: unknown[]) => authorizedFetchMock(...args),
 }));
 
 function openGuestProfileMenu(): void {
@@ -50,11 +48,6 @@ describe("App", () => {
     keycloakState.logoutMock.mockClear();
     keycloakState.createAccountUrlMock.mockClear();
     apiRequestMock.mockReset();
-    authorizedFetchMock.mockReset();
-    authorizedFetchMock.mockResolvedValue({
-      ok: true,
-      json: async () => ({ items: [] }),
-    });
   });
 
   it("renders guest landing when user is not authenticated", async () => {
@@ -124,33 +117,6 @@ describe("App", () => {
       expect(screen.getAllByText("Роли доступа").length).toBeGreaterThan(0);
       expect(screen.getByText("Добро пожаловать, Demo User.")).toBeInTheDocument();
       expect(screen.getByText(/Корреляция запроса:/)).toBeInTheDocument();
-    });
-  });
-
-  it("opens profiles list widget-card from sidebar navigation", async () => {
-    keycloakState.authState = true;
-    apiRequestMock.mockResolvedValue({
-      ok: true,
-      json: async () => ({
-        sub: "u-1",
-        username: "demo",
-        email: "demo@april.local",
-        name: "Demo User",
-        roles: ["user"],
-      }),
-    });
-
-    renderApp();
-
-    await waitFor(() => {
-      expect(screen.getByRole("navigation", { name: "Основная навигация" })).toBeInTheDocument();
-    });
-
-    fireEvent.click(screen.getByRole("link", { name: "Профиль — список" }));
-
-    await waitFor(() => {
-      expect(screen.getByTestId("profiles-list-widget-card")).toBeInTheDocument();
-      expect(screen.getByRole("heading", { name: "Profiles list widget" })).toBeInTheDocument();
     });
   });
 

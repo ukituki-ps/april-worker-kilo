@@ -322,7 +322,7 @@ export function ProfilesListHostWidget({ context }: WidgetProps): JSX.Element {
 
   return (
     <div>
-      <article className="widget-card" data-testid="profiles-list-widget-card">
+      <article className="widget-card">
         <h3>Profiles list widget</h3>
         <p>Tenant: {hostContext.tenant.id}</p>
         <label htmlFor="profiles-list-entity-type-id">Entity type ID</label>
