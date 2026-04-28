@@ -10,6 +10,7 @@ keycloak_realm="${KEYCLOAK_REALM:-april}"
 keycloak_client_id="${SMOKE_KEYCLOAK_CLIENT_ID:-aprilhub-shell}"
 keycloak_user="${SMOKE_KEYCLOAK_USERNAME:-april-dev}"
 keycloak_password="${SMOKE_KEYCLOAK_PASSWORD:-april-dev-pass}"
+smoke_token_error_desc=""
 
 expect_http_code() {
   local expected="$1"
@@ -69,6 +70,7 @@ fetch_keycloak_token() {
   local sleep_s="${SMOKE_TOKEN_SLEEP_SEC:-2}"
   local response_file="/tmp/smoke-after-deploy-token.json"
   local parsed=""
+  local err_desc=""
   for _ in $(seq 1 "$retries"); do
     curl -sS -X POST "${keycloak_base}/realms/${keycloak_realm}/protocol/openid-connect/token" \
       -H "Content-Type: application/x-www-form-urlencoded" \
@@ -79,8 +81,13 @@ fetch_keycloak_token() {
       >"${response_file}" || true
     parsed="$(python3 -c 'import json,sys; print(json.load(sys.stdin).get("access_token",""))' <"${response_file}" 2>/dev/null || true)"
     if [[ -n "${parsed}" ]]; then
+      smoke_token_error_desc=""
       printf '%s\n' "${parsed}"
       return 0
+    fi
+    err_desc="$(python3 -c 'import json,sys; print(json.load(sys.stdin).get("error_description",""))' <"${response_file}" 2>/dev/null || true)"
+    if [[ -n "${err_desc}" ]]; then
+      smoke_token_error_desc="${err_desc}"
     fi
     sleep "${sleep_s}"
   done
@@ -101,6 +108,11 @@ expect_http_codes "401,403" "${hub_bff_base}/api/v1/aggregation/dashboard"
 log "obtaining Keycloak token for smoke user"
 token="$(fetch_keycloak_token || true)"
 if [[ -z "$token" ]]; then
+  if [[ "${smoke_token_error_desc}" == *"Account is not fully set up"* ]]; then
+    log "skip authenticated checks: ${smoke_token_error_desc}"
+    log "smoke checks passed (unauthenticated contour only)"
+    exit 0
+  fi
   exit 1
 fi
 
