@@ -77,7 +77,8 @@ services:
       - -ec
       - |
         STAMP=node_modules/.aprilhub-ci-stamp
-        if [ ! -d node_modules ] || [ ! -f "$$STAMP" ] || [ package-lock.json -nt "$$STAMP" ]; then
+        REACT_REFRESH_RUNTIME=node_modules/@vitejs/plugin-react/dist/refresh-runtime.js
+        if [ ! -d node_modules ] || [ ! -f "$$STAMP" ] || [ package-lock.json -nt "$$STAMP" ] || [ ! -f "$$REACT_REFRESH_RUNTIME" ]; then
           npm ci
           touch "$$STAMP"
         fi
