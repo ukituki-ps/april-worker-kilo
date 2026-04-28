@@ -14,7 +14,9 @@ const toHash = (path: string): string => `#${path}`;
 
 export function buildPrimaryShellNav(): ShellNavItem[] {
   const entityId = defaultProfileEntityIdForNav();
-  const instanceId = entityId;
+  const profileCardPath = entityId ? shellPaths.profileEntity(entityId, "card") : shellPaths.profilesList;
+  const profileInstancePath = entityId ? shellPaths.profileInstance(entityId) : shellPaths.profilesList;
+  const profileHistoryPath = entityId ? shellPaths.profileInstanceHistory(entityId) : shellPaths.profilesList;
   return [
     { id: "overview", label: "Обзор платформы", href: toHash(shellPaths.overview), activePrefix: shellPaths.overview },
     { id: "roles", label: "Роли доступа", href: toHash(shellPaths.roles), activePrefix: shellPaths.roles },
@@ -27,20 +29,20 @@ export function buildPrimaryShellNav(): ShellNavItem[] {
     {
       id: "profile-entity-card",
       label: "Профиль — карточка",
-      href: toHash(shellPaths.profileEntity(entityId, "card")),
-      activePrefix: shellPaths.profileEntity(entityId, "card"),
+      href: toHash(profileCardPath),
+      activePrefix: profileCardPath,
     },
     {
       id: "profile-instance-demo",
       label: "Профиль — экземпляры",
-      href: toHash(shellPaths.profileInstance(instanceId)),
-      activePrefix: shellPaths.profileInstance(instanceId),
+      href: toHash(profileInstancePath),
+      activePrefix: profileInstancePath,
     },
     {
       id: "profile-instance-history-demo",
       label: "Профиль — история экземпляра",
-      href: toHash(shellPaths.profileInstanceHistory(instanceId)),
-      activePrefix: shellPaths.profileInstanceHistory(instanceId),
+      href: toHash(profileHistoryPath),
+      activePrefix: profileHistoryPath,
     },
     {
       id: "profile-admin-conflicts",
