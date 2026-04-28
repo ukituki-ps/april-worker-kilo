@@ -56,7 +56,6 @@
 - [ ] `039`: Аналог задачи 033 для AprilProfile: архитектура и документация error telemetry (Sentry + Loki/Prometheus)
 - [ ] `040`: Единый Grafana-дэшборд ошибок frontend/backend для dev-стенда (панели, фильтры, drill-down, runbook)
 - [x] `041`: Исполнение внешней задачи 040-phase-5-widget-card-layout-modernization из `april-profile-1` (актуализация раздела Profiles list widget + двойной отчёт)
-- [x] `042`: Открытие `Profiles list widget-card` из пункта `Профиль-список` в sidebar AprilHub (навигация + host-обвязка + проверка сценария)
 
 ## Текущий фокус
 
@@ -100,7 +99,6 @@
 - [ ] `039-aprilprofile-observability-error-telemetry-architecture-docs`: отдельная внешняя задача (аналог `033`) на архитектурное решение и документационный контур error telemetry в `april-profile-1` с двойным отчётом
 - [ ] `040-aprilhub-unified-error-dashboard`: собрать полноценный Grafana-дэшборд ошибок всех уровней (`frontend` + `hub-bff` + downstream) для dev-стенда и задокументировать triage-поток
 - [x] `041-aprilhub-execute-external-task-040-phase-5-widget-card-layout-modernization-april-profile-1`: актуализировать в `april-worker` разделы про `Profiles list widget` после изменений во внешнем `april-profile-1` и оформить двойной отчёт
-- [x] `042-aprilhub-profiles-list-widget-card-sidebar-navigation`: обеспечить открытие `Profiles list widget-card` при выборе пункта `Профиль-список` в sidebar с полной host-обвязкой и проверками
 
 ## План реализации AprilHub: статусы
 
@@ -146,4 +144,3 @@
 | `039` | Аналог задачи 033 для AprilProfile: архитектура и документация error telemetry (Sentry + Loki/Prometheus) | ⏳ Не начато | [`tasks/039-aprilprofile-observability-error-telemetry-architecture-docs/TASK.md`](./tasks/039-aprilprofile-observability-error-telemetry-architecture-docs/TASK.md) |
 | `040` | Единый Grafana-дэшборд ошибок frontend/backend для dev-стенда | ⏳ Не начато | [`tasks/040-aprilhub-unified-error-dashboard/TASK.md`](./tasks/040-aprilhub-unified-error-dashboard/TASK.md) |
 | `041` | Исполнение внешней задачи `040-phase-5-widget-card-layout-modernization` из `april-profile-1` (актуализация раздела `Profiles list widget`) | ✅ Выполнено | [`tasks/041-aprilhub-execute-external-task-040-phase-5-widget-card-layout-modernization-april-profile-1/TASK.md`](./tasks/041-aprilhub-execute-external-task-040-phase-5-widget-card-layout-modernization-april-profile-1/TASK.md) |
-| `042` | Открытие `Profiles list widget-card` из пункта `Профиль-список` в sidebar AprilHub (`hub-shell` + host-обвязка) | ✅ Выполнено | [`tasks/042-aprilhub-profiles-list-widget-card-sidebar-navigation/TASK.md`](./tasks/042-aprilhub-profiles-list-widget-card-sidebar-navigation/TASK.md), [`tasks/042-aprilhub-profiles-list-widget-card-sidebar-navigation/REPORT.md`](./tasks/042-aprilhub-profiles-list-widget-card-sidebar-navigation/REPORT.md) |
