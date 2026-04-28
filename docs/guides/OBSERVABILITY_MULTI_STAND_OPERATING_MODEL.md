@@ -66,6 +66,7 @@ docker compose --env-file env/.env up -d prometheus
 - `Infra Runtime`
 - `Multi Stand Service Overview`
 - `Multi Stand Logs Overview`
+- `AprilHub Unified Error Overview`
 
 `Multi Stand Service Overview` и `Multi Stand Logs Overview` являются базовыми для multi-service/multi-stand и поддерживают фильтрацию по `host`, `stand`, `service`.
 
