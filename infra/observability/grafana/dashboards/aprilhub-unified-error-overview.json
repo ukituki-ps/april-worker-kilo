@@ -39,7 +39,7 @@
       },
       "targets": [
         {
-          "expr": "sum(count_over_time({job=~\"docker|docker_remote\",host=~\"$host\",stand=~\"$stand\",service=~\"$service\"} |~ \"(?i)(error|exception|panic|unhandledrejection)\" [5m]))",
+          "expr": "sum(count_over_time({job=~\"docker|docker_remote\",host=~\"${host:regex}|.*\",service=~\"${service:regex}|.*\"} |~ \"(?i)(error|exception|panic|unhandledrejection)\" [5m]))",
           "queryType": "range",
           "refId": "A"
         }
@@ -84,7 +84,7 @@
       },
       "targets": [
         {
-          "expr": "sum(rate(hub_bff_http_requests_total{job=\"aprilhub_dynamic_targets\",env=~\"$env\",stand=~\"$stand\",host=~\"$host\",service=~\"$service\",status=~\"5..\"}[5m])) / clamp_min(sum(rate(hub_bff_http_requests_total{job=\"aprilhub_dynamic_targets\",env=~\"$env\",stand=~\"$stand\",host=~\"$host\",service=~\"$service\"}[5m])), 0.001)",
+          "expr": "sum(rate(hub_bff_http_requests_total{job=\"aprilhub_dynamic_targets\",env=~\"${env:regex}|.*\",host=~\"${host:regex}|.*\",status=~\"5..\"}[5m])) / clamp_min(sum(rate(hub_bff_http_requests_total{job=\"aprilhub_dynamic_targets\",env=~\"${env:regex}|.*\",host=~\"${host:regex}|.*\"}[5m])), 0.001)",
           "legendFormat": "hub-bff 5xx ratio",
           "refId": "A"
         }
@@ -129,7 +129,7 @@
       },
       "targets": [
         {
-          "expr": "sum(rate(april_profile_http_requests_total{job=\"aprilhub_dynamic_targets\",env=~\"$env\",stand=~\"$stand\",host=~\"$host\",service=~\"$service\",status=~\"5..\"}[5m])) / clamp_min(sum(rate(april_profile_http_requests_total{job=\"aprilhub_dynamic_targets\",env=~\"$env\",stand=~\"$stand\",host=~\"$host\",service=~\"$service\"}[5m])), 0.001)",
+          "expr": "sum(rate(april_profile_http_requests_total{job=\"aprilhub_dynamic_targets\",env=~\"${env:regex}|.*\",host=~\"${host:regex}|.*\",status=~\"5..\"}[5m])) / clamp_min(sum(rate(april_profile_http_requests_total{job=\"aprilhub_dynamic_targets\",env=~\"${env:regex}|.*\",host=~\"${host:regex}|.*\"}[5m])), 0.001)",
           "legendFormat": "april-profile 5xx ratio",
           "refId": "A"
         }
@@ -171,7 +171,7 @@
       },
       "targets": [
         {
-          "expr": "sum(count_over_time({job=~\"docker|docker_remote\",host=~\"$host\",stand=~\"$stand\",service=~\"$service\"} |~ \"(?i)(typeerror|referenceerror|unhandledrejection|react error boundary|render failed)\" [5m]))",
+          "expr": "sum(count_over_time({job=~\"docker|docker_remote\",host=~\"${host:regex}|.*\",service=~\"${service:regex}|.*\"} |~ \"(?i)(typeerror|referenceerror|unhandledrejection|react error boundary|render failed)\" [5m]))",
           "queryType": "range",
           "refId": "A"
         }
@@ -199,7 +199,7 @@
       },
       "targets": [
         {
-          "expr": "sum by (service) (count_over_time({job=~\"docker|docker_remote\",host=~\"$host\",stand=~\"$stand\",service=~\"$service\"} |~ \"(?i)(error|exception|panic|unhandledrejection)\" [5m]))",
+          "expr": "sum by (service) (count_over_time({job=~\"docker|docker_remote\",host=~\"${host:regex}|.*\",service=~\"${service:regex}|.*\"} |~ \"(?i)(error|exception|panic|unhandledrejection)\" [5m]))",
           "queryType": "range",
           "refId": "A"
         }
@@ -227,12 +227,12 @@
       },
       "targets": [
         {
-          "expr": "sum(rate(hub_bff_http_requests_total{job=\"aprilhub_dynamic_targets\",env=~\"$env\",stand=~\"$stand\",host=~\"$host\",service=~\"$service\",status=~\"4..|5..\"}[5m])) by (path, status)",
+          "expr": "sum(rate(hub_bff_http_requests_total{job=\"aprilhub_dynamic_targets\",env=~\"${env:regex}|.*\",host=~\"${host:regex}|.*\",status=~\"4..|5..\"}[5m])) by (path, status)",
           "legendFormat": "hub-bff {{path}} {{status}}",
           "refId": "A"
         },
         {
-          "expr": "sum(rate(april_profile_http_requests_total{job=\"aprilhub_dynamic_targets\",env=~\"$env\",stand=~\"$stand\",host=~\"$host\",service=~\"$service\",status=~\"4..|5..\"}[5m])) by (route, status)",
+          "expr": "sum(rate(april_profile_http_requests_total{job=\"aprilhub_dynamic_targets\",env=~\"${env:regex}|.*\",host=~\"${host:regex}|.*\",status=~\"4..|5..\"}[5m])) by (route, status)",
           "legendFormat": "april-profile {{route}} {{status}}",
           "refId": "B"
         }
@@ -245,11 +245,179 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 2,
+          "unit": "reqps"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 12
+      },
+      "id": 11,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value_and_name"
+      },
+      "targets": [
+        {
+          "expr": "(sum(rate(hub_bff_http_requests_total{job=\"aprilhub_dynamic_targets\",env=~\"${env:regex}|.*\",host=~\"${host:regex}|.*\",status=\"401\"}[5m])) or vector(0)) + (sum(rate(april_profile_http_requests_total{job=\"aprilhub_dynamic_targets\",env=~\"${env:regex}|.*\",host=~\"${host:regex}|.*\",status=\"401\"}[5m])) or vector(0))",
+          "refId": "A"
+        }
+      ],
+      "title": "HTTP 401 Rate",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 2,
+          "unit": "reqps"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 12
+      },
+      "id": 12,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value_and_name"
+      },
+      "targets": [
+        {
+          "expr": "(sum(rate(hub_bff_http_requests_total{job=\"aprilhub_dynamic_targets\",env=~\"${env:regex}|.*\",host=~\"${host:regex}|.*\",status=\"403\"}[5m])) or vector(0)) + (sum(rate(april_profile_http_requests_total{job=\"aprilhub_dynamic_targets\",env=~\"${env:regex}|.*\",host=~\"${host:regex}|.*\",status=\"403\"}[5m])) or vector(0))",
+          "refId": "A"
+        }
+      ],
+      "title": "HTTP 403 Rate",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 2,
+          "unit": "reqps"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 12
+      },
+      "id": 13,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value_and_name"
+      },
+      "targets": [
+        {
+          "expr": "(sum(rate(hub_bff_http_requests_total{job=\"aprilhub_dynamic_targets\",env=~\"${env:regex}|.*\",host=~\"${host:regex}|.*\",status=\"404\"}[5m])) or vector(0)) + (sum(rate(april_profile_http_requests_total{job=\"aprilhub_dynamic_targets\",env=~\"${env:regex}|.*\",host=~\"${host:regex}|.*\",status=\"404\"}[5m])) or vector(0))",
+          "refId": "A"
+        }
+      ],
+      "title": "HTTP 404 Rate",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 2,
+          "unit": "reqps"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 18,
+        "y": 12
+      },
+      "id": 14,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value_and_name"
+      },
+      "targets": [
+        {
+          "expr": "(sum(rate(hub_bff_http_requests_total{job=\"aprilhub_dynamic_targets\",env=~\"${env:regex}|.*\",host=~\"${host:regex}|.*\",status=\"502\"}[5m])) or vector(0)) + (sum(rate(april_profile_http_requests_total{job=\"aprilhub_dynamic_targets\",env=~\"${env:regex}|.*\",host=~\"${host:regex}|.*\",status=\"502\"}[5m])) or vector(0))",
+          "refId": "A"
+        }
+      ],
+      "title": "HTTP 502 Rate",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 12
+        "y": 16
       },
       "id": 7,
       "options": {
@@ -257,14 +425,14 @@
       },
       "targets": [
         {
-          "expr": "topk(10, sum(rate(hub_bff_http_requests_total{job=\"aprilhub_dynamic_targets\",env=~\"$env\",stand=~\"$stand\",host=~\"$host\",service=~\"$service\",status=~\"5..\"}[5m])) by (path))",
+          "expr": "topk(10, sum(rate(hub_bff_http_requests_total{job=\"aprilhub_dynamic_targets\",env=~\"${env:regex}|.*\",host=~\"${host:regex}|.*\",status=~\"5..\"}[5m])) by (path))",
           "format": "table",
           "instant": true,
           "legendFormat": "{{path}}",
           "refId": "A"
         },
         {
-          "expr": "topk(10, sum(rate(april_profile_http_requests_total{job=\"aprilhub_dynamic_targets\",env=~\"$env\",stand=~\"$stand\",host=~\"$host\",service=~\"$service\",status=~\"5..\"}[5m])) by (route))",
+          "expr": "topk(10, sum(rate(april_profile_http_requests_total{job=\"aprilhub_dynamic_targets\",env=~\"${env:regex}|.*\",host=~\"${host:regex}|.*\",status=~\"5..\"}[5m])) by (route))",
           "format": "table",
           "instant": true,
           "legendFormat": "{{route}}",
@@ -283,7 +451,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 12
+        "y": 16
       },
       "id": 8,
       "options": {
@@ -291,7 +459,7 @@
       },
       "targets": [
         {
-          "expr": "topk(10, sum by (service) (count_over_time({job=~\"docker|docker_remote\",host=~\"$host\",stand=~\"$stand\",service=~\"$service\"} |~ \"(?i)(error|exception|panic|unhandledrejection)\" [30m])))",
+          "expr": "topk(10, sum by (service) (count_over_time({job=~\"docker|docker_remote\",host=~\"${host:regex}|.*\",service=~\"${service:regex}|.*\"} |~ \"(?i)(error|exception|panic|unhandledrejection)\" [30m])))",
           "queryType": "instant",
           "refId": "A"
         }
@@ -305,10 +473,53 @@
         "uid": "loki"
       },
       "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 24
+      },
+      "id": 15,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum by (service) (count_over_time({job=~\"docker|docker_remote\",host=~\"${host:regex}|.*\",service=~\"${service:regex}|.*nginx.*\"} |~ \"( 401 | status=401|\\\"status\\\":401)\" [5m]))",
+          "queryType": "range",
+          "refId": "A"
+        },
+        {
+          "expr": "sum by (service) (count_over_time({job=~\"docker|docker_remote\",host=~\"${host:regex}|.*\",service=~\"${service:regex}|.*nginx.*\"} |~ \"( 403 | status=403|\\\"status\\\":403)\" [5m]))",
+          "queryType": "range",
+          "refId": "B"
+        },
+        {
+          "expr": "sum by (service) (count_over_time({job=~\"docker|docker_remote\",host=~\"${host:regex}|.*\",service=~\"${service:regex}|.*nginx.*\"} |~ \"( 404 | status=404|\\\"status\\\":404)\" [5m]))",
+          "queryType": "range",
+          "refId": "C"
+        },
+        {
+          "expr": "sum by (service) (count_over_time({job=~\"docker|docker_remote\",host=~\"${host:regex}|.*\",service=~\"${service:regex}|.*nginx.*\"} |~ \"( 502 | status=502|\\\"status\\\":502)\" [5m]))",
+          "queryType": "range",
+          "refId": "D"
+        }
+      ],
+      "title": "Ingress Access Codes 401/403/404/502 (logs)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "gridPos": {
         "h": 12,
         "w": 24,
         "x": 0,
-        "y": 20
+        "y": 32
       },
       "id": 9,
       "options": {
@@ -323,7 +534,7 @@
       },
       "targets": [
         {
-          "expr": "{job=~\"docker|docker_remote\",host=~\"$host\",stand=~\"$stand\",service=~\"$service\"} |~ \"(?i)$contains\" |= \"$correlation\"",
+          "expr": "{job=~\"docker|docker_remote\",host=~\"${host:regex}|.*\",service=~\"${service:regex}|.*\"} |~ \"(?i)$contains\" |= \"$correlation\"",
           "queryType": "range",
           "refId": "A"
         }
@@ -336,11 +547,11 @@
         "h": 6,
         "w": 24,
         "x": 0,
-        "y": 32
+        "y": 44
       },
       "id": 10,
       "options": {
-        "content": "### Triage quick guide\\n1. Найдите всплеск по панели **Error Rate by Service** и выберите сервис.\\n2. Проверьте **HTTP Error Rate by Route** и **Top 5xx Routes** для локализации endpoint/route.\\n3. Перейдите в **Drill-down Logs**, задайте `contains` (например `ERROR|exception|503`) и `correlation` (`requestId`/`correlationId`).\\n4. Сверьте окно времени с алертами Prometheus и Sentry issue (если есть).\\n\\nИнцидентом считать:\\n- устойчивый рост 5xx ratio > 0.05 более 10 минут,\\n- или фронтовые runtime ошибки с повторяемостью на одном route/module.\\n\\nЭскалация:\\n- `frontend runtime` -> владелец `hub-shell`/widget;\\n- `api 4xx/5xx` -> владелец `hub-bff` или downstream сервиса.",
+        "content": "### Triage quick guide\\n1. Проверить стат-панели **401/403/404/502** и выбрать проблемный код.\\n2. Сверить динамику по **HTTP Error Rate by Route** и **Ingress Access Codes 401/403/404/502**.\\n3. В **Drill-down Logs** задать `contains` (например `404|502|vite|websocket|hmr|exception`) и `correlation` (`requestId`/`correlationId`).\\n4. Сопоставить с алертами Prometheus и Sentry issue (если есть).\\n\\nИнцидентом считать:\\n- устойчивый рост 5xx ratio > 0.05 более 10 минут,\\n- всплеск 401/403/404 относительно baseline,\\n- повторяемые frontend runtime/WebSocket ошибки на одном route/module.\\n\\nЭскалация:\\n- `frontend runtime` -> владелец `hub-shell`/widget;\\n- `api 4xx/5xx` -> владелец `hub-bff` или downstream сервиса;\\n- массовые ingress-коды (`404/502`) -> владелец ingress/маршрутизации.",
         "mode": "markdown"
       },
       "pluginVersion": "10.0.0",
@@ -465,13 +676,13 @@
       {
         "current": {
           "selected": false,
-          "text": "ERROR|exception|503",
-          "value": "ERROR|exception|503"
+          "text": "404|502|vite|websocket|hmr|ERROR|exception",
+          "value": "404|502|vite|websocket|hmr|ERROR|exception"
         },
         "hide": 0,
         "label": "contains",
         "name": "contains",
-        "query": "ERROR|exception|503",
+        "query": "404|502|vite|websocket|hmr|ERROR|exception",
         "skipUrlSync": false,
         "type": "textbox"
       },
@@ -494,7 +705,7 @@
     "from": "now-6h",
     "to": "now"
   },
-  "title": "AprilHub Unified Error Overview",
-  "uid": "aprilhub-unified-error-overview",
+  "title": "AprilHub Unified Error Overview v2",
+  "uid": "aprilhub-unified-error-overview-v2",
   "version": 1
 }
