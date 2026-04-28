@@ -2,24 +2,11 @@ import { describe, expect, it } from "vitest";
 import { matchShellRoute } from "./shell-paths";
 
 describe("matchShellRoute", () => {
-  it("matches overview and profile entity tabs", () => {
+  it("matches minimal authorized shell routes", () => {
     expect(matchShellRoute("/")).toEqual({ kind: "redirect" });
-    expect(matchShellRoute("/app/overview")).toEqual({ kind: "overview" });
     expect(matchShellRoute("/app/profile/entities")).toEqual({ kind: "profile-list" });
-    expect(matchShellRoute("/app/profile/entities/e1")).toEqual({
-      kind: "profile-entity",
-      entityId: "e1",
-      tab: "card",
-    });
-    expect(matchShellRoute("/app/profile/entities/e1/meta")).toEqual({
-      kind: "profile-entity",
-      entityId: "e1",
-      tab: "meta",
-    });
-    expect(matchShellRoute("/app/profile/instances/i1")).toEqual({
-      kind: "profile-instance",
-      instanceId: "i1",
-    });
-    expect(matchShellRoute("/app/profile/admin/conflicts")).toEqual({ kind: "profile-admin-conflicts" });
+    expect(matchShellRoute("/app/overview")).toEqual({ kind: "not-found" });
+    expect(matchShellRoute("/app/profile/entities/e1")).toEqual({ kind: "not-found" });
+    expect(matchShellRoute("/app/profile/instances/i1")).toEqual({ kind: "not-found" });
   });
 });

@@ -14,15 +14,16 @@ test.describe("AprilHub shell (привилегированная персона
     await expect(page.getByText("Авторизовано")).toBeVisible();
   });
 
-  test("показывает админ-пункты навигации (realm-роль admin)", async ({ page }) => {
-    await page.goto("/#/app/overview");
-    await expect(page.getByRole("navigation", { name: "Основная навигация" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Профиль — конфликты и merge" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Админ-контур" })).toBeVisible();
+  test("показывает минимальный сайдбар только с профилем", async ({ page }) => {
+    await page.goto("/#/app/profile/entities");
+    const nav = page.getByRole("navigation", { name: "Основная навигация" });
+    await expect(nav).toBeVisible();
+    await expect(nav.getByRole("link", { name: "Профиль — список" })).toHaveCount(1);
+    await expect(nav.getByRole("link")).toHaveCount(1);
   });
 
   test("выход из сессии возвращает в гостевую зону", async ({ page }) => {
-    await page.goto("/#/app/overview");
+    await page.goto("/#/app/profile/entities");
     await page.getByLabel("Меню профиля и настроек").click();
     await page.getByRole("menuitem", { name: "Выйти" }).click();
     await expect(page.getByTestId("guest-landing")).toBeVisible({ timeout: 30_000 });

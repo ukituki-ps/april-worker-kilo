@@ -9,30 +9,12 @@
  */
 
 export const shellPaths = {
-  overview: "/app/overview",
-  roles: "/app/roles",
-  adminControl: "/app/admin-control",
   profilesList: "/app/profile/entities",
-  /** Админ-экран очереди конфликтов authority и merge дубликатов (BFF → AprilProfile admin API). */
-  profileAdminConflicts: "/app/profile/admin/conflicts",
-  profileEntity: (entityId: string, tab: ProfileEntityTab = "card") =>
-    `/app/profile/entities/${encodeURIComponent(entityId)}/${tab}`,
-  profileInstance: (instanceId: string) => `/app/profile/instances/${encodeURIComponent(instanceId)}`,
-  profileInstanceHistory: (instanceId: string) => `/app/profile/instances/${encodeURIComponent(instanceId)}/history`,
 } as const;
-
-export type ProfileEntityTab = "card" | "meta";
 
 export type ShellRouteMatch =
   | { kind: "redirect" }
-  | { kind: "overview" }
-  | { kind: "roles" }
-  | { kind: "admin" }
   | { kind: "profile-list" }
-  | { kind: "profile-admin-conflicts" }
-  | { kind: "profile-instance"; instanceId: string }
-  | { kind: "profile-instance-history"; instanceId: string }
-  | { kind: "profile-entity"; entityId: string; tab: ProfileEntityTab }
   | { kind: "not-found" };
 
 /** Текущий путь из location.hash (без #), всегда начинается с /. */
@@ -47,38 +29,8 @@ export function matchShellRoute(pathname: string): ShellRouteMatch {
   if (p === "/" || p === "") {
     return { kind: "redirect" };
   }
-  if (p === "/app/overview") {
-    return { kind: "overview" };
-  }
-  if (p === "/app/roles") {
-    return { kind: "roles" };
-  }
-  if (p === "/app/admin-control") {
-    return { kind: "admin" };
-  }
   if (p === "/app/profile/entities") {
     return { kind: "profile-list" };
-  }
-  if (p === "/app/profile/admin/conflicts" || p === "/app/profile/admin/conflicts/") {
-    return { kind: "profile-admin-conflicts" };
-  }
-
-  const instanceHistoryMatch = /^\/app\/profile\/instances\/([^/]+)\/history\/?$/.exec(p);
-  if (instanceHistoryMatch) {
-    return { kind: "profile-instance-history", instanceId: decodeURIComponent(instanceHistoryMatch[1]) };
-  }
-
-  const instanceMatch = /^\/app\/profile\/instances\/([^/]+)\/?$/.exec(p);
-  if (instanceMatch) {
-    return { kind: "profile-instance", instanceId: decodeURIComponent(instanceMatch[1]) };
-  }
-
-  const entityMatch = /^\/app\/profile\/entities\/([^/]+)\/?(?:([^/]+)\/?)?$/.exec(p);
-  if (entityMatch) {
-    const entityId = decodeURIComponent(entityMatch[1]);
-    const tabSeg = entityMatch[2];
-    const tab: ProfileEntityTab = tabSeg === "meta" ? "meta" : "card";
-    return { kind: "profile-entity", entityId, tab };
   }
 
   return { kind: "not-found" };
@@ -97,11 +49,3 @@ export function subscribeShellPath(listener: () => void): () => void {
   return () => window.removeEventListener("hashchange", listener);
 }
 
-/** Опциональный demo entityId для пунктов навигации, где нужен конкретный UUID сущности. */
-export function defaultProfileEntityIdForNav(): string | undefined {
-  const fromEnv = import.meta.env.VITE_PROFILE_DEMO_ENTITY_ID?.trim();
-  if (fromEnv && fromEnv !== "00000000-0000-0000-0000-000000000001") {
-    return fromEnv;
-  }
-  return undefined;
-}

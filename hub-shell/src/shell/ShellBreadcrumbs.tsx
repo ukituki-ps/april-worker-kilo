@@ -1,6 +1,5 @@
 import { Anchor, Breadcrumbs, Text } from "@mantine/core";
 import type { ShellRouteMatch } from "./shell-paths";
-import { shellPaths } from "./shell-paths";
 
 type Props = {
   match: ShellRouteMatch;
@@ -8,82 +7,15 @@ type Props = {
 
 export function ShellBreadcrumbs({ match }: Props): JSX.Element {
   const items: JSX.Element[] = [
-    <Anchor key="hub" href="#/app/overview" size="sm">
+    <Anchor key="hub" href="#/app/profile/entities" size="sm">
       AprilHub
     </Anchor>,
   ];
 
-  if (match.kind === "overview") {
-    items.push(
-      <Text key="cur" size="sm">
-        Обзор
-      </Text>,
-    );
-  } else if (match.kind === "roles") {
-    items.push(
-      <Text key="cur" size="sm">
-        Роли доступа
-      </Text>,
-    );
-  } else if (match.kind === "admin") {
-    items.push(
-      <Text key="cur" size="sm">
-        Админ-контур
-      </Text>,
-    );
-  } else if (match.kind === "profile-list") {
+  if (match.kind === "profile-list") {
     items.push(
       <Text key="cur" size="sm">
         Профиль / Список
-      </Text>,
-    );
-  } else if (match.kind === "profile-admin-conflicts") {
-    items.push(
-      <Anchor key="prof" href={`#${shellPaths.profilesList}`} size="sm">
-        Профиль
-      </Anchor>,
-    );
-    items.push(
-      <Text key="cur" size="sm">
-        Конфликты и merge
-      </Text>,
-    );
-  } else if (match.kind === "profile-entity") {
-    items.push(
-      <Anchor key="prof" href={`#${shellPaths.profilesList}`} size="sm">
-        Профиль
-      </Anchor>,
-    );
-    items.push(
-      <Text key="cur" size="sm">
-        Сущность {match.entityId.slice(0, 8)}… / {match.tab === "card" ? "Данные" : "Связи"}
-      </Text>,
-    );
-  } else if (match.kind === "profile-instance") {
-    items.push(
-      <Anchor key="prof" href={`#${shellPaths.profilesList}`} size="sm">
-        Профиль
-      </Anchor>,
-    );
-    items.push(
-      <Text key="cur" size="sm">
-        Экземпляры / {match.instanceId}
-      </Text>,
-    );
-  } else if (match.kind === "profile-instance-history") {
-    items.push(
-      <Anchor key="prof" href={`#${shellPaths.profilesList}`} size="sm">
-        Профиль
-      </Anchor>,
-    );
-    items.push(
-      <Anchor key="instance" href={`#${shellPaths.profileInstance(match.instanceId)}`} size="sm">
-        Экземпляры
-      </Anchor>,
-    );
-    items.push(
-      <Text key="cur" size="sm">
-        История / {match.instanceId}
       </Text>,
     );
   } else {
