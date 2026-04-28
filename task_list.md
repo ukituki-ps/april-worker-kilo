@@ -55,6 +55,7 @@
 - [ ] `038`: Реализация Sentry и error telemetry в AprilProfile (`april-profile-1`)
 - [ ] `039`: Аналог задачи 033 для AprilProfile: архитектура и документация error telemetry (Sentry + Loki/Prometheus)
 - [ ] `040`: Единый Grafana-дэшборд ошибок frontend/backend для dev-стенда (панели, фильтры, drill-down, runbook)
+- [x] `041`: Исполнение внешней задачи 040-phase-5-widget-card-layout-modernization из `april-profile-1` (актуализация раздела Profiles list widget + двойной отчёт)
 
 ## Текущий фокус
 
@@ -97,6 +98,7 @@
 - [ ] `038-aprilprofile-sentry-implementation`: реализовать error capture и операционную интеграцию в `april-profile-1` (внешняя постановка + двойной отчёт)
 - [ ] `039-aprilprofile-observability-error-telemetry-architecture-docs`: отдельная внешняя задача (аналог `033`) на архитектурное решение и документационный контур error telemetry в `april-profile-1` с двойным отчётом
 - [ ] `040-aprilhub-unified-error-dashboard`: собрать полноценный Grafana-дэшборд ошибок всех уровней (`frontend` + `hub-bff` + downstream) для dev-стенда и задокументировать triage-поток
+- [x] `041-aprilhub-execute-external-task-040-phase-5-widget-card-layout-modernization-april-profile-1`: актуализировать в `april-worker` разделы про `Profiles list widget` после изменений во внешнем `april-profile-1` и оформить двойной отчёт
 
 ## План реализации AprilHub: статусы
 
@@ -141,3 +143,4 @@
 | `038` | Реализация Sentry и error telemetry в AprilProfile (`april-profile-1`) | ⏳ Не начато | [`tasks/038-aprilprofile-sentry-implementation/TASK.md`](./tasks/038-aprilprofile-sentry-implementation/TASK.md) |
 | `039` | Аналог задачи 033 для AprilProfile: архитектура и документация error telemetry (Sentry + Loki/Prometheus) | ⏳ Не начато | [`tasks/039-aprilprofile-observability-error-telemetry-architecture-docs/TASK.md`](./tasks/039-aprilprofile-observability-error-telemetry-architecture-docs/TASK.md) |
 | `040` | Единый Grafana-дэшборд ошибок frontend/backend для dev-стенда | ⏳ Не начато | [`tasks/040-aprilhub-unified-error-dashboard/TASK.md`](./tasks/040-aprilhub-unified-error-dashboard/TASK.md) |
+| `041` | Исполнение внешней задачи `040-phase-5-widget-card-layout-modernization` из `april-profile-1` (актуализация раздела `Profiles list widget`) | ✅ Выполнено | [`tasks/041-aprilhub-execute-external-task-040-phase-5-widget-card-layout-modernization-april-profile-1/TASK.md`](./tasks/041-aprilhub-execute-external-task-040-phase-5-widget-card-layout-modernization-april-profile-1/TASK.md) |
