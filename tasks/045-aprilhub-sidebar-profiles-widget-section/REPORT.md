@@ -67,3 +67,16 @@ npm --prefix hub-shell run e2e:smoke
 ## 8) Что осталось
 - [ ] Повторно прогнать `npm --prefix hub-shell run e2e:smoke` на стабильном dev-стенде и зафиксировать успешный результат.
 - [ ] Создать PR с test plan и рисками после успешного smoke.
+
+## 9) Incident triage (белый экран `dev.april.ukituki.tech`)
+- Инцидент: белый экран на `https://dev.april.ukituki.tech/` (окружение `dev`), фронтенд runtime crash до отрисовки.
+- Корреляция: route `/`; `requestId`/`correlationId`/`tenant`/роль Keycloak в публичном доступе не получены (экран падает до прикладного API-взаимодействия).
+- Sentry: прямой доступ к issue отсутствует в текущем контуре (нужны доступы к проекту Sentry/issue URL), но runtime-симптом воспроизведён через Playwright.
+- Loki/Prometheus: через `dev.april.ukituki.tech` observability-endpoint'ы действительно уходят в Vite fallback, но прямой central доступ работает: `http://192.168.1.29:3100` (Loki) и `http://192.168.1.29:9090` (Prometheus).
+- Loki (30m): зафиксированы ошибки `hub-shell` уровня dev-server (`[vite] Pre-transform error: ENOENT ... @vitejs/plugin-react/dist/refresh-runtime.js`), а также HMR события; прямых backend request-correlated ошибок по `requestId`/`correlationId` в рамках этого инцидента не выявлено.
+- Prometheus: активен алерт `AprilHubTargetDown` для `instance=192.168.1.42:8081` (`up=0`), при этом локальный target `192.168.1.29:8081` остаётся `up=1`.
+- Prometheus (HTTP rate): в `hub_bff_http_requests_total` видна базовая активность `200` и единичные `404`, а явного всплеска `5xx` в окне triage не зафиксировано.
+- Наблюдения frontend: `PAGEERROR The requested module '/@fs/workspace/design-system/DisignApril/packages/ui/dist/index.js?...' does not provide an export named 'CardListColumn'`.
+- Root cause classification: **frontend runtime integration defect** (несовместимость экспортов внешнего widget-контракта/дизайн-системы на этапе module import).
+- Исправление: в `hub-shell/src/widgets.tsx` переведён импорт внешнего `ProfilesWidget` на `React.lazy` + `Suspense` под `CompositionErrorBoundary`, чтобы сбой внешнего модуля не валил весь shell в белый экран.
+- Верификация: `npm --prefix hub-shell run lint` и `npm --prefix hub-shell run build` — `ok`; сборка содержит отдельный chunk `april-profile-ui-*.js`, подтверждая lazy загрузку интеграции.
