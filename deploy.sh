@@ -183,9 +183,8 @@ run_submodules() {
   local profile_submodule="vendor/april-profile"
   local disignapril_ssh_default="git@github-disignapril:ukituki-ps/DisignApril.git"
   local disignapril_ssh_fallback="git@github.com:ukituki-ps/DisignApril.git"
-  local profile_ssh_default="git@github.com:ukituki-ps/april-profile.git"
   local disignapril_url="${DISIGNAPRIL_SUBMODULE_URL:-}"
-  local profile_url="${APRIL_PROFILE_SUBMODULE_URL:-${profile_ssh_default}}"
+  local profile_url="${APRIL_PROFILE_SUBMODULE_URL:-}"
 
   if [[ -z "${disignapril_url}" ]]; then
     if ssh -G github-disignapril >/dev/null 2>&1; then
@@ -196,7 +195,9 @@ run_submodules() {
   fi
 
   git config "submodule.${design_april_submodule}.url" "${disignapril_url}" || true
-  git config "submodule.${profile_submodule}.url" "${profile_url}" || true
+  if [[ -n "${profile_url}" ]]; then
+    git config "submodule.${profile_submodule}.url" "${profile_url}" || true
+  fi
 
   log "git submodule update --init --recursive"
   git submodule update --init --recursive "${design_april_submodule}" "${profile_submodule}"
