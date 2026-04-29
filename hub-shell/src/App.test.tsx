@@ -94,7 +94,7 @@ describe("App", () => {
     });
   });
 
-  it("renders authorized shell in auth-only mode", async () => {
+  it("renders authorized shell with profiles section", async () => {
     keycloakState.authState = true;
     apiRequestMock.mockResolvedValue({
       ok: true,
@@ -114,9 +114,9 @@ describe("App", () => {
       expect(screen.getByTestId("theme-scheme-control")).toBeInTheDocument();
       const nav = screen.getByRole("navigation", { name: "Основная навигация" });
       expect(nav).toBeInTheDocument();
-      expect(nav.querySelectorAll("a")).toHaveLength(0);
-      expect(screen.getByTestId("authorized-empty-placeholder")).toBeInTheDocument();
-      expect(screen.getByText("Продуктовые разделы временно отключены в рамках auth-only режима.")).toBeInTheDocument();
+      expect(nav.querySelectorAll("a")).toHaveLength(1);
+      expect(screen.getByRole("link", { name: "Профили" })).toBeInTheDocument();
+      expect(screen.getByTestId("profiles-widget-card")).toBeInTheDocument();
     });
   });
 
