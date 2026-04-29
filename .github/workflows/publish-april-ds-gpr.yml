@@ -23,11 +23,15 @@ jobs:
   publish:
     runs-on: [self-hosted, ci, profile]
     steps:
+      # secrets нельзя использовать в if: у шага — workflow не принимается (422). Проверка через env.
       - name: Require GPR_PUBLISH_TOKEN secret
-        if: ${{ secrets.GPR_PUBLISH_TOKEN == '' }}
+        env:
+          GPR_PUBLISH_TOKEN: ${{ secrets.GPR_PUBLISH_TOKEN }}
         run: |
-          echo "::error title=Missing GPR_PUBLISH_TOKEN::Add repository secret GPR_PUBLISH_TOKEN (classic PAT: write:packages, read:packages). See workflow header in publish-april-ds-gpr.yml"
-          exit 1
+          if [ -z "$GPR_PUBLISH_TOKEN" ]; then
+            echo "::error title=Missing GPR_PUBLISH_TOKEN::Add repository secret GPR_PUBLISH_TOKEN (classic PAT: write:packages, read:packages). See workflow header in publish-april-ds-gpr.yml"
+            exit 1
+          fi
 
       - uses: actions/checkout@v4
         with:
