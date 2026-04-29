@@ -3,7 +3,7 @@
 - Статус: ⚠️ частично — выполнена **финальная верификация по [`TASK-049-99`](./TASK-049-99-aprilhub-final-integration-verify.md)**; **полное закрытие эпика 049** по [`TASK.md`](./TASK.md) (registry-only lock, подтверждённые публикации, AprilProfile/DisignApril) **ещё не зафиксировано**
 - Задача: 049-99 — AprilHub: финальная сквозная проверка и сборка эпика registry-DS
 - Ветка: `feature/049-99-epic-final-verify`
-- Коммиты: `e14d72a`
+- Коммиты: ветка `feature/049-99-epic-final-verify` — см. последний коммит на GitHub
 - PR: https://github.com/ukituki-ps/april-worker/compare/develop...feature/049-99-epic-final-verify
 
 ## 2) Что сделано
