@@ -12,10 +12,8 @@
     "build": "tsc --noEmit && vite build",
     "lint": "tsc --noEmit",
     "test": "vitest run",
-    "check:profile-ui-semver": "node scripts/check-april-profile-ui-semver.mjs",
     "e2e": "playwright test",
-    "e2e:integration": "playwright test tests/e2e/profile-widgets-integration.spec.ts",
-    "e2e:smoke": "playwright test tests/e2e/guest.spec.ts tests/e2e/shell-privileged.spec.ts tests/e2e/profile-widgets-smoke.spec.ts",
+    "e2e:smoke": "playwright test tests/e2e/guest.spec.ts tests/e2e/shell-privileged.spec.ts",
     "e2e:install": "playwright install --with-deps chromium",
     "preview": "vite preview --host 0.0.0.0 --port 4173"
   },

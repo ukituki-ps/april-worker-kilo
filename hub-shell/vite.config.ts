@@ -34,7 +34,6 @@ export default defineConfig(({ mode }) => {
       alias: {
         "@mantine/core": path.join(hubShellDir, "node_modules/@mantine/core"),
         "@mantine/hooks": path.join(hubShellDir, "node_modules/@mantine/hooks"),
-        "@april/profile-ui": path.resolve(hubShellDir, "src/vendor/april-profile-ui.tsx"),
       },
     },
     server: {

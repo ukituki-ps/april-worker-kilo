@@ -7,9 +7,6 @@
     "skipLibCheck": true,
     "moduleResolution": "Bundler",
     "baseUrl": ".",
-    "paths": {
-      "@april/profile-ui": ["src/vendor/april-profile-ui.tsx"]
-    },
     "allowImportingTsExtensions": false,
     "resolveJsonModule": true,
     "isolatedModules": true,

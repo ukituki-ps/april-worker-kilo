@@ -1,6 +1,6 @@
 import type { ComponentType } from "react";
 import type { ShellUserContext } from "./types";
-import { BrokenWidget, OverviewWidget, ProfileWidget, RolesWidget } from "./widgets";
+import { BrokenWidget, OverviewWidget, RolesWidget } from "./widgets";
 
 export type WidgetComponent = ComponentType<{ context: ShellUserContext }>;
 
@@ -29,10 +29,5 @@ export const shellRegistry: CompositionModule[] = [
     title: "Админ-контур",
     requiresRole: "admin",
     loader: staticLoad(BrokenWidget),
-  },
-  {
-    id: "profile-widget",
-    title: "Профиль (виджет)",
-    loader: staticLoad(ProfileWidget),
   },
 ];
