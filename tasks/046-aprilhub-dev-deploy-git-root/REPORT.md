@@ -19,6 +19,7 @@
 
 - [infra] Дефолт `APRIL_DEPLOY_ROOT` в `dev-deploy.yml` заменён на `/opt/april-worker`, добавлены комментарии.
 - [docs] Обновлены `docs/DEPLOYMENT_STRATEGY.md`, `docs/guides/PROJECT_DEFAULTS.md` (разделение AprilHub / AprilProfile).
+- [docs+scripts] Раздел **§5.1** «Что должно быть на сервере один раз» и `scripts/bootstrap-server-deploy-once.sh` (идемпотентная подготовка `.env`/`images.env`); скрипт выполнен на dev-хосте `192.168.1.42` (`.env`/`images.env` уже были).
 
 ## 4) Изменённые файлы
 
