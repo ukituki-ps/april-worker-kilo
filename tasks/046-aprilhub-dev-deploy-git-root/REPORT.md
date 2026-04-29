@@ -4,7 +4,7 @@
 - Задача: исправление дефолта пути деплоя GitHub Actions для AprilHub (`april-worker`)
 - Ветка: `fix/046-dev-deploy-git-root`
 - Коммиты: единый коммит на ветке `fix/046-dev-deploy-git-root` (до merge)
-- PR: не создавался из среды агента
+- PR: https://github.com/ukituki-ps/april-worker/pull/92
 
 ## 2) Инцидент и классификация (CI / Git, не runtime Sentry)
 
