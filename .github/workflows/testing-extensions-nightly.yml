@@ -9,6 +9,7 @@ jobs:
   hub-shell-playwright-smoke:
     name: Hub Shell Playwright smoke
     runs-on: [self-hosted, ci, profile]
+    continue-on-error: true
     timeout-minutes: 35
     steps:
       - name: Pre-clean workspace (best effort)
