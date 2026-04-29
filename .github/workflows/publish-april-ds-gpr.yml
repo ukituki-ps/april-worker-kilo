@@ -5,8 +5,11 @@ name: Publish @april DS to GitHub Packages
 on:
   workflow_dispatch:
 
-# If org caps default token, explicit scopes may still omit packages:write — write-all requests max allowed.
-permissions: write-all
+# Repo «Read and write» alone is often NOT enough: many orgs cap GITHUB_TOKEN so GPR publish still gets write_package.
+# Fix: add repo secret GPR_PUBLISH_TOKEN = classic PAT with write:packages (+ repo if private); SSO authorize token for org.
+permissions:
+  contents: read
+  packages: write
 
 concurrency:
   group: publish-april-ds-gpr
