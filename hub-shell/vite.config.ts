@@ -32,8 +32,14 @@ export default defineConfig(({ mode }) => {
       // @april/ui из submodule тянет @mantine/* из pnpm внутри DS → второй React и invalid hook call в Vitest.
       dedupe: ["react", "react-dom"],
       alias: {
+        "@april/ui": path.join(hubShellDir, "node_modules/@april/ui"),
+        "@april/tokens": path.join(hubShellDir, "node_modules/@april/tokens"),
         "@mantine/core": path.join(hubShellDir, "node_modules/@mantine/core"),
         "@mantine/hooks": path.join(hubShellDir, "node_modules/@mantine/hooks"),
+        "@april/profile-ui-external": path.join(
+          hubShellDir,
+          "../vendor/april-profile/frontend/packages/profile-ui/src/index.ts",
+        ),
       },
     },
     server: {
