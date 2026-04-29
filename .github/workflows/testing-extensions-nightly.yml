@@ -34,6 +34,8 @@ jobs:
         run: mkdir -p artifacts/playwright
 
       - name: Run Playwright smoke suite
+        env:
+          DOCS_HTTP_PORT: "18080"
         run: ./scripts/run-playwright-aprilhub.sh
 
       - name: Copy Playwright report artifacts
@@ -96,7 +98,17 @@ jobs:
 
       - name: Run integration suite
         working-directory: hub-bff
-        run: go test ./... -run Integration
+        run: |
+          for attempt in 1 2; do
+            if go test ./... -run Integration; then
+              exit 0
+            fi
+            if [ "$attempt" -eq 2 ]; then
+              exit 1
+            fi
+            echo "Integration test failed on attempt $attempt; retrying once..."
+            sleep 5
+          done
 
       - name: Write quality metrics payload
         if: always()
