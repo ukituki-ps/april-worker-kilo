@@ -3,7 +3,7 @@
 - Статус: ✅ выполнено (локальная интеграция и сборка; смок на dev-ingress ожидается при поднятом upstream без 502)
 - Задача: AprilHub Shell — parity с `@april/ui` (Header / Sidebar), full-height layout, favicon Icon Only `#12B886`, выравнивание Keycloak favicon
 - Ветка: `fix/047-aprilhub-shell-ds-parity`
-- Коммиты: `0371e02` (родитель), `5e03e27` (подмодуль `design-system/DisignApril`)
+- Коммиты: см. последний коммит на ветке `fix/047-aprilhub-shell-ds-parity`; подмодуль [`design-system/DisignApril`](../../design-system/DisignApril) зафиксирован на `5e03e27`.
 - PR: не создавался
 
 ## 2) Что сделано
