@@ -6,7 +6,7 @@ import { useShellNavigate, useShellPathname } from "./use-shell-pathname";
 
 /** Расширение контракта host → виджет (см. docs/WIDGET_CONTRACTS.md): навигация и маршрут. */
 export type HubHostNavigationApi = {
-  /** Возврат к базовому экрану профилей. */
+  /** Возврат к базовому экрану авторизованного shell. */
   goToProfilesList: () => void;
   goBack: () => void;
 };
@@ -57,7 +57,7 @@ export function HubHostContextProvider({ context, children }: ProviderProps): JS
   const navigation = useMemo<HubHostNavigationApi>(
     () => ({
       goToProfilesList: () => {
-        navigate(shellPaths.profilesList);
+        navigate(shellPaths.home);
       },
       goBack: () => {
         window.history.back();
