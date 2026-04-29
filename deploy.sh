@@ -199,6 +199,10 @@ run_submodules() {
     git config "submodule.${profile_submodule}.url" "${profile_url}" || true
   fi
 
+  # Если URL субмодуля раньше был переопределён локально (например на SSH),
+  # синхронизируем .git/config из актуального .gitmodules перед update.
+  git submodule sync --recursive "${design_april_submodule}" "${profile_submodule}"
+
   log "git submodule update --init --recursive"
   git submodule update --init --recursive "${design_april_submodule}" "${profile_submodule}"
 }
