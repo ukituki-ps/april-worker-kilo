@@ -9,8 +9,14 @@ export type ShellNavItem = {
 };
 
 export function buildPrimaryShellNav(): ShellNavItem[] {
-  // Auth-only режим: sidebar остаётся как структурный контейнер, но без продуктовых пунктов.
-  return [];
+  return [
+    {
+      id: "profiles-list",
+      label: "Профили",
+      href: "#/app/profile/entities",
+      activePrefix: "/app/profile/entities",
+    },
+  ];
 }
 
 export function resolveActiveNavId(pathname: string, items: ShellNavItem[]): string | undefined {
