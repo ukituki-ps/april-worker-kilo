@@ -26,6 +26,7 @@
 - `hub-shell/src/shell/shell-paths.ts`
 - `hub-shell/src/shell/shell-paths.test.ts`
 - `hub-shell/src/widgets.tsx`
+- `hub-shell/scripts/ds-prepare.sh`
 - `hub-shell/tests/e2e/shell-privileged.spec.ts`
 - `hub-shell/tests/e2e/profile-widgets-smoke.spec.ts`
 - `tasks/045-aprilhub-sidebar-profiles-widget-section/PLAN.md`
@@ -37,17 +38,16 @@
 - Обратимость: да (revert frontend/docs изменений)
 
 ## 5) Проверка качества
-- Линтер: ok
-- Сборка: ok
-- Unit tests: ok
-- Integration tests: ok (в составе `vitest run`)
-- E2E / smoke: fail (таймауты стенда в Playwright-прогоне)
+- Линтер: ok (`npm --prefix hub-shell run lint`)
+- Сборка: ok (`npm --prefix hub-shell run build`)
+- Unit tests: ok (исторический прогон в рамках задачи)
+- Integration tests: ok (исторический прогон в составе `vitest run`)
+- E2E / smoke: fail (многочисленные таймауты Playwright, прогон прерван после серии падений)
 
 Команды (фактически выполненные):
 ```bash
 npm --prefix hub-shell install --package-lock-only
 npm --prefix hub-shell run lint
-npm --prefix hub-shell run test
 npm --prefix hub-shell run build
 npm --prefix hub-shell run e2e:smoke
 ```
@@ -62,10 +62,11 @@ npm --prefix hub-shell run e2e:smoke
 ## 7) Риски и ограничения
 - В текущем окружении `npm --prefix hub-shell install` падает с `EACCES`, поэтому прямое подключение `@april/profile-ui` через `node_modules` не использовано.
 - Использован внешний runtime-артефакт (`dist/index.js`) из соседнего репозитория `april-profile-1`; это соответствует требованию "строго внешний виджет", но требует наличия этого артефакта на рабочей машине/CI.
-- `e2e:smoke` не завершён успешно из-за стендовых таймаутов; перед merge нужен зелёный прогон smoke.
+- `e2e:smoke` не завершён успешно из-за стендовых таймаутов (упали guest/privileged/profile-widgets smoke); перед merge нужен зелёный прогон smoke.
 
 ## 8) Что осталось
 - [ ] Повторно прогнать `npm --prefix hub-shell run e2e:smoke` на стабильном dev-стенде и зафиксировать успешный результат.
+- [ ] Добавить в incident артефакты из Sentry (issue URL + теги корреляции), как только будет доступ к проекту.
 - [ ] Создать PR с test plan и рисками после успешного smoke.
 
 ## 9) Incident triage (белый экран `dev.april.ukituki.tech`)
@@ -77,6 +78,6 @@ npm --prefix hub-shell run e2e:smoke
 - Prometheus: активен алерт `AprilHubTargetDown` для `instance=192.168.1.42:8081` (`up=0`), при этом локальный target `192.168.1.29:8081` остаётся `up=1`.
 - Prometheus (HTTP rate): в `hub_bff_http_requests_total` видна базовая активность `200` и единичные `404`, а явного всплеска `5xx` в окне triage не зафиксировано.
 - Наблюдения frontend: `PAGEERROR The requested module '/@fs/workspace/design-system/DisignApril/packages/ui/dist/index.js?...' does not provide an export named 'CardListColumn'`.
-- Root cause classification: **frontend runtime integration defect** (несовместимость экспортов внешнего widget-контракта/дизайн-системы на этапе module import).
-- Исправление: в `hub-shell/src/widgets.tsx` переведён импорт внешнего `ProfilesWidget` на `React.lazy` + `Suspense` под `CompositionErrorBoundary`, чтобы сбой внешнего модуля не валил весь shell в белый экран.
-- Верификация: `npm --prefix hub-shell run lint` и `npm --prefix hub-shell run build` — `ok`; сборка содержит отдельный chunk `april-profile-ui-*.js`, подтверждая lazy загрузку интеграции.
+- Root cause classification: **frontend runtime integration defect** (рассинхронизация артефактов `@april/ui`: внешний `ProfilesWidget` ожидает экспорт `CardListColumn`, а установленный runtime-пакет мог не содержать актуальный `dist`).
+- Исправление: в `hub-shell/scripts/ds-prepare.sh` добавлена принудительная синхронизация `@april/ui` из `design-system/DisignApril/packages/ui/dist` в `hub-shell/node_modules/@april/ui` (с безопасными skip-ветками для read-only и symlink-сценариев), чтобы исключить stale-артефакты перед `dev/build/test`.
+- Верификация: `npm --prefix hub-shell run ds:prepare`, `npm --prefix hub-shell run lint`, `npm --prefix hub-shell run build` — `ok`; экспорт `CardListColumn` присутствует в `design-system/.../packages/ui/dist/index.js`.
