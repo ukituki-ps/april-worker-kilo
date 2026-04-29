@@ -42,8 +42,12 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          jq '. + {"repository":{"type":"git","url":"git+https://github.com/ukituki-ps/april-worker.git"}}' package.json > package.json.tmp
-          mv package.json.tmp package.json
+          node <<'NODE'
+          const fs = require('fs');
+          const p = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+          p.repository = { type: 'git', url: 'git+https://github.com/ukituki-ps/april-worker.git' };
+          fs.writeFileSync('package.json', JSON.stringify(p, null, 2) + '\n');
+          NODE
           npm publish --registry=https://npm.pkg.github.com
 
       - name: Publish @april/ui
@@ -51,6 +55,12 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          jq '.dependencies["@april/tokens"]="^0.1.0" | . + {"repository":{"type":"git","url":"git+https://github.com/ukituki-ps/april-worker.git"}}' package.json > package.json.tmp
-          mv package.json.tmp package.json
+          node <<'NODE'
+          const fs = require('fs');
+          const p = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+          p.dependencies = p.dependencies || {};
+          p.dependencies['@april/tokens'] = '^0.1.0';
+          p.repository = { type: 'git', url: 'git+https://github.com/ukituki-ps/april-worker.git' };
+          fs.writeFileSync('package.json', JSON.stringify(p, null, 2) + '\n');
+          NODE
           npm publish --registry=https://npm.pkg.github.com
