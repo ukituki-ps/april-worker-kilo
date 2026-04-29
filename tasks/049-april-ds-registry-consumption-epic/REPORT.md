@@ -28,6 +28,8 @@
 
 - `task_list.md`
 - `tasks/049-april-ds-registry-consumption-epic/REPORT.md`
+- `tasks/049-april-ds-registry-consumption-epic/TASK.md`
+- `tasks/049-april-ds-registry-consumption-epic/TASK-049-99-aprilhub-final-integration-verify.md`
 
 ## 4) Миграции и данные
 
