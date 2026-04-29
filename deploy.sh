@@ -290,7 +290,11 @@ run_compose() {
   nginx_hash_before="$(calc_sha256 "$nginx_conf" || true)"
 
   log "docker compose pull"
-  "${compose_files[@]}" pull
+  if ! "${compose_files[@]}" pull; then
+    # На нестабильных dev-стендах pull может временно падать из-за DNS/registry сетевых сбоев.
+    # Продолжаем с локальным кэшем образов; если нужного образа нет — compose up ниже завершится ошибкой.
+    log "предупреждение: docker compose pull завершился с ошибкой, продолжаем с локальными образами"
+  fi
   log "docker compose up -d"
   "${compose_files[@]}" up -d
 
