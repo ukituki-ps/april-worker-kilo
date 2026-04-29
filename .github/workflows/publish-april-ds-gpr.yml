@@ -5,10 +5,8 @@ name: Publish @april DS to GitHub Packages
 on:
   workflow_dispatch:
 
-# Typical GPR publish: packages:write (+ contents:read). contents:write avoids rare link/metadata failures.
-permissions:
-  contents: write
-  packages: write
+# If org caps default token, explicit scopes may still omit packages:write — write-all requests max allowed.
+permissions: write-all
 
 concurrency:
   group: publish-april-ds-gpr
