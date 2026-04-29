@@ -113,9 +113,18 @@ ensure_ui_runtime_exports() {
   fi
 
   echo "[ds:prepare] CardListColumn export missing in @april/ui dist, try runtime-only rebuild"
+  if command -v pnpm >/dev/null 2>&1; then
+    pnpm_cmd="pnpm"
+  elif command -v corepack >/dev/null 2>&1; then
+    pnpm_cmd="corepack pnpm"
+  else
+    echo "[ds:prepare] warning: neither pnpm nor corepack found, skip runtime rebuild"
+    return
+  fi
   (
     cd "${ui_pkg_dir}"
-    pnpm exec tsup --dts false
+    # node:<version>-alpine can lack a pnpm shim in PATH; corepack fallback keeps dev containers working.
+    sh -c "${pnpm_cmd} exec tsup --dts false"
   )
 
   if grep -q "CardListColumn" "${ui_dist_file}"; then
