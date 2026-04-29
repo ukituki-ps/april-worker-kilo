@@ -15,7 +15,8 @@ concurrency:
 
 jobs:
   publish:
-    runs-on: ubuntu-latest
+    # GitHub-hosted runners may be unavailable for private org billing; use the same pool as CI.
+    runs-on: [self-hosted, ci, profile]
     steps:
       - uses: actions/checkout@v4
         with:
