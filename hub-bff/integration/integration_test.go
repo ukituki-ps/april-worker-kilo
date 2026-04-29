@@ -27,7 +27,7 @@ func TestIntegrationAtlasMigrationFlow(t *testing.T) {
 	defer cancel()
 
 	req := testcontainers.ContainerRequest{
-		Image:        "postgres:16-alpine",
+		Image:        "postgres:15-alpine",
 		ExposedPorts: []string{"5432/tcp"},
 		Env: map[string]string{
 			"POSTGRES_DB":       "aprilhub",

@@ -49,6 +49,7 @@ jobs:
         env:
           PLAYWRIGHT_RUNNER: docker
           PLAYWRIGHT_DOCKER_IMAGE: mcr.microsoft.com/playwright:v1.53.0-noble
+          PLAYWRIGHT_NPM_SCRIPT: e2e:smoke
         run: ./scripts/run-playwright-aprilhub.sh
 
       - name: Copy Playwright report artifacts

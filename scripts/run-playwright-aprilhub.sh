@@ -117,6 +117,7 @@ fi
 echo "[playwright] running smoke suite"
 if [ "${PLAYWRIGHT_RUNNER:-host}" = "docker" ]; then
   PLAYWRIGHT_DOCKER_IMAGE="${PLAYWRIGHT_DOCKER_IMAGE:-mcr.microsoft.com/playwright:v1.53.0-noble}"
+  PLAYWRIGHT_NPM_SCRIPT="${PLAYWRIGHT_NPM_SCRIPT:-e2e}"
   echo "[playwright] running smoke suite in docker (${PLAYWRIGHT_DOCKER_IMAGE})"
   docker run --rm \
     --network host \
@@ -128,13 +129,15 @@ if [ "${PLAYWRIGHT_RUNNER:-host}" = "docker" ]; then
     -e PLAYWRIGHT_PASSWORD \
     -e PLAYWRIGHT_RESTRICTED_USER \
     -e PLAYWRIGHT_RESTRICTED_PASSWORD \
+    -e PLAYWRIGHT_NPM_SCRIPT \
     -v "$ROOT_DIR/hub-shell:/workspace/hub-shell" \
     -w /workspace/hub-shell \
     "$PLAYWRIGHT_DOCKER_IMAGE" \
-    sh -lc "npm ci && npx playwright install chromium && npm run e2e"
+    sh -lc "npm ci && npx playwright install chromium && npm run ${PLAYWRIGHT_NPM_SCRIPT}"
 else
+  PLAYWRIGHT_NPM_SCRIPT="${PLAYWRIGHT_NPM_SCRIPT:-e2e}"
   (
     cd hub-shell
-    npm run e2e
+    npm run "${PLAYWRIGHT_NPM_SCRIPT}"
   )
 fi
