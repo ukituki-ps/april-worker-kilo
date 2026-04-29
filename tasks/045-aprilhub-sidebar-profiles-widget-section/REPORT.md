@@ -6,25 +6,30 @@
 - PR: не создавался
 
 ## 2) Что сделано
-- [frontend] Восстановлен продуктовый маршрут `Профили` в shell: `#/app/profile/entities`, redirect с `#/app` и fallback для неизвестных маршрутов.
-- [frontend] В primary sidebar возвращён пункт `Профили` с корректным active-state.
-- [frontend] В `AuthorizedHubContent` подключён `ProfilesListHostWidget` в `CompositionErrorBoundary` (host-context/auth/tenant/correlation callbacks сохранены в host-виджете).
-- [frontend] Синхронизированы `ShellBreadcrumbs` и `HubHostContext` navigation API под новый целевой маршрут.
-- [frontend/tests] Обновлены unit/e2e smoke тесты под новый контракт shell (раздел `Профили`, redirect, fallback).
-- [docs] Добавлены артефакты задачи: `PLAN.md`, обновлён `task_list.md` со статусом `045`.
+- [frontend] Восстановлен продуктовый раздел `Профили` в сайдбаре (`#/app/profile/entities`) и активный state навигации.
+- [frontend] Обновлена маршрутизация `hub-shell`: redirect с `#/app` в `#/app/profile/entities`, fallback для неизвестных маршрутов, поддержка host-навигации в legacy entity-route (`/app/profile/entities/:entityId/:tab`).
+- [frontend] В `AuthorizedHubContent` подключен `ProfilesListHostWidget` через `CompositionErrorBoundary`.
+- [frontend] Добавлен vendor adapter `hub-shell/src/vendor/april-profile-ui.tsx` с контрактом `ProfilesWidget` (hostContext, `apiBaseUrl`, `accessToken`, `onAction`, `onError`, `onOpenEntity`, `onObservability`) и базовой telemetry-эмиссией `view/list_*`.
+- [frontend] Интегрированы callbacks host-уровня: toast для успешных действий, user-safe error сообщения с `request_id`, host navigation для `onOpenEntity`.
+- [frontend/tests] Обновлены unit/e2e smoke тесты под новый UX-контракт раздела `Профили`, добавлен отдельный smoke-спек.
+- [docs] Актуализированы `PLAN.md`, `REPORT.md` и статус `045` в `task_list.md`.
 
 ## 3) Изменённые файлы
-- `hub-shell/src/shell/shell-paths.ts`
-- `hub-shell/src/shell/shell-paths.test.ts`
-- `hub-shell/src/shell/shell-nav-config.ts`
+- `hub-shell/package.json`
+- `hub-shell/src/App.test.tsx`
 - `hub-shell/src/shell/AuthorizedHubContent.tsx`
 - `hub-shell/src/shell/ShellBreadcrumbs.tsx`
 - `hub-shell/src/shell/hub-host-context.tsx`
-- `hub-shell/src/App.test.tsx`
+- `hub-shell/src/shell/shell-nav-config.ts`
+- `hub-shell/src/shell/shell-paths.ts`
+- `hub-shell/src/shell/shell-paths.test.ts`
+- `hub-shell/src/widgets.tsx`
+- `hub-shell/src/vendor/april-profile-ui.tsx`
 - `hub-shell/tests/e2e/shell-privileged.spec.ts`
 - `hub-shell/tests/e2e/profile-widgets-smoke.spec.ts`
-- `tasks/045-aprilhub-sidebar-profiles-widget-section/PLAN.md`
 - `task_list.md`
+- `tasks/045-aprilhub-sidebar-profiles-widget-section/PLAN.md`
+- `tasks/045-aprilhub-sidebar-profiles-widget-section/REPORT.md`
 
 ## 4) Миграции и данные
 - Миграции Atlas: нет
@@ -40,9 +45,11 @@
 
 Команды (фактически выполненные):
 ```bash
-cd hub-shell && npm run lint && npm run test
-cd hub-shell && npm run e2e:smoke
-cd hub-shell && npm run build
+npm --prefix hub-shell install --package-lock-only
+npm --prefix hub-shell run lint
+npm --prefix hub-shell run test
+npm --prefix hub-shell run build
+npm --prefix hub-shell run e2e:smoke
 ```
 
 ## 6) Деплой
@@ -53,8 +60,8 @@ cd hub-shell && npm run build
 - Rollback: нет
 
 ## 7) Риски и ограничения
-- Контракт `onOpenEntity` в текущих типах `@april/profile-ui`, доступных в этом репозитории, явно не представлен; интеграция выполнена через поддерживаемые callbacks (`onAction`, `onError`) и host-navigation API.
-- Полный release-gate с evidence по мониторингу/логам требует отдельной проверки на целевом стенде с реальными telemetry данными.
+- Интеграция `profiles-widget` выполнена через локальный vendor adapter в `hub-shell` (shim), а не через поставку npm-пакета `@april/profile-ui` в runtime, из-за ограничений окружения (`EACCES` при `npm install` в `node_modules`).
+- Для полного production-path желательно заменить shim на прямое подключение внешнего пакета (dist/registry) без локальной адаптации.
 
 ## 8) Что осталось
-- [ ] Создать рабочую ветку `feature/*` от `develop` и оформить commit/PR по изменениям.
+- [ ] Вынести vendor shim на прямую поставку `@april/profile-ui` (при доступном install/runtime контуре).
