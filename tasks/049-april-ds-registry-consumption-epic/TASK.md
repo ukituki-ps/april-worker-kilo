@@ -34,7 +34,7 @@
 - [ ] AprilHub: `hub-shell` собирается из lock с зависимостями из registry; документация обновлена
 - [ ] AprilProfile: постановка выполнена во внешнем репо (координация владельца)
 - [ ] DisignApril: постановка выполнена во внешнем репо
-- [ ] Выполнена [`TASK-049-99`](./TASK-049-99-aprilhub-final-integration-verify.md)
+- [x] Выполнена [`TASK-049-99`](./TASK-049-99-aprilhub-final-integration-verify.md) — отчёт [`REPORT.md`](./REPORT.md); полное закрытие эпика см. критерии выше и статус в [`task_list.md`](../../task_list.md)
 
 ## Внешние постановки (скопировать в другие репозитории)
 
