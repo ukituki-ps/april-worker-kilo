@@ -60,6 +60,7 @@
 - [ ] `043`: Минималистичный сайдбар AprilHub — оставить только `Профиль — список`, убрать остальные разделы/маршруты/запросы
 - [x] `044`: Auth-only контур AprilHub — оставить авторизацию и пустой сайдбар, убрать весь продуктовый runtime
 - [ ] `045`: Вернуть в AprilHub раздел `Профили` в сайдбаре и встроить `profiles-widget` как production-ready модуль (host-context/auth/tenant/error/telemetry/release-gate)
+- [x] `047`: Parity авторизованного shell и Keycloak login с эталонами `@april/ui` (`HeaderSection` / `SidebarSection` из `UIKit` §2–3, favicon `#12B886`, full-height каркас, восстановление Keycloak темы; см. [`tasks/047-aprilhub-shell-ds-parity-keycloak-layout/TASK.md`](./tasks/047-aprilhub-shell-ds-parity-keycloak-layout/TASK.md), [`REPORT.md`](./tasks/047-aprilhub-shell-ds-parity-keycloak-layout/REPORT.md))
 
 ## Текущий фокус
 
@@ -156,3 +157,4 @@
 | `043` | Минималистичный сайдбар AprilHub: только `Профиль — список` (удаление лишних разделов/маршрутов/host-runtime) | ⏳ Не начато | [`tasks/043-aprilhub-sidebar-minimal-profile-list-only/TASK.md`](./tasks/043-aprilhub-sidebar-minimal-profile-list-only/TASK.md) |
 | `044` | Auth-only контур AprilHub: только авторизация и пустой сайдбар (без продуктовых маршрутов/виджетов/API) | ✅ Выполнено | [`tasks/044-aprilhub-auth-only-empty-sidebar/TASK.md`](./tasks/044-aprilhub-auth-only-empty-sidebar/TASK.md), [`tasks/044-aprilhub-auth-only-empty-sidebar/PLAN.md`](./tasks/044-aprilhub-auth-only-empty-sidebar/PLAN.md), [`tasks/044-aprilhub-auth-only-empty-sidebar/REPORT.md`](./tasks/044-aprilhub-auth-only-empty-sidebar/REPORT.md) |
 | `045` | Раздел `Профили` в sidebar AprilHub + интеграция `profiles-widget` (production-ready host wiring и release-gate) | ⏳ Не начато | [`tasks/045-aprilhub-sidebar-profiles-widget-section/TASK.md`](./tasks/045-aprilhub-sidebar-profiles-widget-section/TASK.md) |
+| `047` | AprilHub Shell: parity с `@april/ui` (`ProductHeaderToolbar`, `ProductSidebarNavigation`), full-height каркас, favicon Icon Only `#12B886`, Keycloak favicon | ✅ Выполнено | [`tasks/047-aprilhub-shell-ds-parity-keycloak-layout/TASK.md`](./tasks/047-aprilhub-shell-ds-parity-keycloak-layout/TASK.md), [`REPORT.md`](./tasks/047-aprilhub-shell-ds-parity-keycloak-layout/REPORT.md) |
