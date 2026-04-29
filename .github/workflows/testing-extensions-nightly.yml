@@ -33,9 +33,19 @@ jobs:
       - name: Prepare Playwright artifacts
         run: mkdir -p artifacts/playwright
 
+      - name: Pick free ingress port for Playwright stack
+        run: |
+          DOCS_HTTP_PORT="$(python3 - <<'PY'
+          import socket
+          s = socket.socket()
+          s.bind(("127.0.0.1", 0))
+          print(s.getsockname()[1])
+          s.close()
+          PY
+          )"
+          echo "DOCS_HTTP_PORT=${DOCS_HTTP_PORT}" >> "$GITHUB_ENV"
+
       - name: Run Playwright smoke suite
-        env:
-          DOCS_HTTP_PORT: "18080"
         run: ./scripts/run-playwright-aprilhub.sh
 
       - name: Copy Playwright report artifacts

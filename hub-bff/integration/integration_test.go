@@ -79,6 +79,24 @@ func TestIntegrationAtlasMigrationFlow(t *testing.T) {
 		t.Fatalf("atlas migrate hash failed: %v\n%s", err, string(output))
 	}
 
+	db, err := sql.Open("postgres", databaseURL)
+	if err != nil {
+		t.Fatalf("open db connection: %v", err)
+	}
+	defer db.Close()
+	for attempt := 1; attempt <= 10; attempt++ {
+		pingCtx, pingCancel := context.WithTimeout(ctx, 2*time.Second)
+		pingErr := db.PingContext(pingCtx)
+		pingCancel()
+		if pingErr == nil {
+			break
+		}
+		if attempt == 10 {
+			t.Fatalf("postgres is not ready for ping: %v", pingErr)
+		}
+		time.Sleep(500 * time.Millisecond)
+	}
+
 	applyCmd := exec.CommandContext(
 		ctx,
 		"atlas",
@@ -89,15 +107,30 @@ func TestIntegrationAtlasMigrationFlow(t *testing.T) {
 		"--url",
 		databaseURL,
 	)
-	if output, err := applyCmd.CombinedOutput(); err != nil {
-		t.Fatalf("atlas migrate apply failed: %v\n%s", err, string(output))
+	var applyErr error
+	var output []byte
+	for attempt := 1; attempt <= 3; attempt++ {
+		output, applyErr = applyCmd.CombinedOutput()
+		if applyErr == nil {
+			break
+		}
+		if attempt < 3 {
+			time.Sleep(1 * time.Second)
+			applyCmd = exec.CommandContext(
+				ctx,
+				"atlas",
+				"migrate",
+				"apply",
+				"--dir",
+				fmt.Sprintf("file://%s", migrationsDir),
+				"--url",
+				databaseURL,
+			)
+		}
 	}
-
-	db, err := sql.Open("postgres", databaseURL)
-	if err != nil {
-		t.Fatalf("open db connection: %v", err)
+	if applyErr != nil {
+		t.Fatalf("atlas migrate apply failed: %v\n%s", applyErr, string(output))
 	}
-	defer db.Close()
 
 	var tableName string
 	if err := db.QueryRowContext(ctx, "select to_regclass('public.integration_probe')::text").Scan(&tableName); err != nil {
