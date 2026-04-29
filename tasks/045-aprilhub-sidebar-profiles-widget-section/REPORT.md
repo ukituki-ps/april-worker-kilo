@@ -91,3 +91,19 @@ npm --prefix hub-shell run e2e:smoke
 - Классификация: **UI/runtime defect**, owner: AprilHub frontend integration + DisignApril build artifacts.
 - Изменения: в `hub-shell/scripts/ds-prepare.sh` добавлена проверка экспортов runtime-бандла `@april/ui` и auto-rebuild (`pnpm exec tsup --dts false`), если в `dist/index.js` отсутствует `CardListColumn`.
 - Верификация: `npm --prefix hub-shell run ds:prepare`, `npm --prefix hub-shell run lint`, `npm --prefix hub-shell run build` — `ok`; сборка формирует chunk `april-profile-ui-*.js`.
+
+## 11) Incident triage (точечный hardening проверки экспорта)
+- Инцидент: повторяемый runtime crash `SyntaxError` при lazy-import `ProfilesWidget` в `dev` (`route=#/app/profile/entities`), окно triage `2026-04-29`.
+- Корреляция: в предоставленном событии доступны `route` и `module=ProfilesWidget`; `requestId`/`correlationId`/`tenant`/`roleSet` и Sentry issue URL отсутствуют, так как ошибка возникает до API-вызовов.
+- Sentry: подтверждён client-side import failure (`does not provide an export named 'CardListColumn'`), источник — `ProfilesWidgetCore.tsx` внешнего runtime-пакета.
+- Loki: в логах backend/BFF не найдено коррелирующих `requestId`-ошибок по этому сценарию; инцидент остаётся в UI runtime-слое.
+- Prometheus: системные алерты (`AprilHubTargetDown` на удалённом instance) не показывают причинно-следственной связи с import-failure конкретного виджета.
+- Root cause: ложноположительная проверка в `ds:prepare` (поиск подстроки `CardListColumn`), которая могла пропустить состояние, когда символ встречается в bundle, но **не экспортируется** как named export.
+- Исправление: в `hub-shell/scripts/ds-prepare.sh` внедрена строгая проверка named export `CardListColumn` через анализ export-блоков в `dist/index.js` (Node one-liner до и после rebuild).
+- Верификация: `npm run ds:prepare && npm run lint && npm run build` (в `hub-shell`) — `ok`; рабочее дерево очищено от build-артефактов, кроме целевого изменения скрипта.
+
+## 12) Regression guard (CI/runtime)
+- Добавлен отдельный guard-скрипт `hub-shell/scripts/check-ui-exports.mjs`, проверяющий наличие named export `CardListColumn` в `design-system/DisignApril/packages/ui/dist/index.js`.
+- В `hub-shell/package.json` добавлен script `ds:check-exports`.
+- Guard включён в quality gate команд `lint` и `build` (до `tsc`/`vite build`), чтобы регрессия ловилась на раннем этапе и в CI.
+- Повторная верификация: `npm run lint && npm run build` (в `hub-shell`) — `ok`, guard возвращает `ok: CardListColumn named export is present`.
