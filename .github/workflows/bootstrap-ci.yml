@@ -89,7 +89,18 @@ jobs:
             echo "System cache not writable; switched to $FALLBACK_ROOT"
           fi
 
-      - name: Init git submodules (public DisignApril; avoid GITHUB_TOKEN 404)
+      - name: Generate GitHub App token for april-profile submodule
+        id: app-token-bootstrap
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.APRIL_APP_ID }}
+          private-key: ${{ secrets.APRIL_APP_PRIVATE_KEY }}
+          owner: ukituki-ps
+          repositories: april-profile
+
+      - name: Init git submodules (DisignApril + april-profile)
+        env:
+          APRIL_PROFILE_GH_TOKEN: ${{ steps.app-token-bootstrap.outputs.token }}
         run: ./scripts/ci-init-git-submodules.sh
 
       - uses: actions/setup-go@v5
