@@ -27,6 +27,10 @@ jobs:
           cache: npm
           cache-dependency-path: hub-shell/package-lock.json
 
+      - name: Install Playwright browser runtime
+        working-directory: hub-shell
+        run: npx playwright install --with-deps chromium
+
       - name: Setup start time
         run: echo "JOB_STARTED_AT=$(date +%s)" >> "$GITHUB_ENV"
 

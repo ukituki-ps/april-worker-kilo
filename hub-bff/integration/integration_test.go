@@ -51,6 +51,11 @@ func TestIntegrationAtlasMigrationFlow(t *testing.T) {
 	if err != nil {
 		t.Fatalf("get postgres host: %v", err)
 	}
+	// On some self-hosted runners "localhost" resolves to ::1 first and Atlas
+	// intermittently gets connection resets against the mapped container port.
+	if host == "localhost" {
+		host = "127.0.0.1"
+	}
 	port, err := pgContainer.MappedPort(ctx, "5432")
 	if err != nil {
 		t.Fatalf("get postgres mapped port: %v", err)
