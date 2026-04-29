@@ -108,7 +108,27 @@ ensure_ui_runtime_exports() {
     return
   fi
 
-  if grep -q "CardListColumn" "${ui_dist_file}"; then
+  has_card_list_column_export="false"
+  if node -e '
+const fs = require("fs");
+const filePath = process.argv[1];
+const source = fs.readFileSync(filePath, "utf8");
+const exportBlocks = source.matchAll(/export\s*\{([^}]*)\}/g);
+const hasNamedExport = Array.from(exportBlocks).some((match) => {
+  const parts = match[1].split(",").map((part) => part.trim());
+  return parts.some(
+    (part) =>
+      part === "CardListColumn" ||
+      part.startsWith("CardListColumn as ") ||
+      part.endsWith(" as CardListColumn")
+  );
+});
+process.exit(hasNamedExport ? 0 : 1);
+' "${ui_dist_file}"; then
+    has_card_list_column_export="true"
+  fi
+
+  if [ "${has_card_list_column_export}" = "true" ]; then
     return
   fi
 
@@ -129,7 +149,27 @@ ensure_ui_runtime_exports() {
     echo "[ds:prepare] warning: runtime-only rebuild failed, keep existing dist"
   fi
 
-  if grep -q "CardListColumn" "${ui_dist_file}"; then
+  has_card_list_column_export="false"
+  if node -e '
+const fs = require("fs");
+const filePath = process.argv[1];
+const source = fs.readFileSync(filePath, "utf8");
+const exportBlocks = source.matchAll(/export\s*\{([^}]*)\}/g);
+const hasNamedExport = Array.from(exportBlocks).some((match) => {
+  const parts = match[1].split(",").map((part) => part.trim());
+  return parts.some(
+    (part) =>
+      part === "CardListColumn" ||
+      part.startsWith("CardListColumn as ") ||
+      part.endsWith(" as CardListColumn")
+  );
+});
+process.exit(hasNamedExport ? 0 : 1);
+' "${ui_dist_file}"; then
+    has_card_list_column_export="true"
+  fi
+
+  if [ "${has_card_list_column_export}" = "true" ]; then
     echo "[ds:prepare] restored CardListColumn export in @april/ui dist"
     return
   fi
