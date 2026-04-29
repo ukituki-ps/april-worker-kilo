@@ -50,6 +50,9 @@ jobs:
           PLAYWRIGHT_RUNNER: docker
           PLAYWRIGHT_DOCKER_IMAGE: mcr.microsoft.com/playwright:v1.53.0-noble
           PLAYWRIGHT_NPM_SCRIPT: e2e:smoke
+          PLAYWRIGHT_WORKERS: "1"
+          PLAYWRIGHT_TEST_TIMEOUT_MS: "300000"
+          PLAYWRIGHT_EXPECT_TIMEOUT_MS: "45000"
           COMPOSE_PROJECT_NAME: aprilhub-playwright-${{ github.run_id }}-${{ github.run_attempt }}
         run: ./scripts/run-playwright-aprilhub.sh
 
