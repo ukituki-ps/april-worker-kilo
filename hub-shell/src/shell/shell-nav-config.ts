@@ -13,8 +13,14 @@ export type ShellNavItem = {
 const toHash = (path: string): string => `#${path}`;
 
 export function buildPrimaryShellNav(): ShellNavItem[] {
-  // Auth-only режим: sidebar остаётся как структурный контейнер, но без продуктовых пунктов.
-  return [];
+  return [
+    {
+      id: "profiles",
+      label: "Профили",
+      href: toHash(shellPaths.profilesList),
+      activePrefix: shellPaths.profilesList,
+    },
+  ];
 }
 
 export function resolveActiveNavId(pathname: string, items: ShellNavItem[]): string | undefined {

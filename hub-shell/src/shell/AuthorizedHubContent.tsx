@@ -5,6 +5,8 @@ import { matchShellRoute, shellNavigate, shellPaths } from "./shell-paths";
 import { useShellPathname } from "./use-shell-pathname";
 import { ShellBreadcrumbs } from "./ShellBreadcrumbs";
 import { useHubHostContext } from "./hub-host-context";
+import { CompositionErrorBoundary } from "../composition-error-boundary";
+import { ProfilesListHostWidget } from "../widgets";
 
 type Props = {
   context: ShellUserContext;
@@ -26,7 +28,7 @@ export function AuthorizedHubContent({ context }: Props): JSX.Element {
 
   useEffect(() => {
     if (match.kind === "redirect") {
-      shellNavigate(shellPaths.home);
+      shellNavigate(shellPaths.profilesList);
     }
   }, [match.kind]);
 
@@ -40,7 +42,7 @@ export function AuthorizedHubContent({ context }: Props): JSX.Element {
         state="error"
         message={`Маршрут не найден: ${pathname}`}
         action={
-          <button type="button" className="shell-text-button" onClick={() => shellNavigate(shellPaths.home)}>
+          <button type="button" className="shell-text-button" onClick={() => shellNavigate(shellPaths.profilesList)}>
             Перейти в рабочую зону
           </button>
         }
@@ -48,15 +50,12 @@ export function AuthorizedHubContent({ context }: Props): JSX.Element {
     );
   }
 
-  if (match.kind === "home") {
+  if (match.kind === "profiles-list") {
     return (
       <RouteChrome>
-        <article className="widget-card" data-testid="authorized-empty-placeholder">
-          <h3>Рабочая зона готова</h3>
-          <p>Пользователь: {context.user.name || context.user.username}</p>
-          <p>Сервисы авторизации и контекст сессии активны.</p>
-          <p>Продуктовые разделы временно отключены в рамках auth-only режима.</p>
-        </article>
+        <CompositionErrorBoundary moduleName="Profiles list widget" tenant={context.orgScope} correlationId={context.correlationId}>
+          <ProfilesListHostWidget context={context} />
+        </CompositionErrorBoundary>
       </RouteChrome>
     );
   }

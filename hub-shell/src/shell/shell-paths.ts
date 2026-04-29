@@ -1,10 +1,11 @@
 export const shellPaths = {
   home: "/app",
+  profilesList: "/app/profile/entities",
 } as const;
 
 export type ShellRouteMatch =
   | { kind: "redirect" }
-  | { kind: "home" }
+  | { kind: "profiles-list" }
   | { kind: "not-found" };
 
 /** Текущий путь из location.hash (без #), всегда начинается с /. */
@@ -20,7 +21,10 @@ export function matchShellRoute(pathname: string): ShellRouteMatch {
     return { kind: "redirect" };
   }
   if (p === shellPaths.home) {
-    return { kind: "home" };
+    return { kind: "redirect" };
+  }
+  if (p === shellPaths.profilesList) {
+    return { kind: "profiles-list" };
   }
 
   return { kind: "not-found" };
