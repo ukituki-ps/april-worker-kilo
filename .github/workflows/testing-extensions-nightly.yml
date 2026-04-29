@@ -27,9 +27,13 @@ jobs:
           cache: npm
           cache-dependency-path: hub-shell/package-lock.json
 
+      - name: Install Hub Shell dependencies
+        working-directory: hub-shell
+        run: npm ci
+
       - name: Install Playwright browser runtime
         working-directory: hub-shell
-        run: npx playwright install --with-deps chromium
+        run: npx playwright install chromium
 
       - name: Setup start time
         run: echo "JOB_STARTED_AT=$(date +%s)" >> "$GITHUB_ENV"
@@ -104,7 +108,7 @@ jobs:
 
       - name: Install Atlas CLI
         run: |
-          go install ariga.io/atlas/cmd/atlas@latest
+          go install ariga.io/atlas/cmd/atlas@v0.38.0
           echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
 
       - name: Setup start time
