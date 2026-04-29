@@ -121,11 +121,13 @@ ensure_ui_runtime_exports() {
     echo "[ds:prepare] warning: neither pnpm nor corepack found, skip runtime rebuild"
     return
   fi
-  (
+  if ! (
     cd "${ui_pkg_dir}"
     # node:<version>-alpine can lack a pnpm shim in PATH; corepack fallback keeps dev containers working.
     sh -c "${pnpm_cmd} exec tsup --dts false"
-  )
+  ); then
+    echo "[ds:prepare] warning: runtime-only rebuild failed, keep existing dist"
+  fi
 
   if grep -q "CardListColumn" "${ui_dist_file}"; then
     echo "[ds:prepare] restored CardListColumn export in @april/ui dist"
