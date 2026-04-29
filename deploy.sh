@@ -174,13 +174,18 @@ run_submodules() {
     return 0
   fi
 
-  # Этот submodule используется в hub-shell ds:prepare (pnpm --dir ../design-system/DisignApril ...).
-  # На dev-сервере иногда нет доступа к https URL, поэтому заранее выставляем SSH URL для субмодуля.
-  # Переопределение возможно переменной DISIGNAPRIL_SUBMODULE_URL.
+  # Эти submodule используются в hub-shell runtime:
+  # - design-system/DisignApril: @april/ui + @april/tokens
+  # - vendor/april-profile: внешний source package profile-ui
+  # На dev-сервере иногда нет доступа к https URL, поэтому заранее выставляем SSH URL для субмодулей.
+  # Переопределение возможно переменными DISIGNAPRIL_SUBMODULE_URL / APRIL_PROFILE_SUBMODULE_URL.
   local design_april_submodule="design-system/DisignApril"
+  local profile_submodule="vendor/april-profile"
   local disignapril_ssh_default="git@github-disignapril:ukituki-ps/DisignApril.git"
   local disignapril_ssh_fallback="git@github.com:ukituki-ps/DisignApril.git"
+  local profile_ssh_default="git@github.com:ukituki-ps/april-profile.git"
   local disignapril_url="${DISIGNAPRIL_SUBMODULE_URL:-}"
+  local profile_url="${APRIL_PROFILE_SUBMODULE_URL:-${profile_ssh_default}}"
 
   if [[ -z "${disignapril_url}" ]]; then
     if ssh -G github-disignapril >/dev/null 2>&1; then
@@ -191,9 +196,10 @@ run_submodules() {
   fi
 
   git config "submodule.${design_april_submodule}.url" "${disignapril_url}" || true
+  git config "submodule.${profile_submodule}.url" "${profile_url}" || true
 
   log "git submodule update --init --recursive"
-  git submodule update --init --recursive "${design_april_submodule}"
+  git submodule update --init --recursive "${design_april_submodule}" "${profile_submodule}"
 }
 
 run_openapi_lint() {
