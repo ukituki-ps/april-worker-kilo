@@ -45,7 +45,7 @@ jobs:
       - name: Publish @ukituki-ps/april-tokens (GPR)
         working-directory: design-system/DisignApril/packages/tokens
         env:
-          # Optional PAT with write:packages when org restricts GITHUB_TOKEN (see repo secrets GPR_PUBLISH_TOKEN).
+          # GPR_PUBLISH_TOKEN: optional classic PAT with write:packages (gh auth token scopes are often insufficient).
           NODE_AUTH_TOKEN: ${{ secrets.GPR_PUBLISH_TOKEN != '' && secrets.GPR_PUBLISH_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
           node <<'NODE'

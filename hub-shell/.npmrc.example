@@ -1,0 +1,6 @@
+# Для установки пакетов из GitHub Packages (после публикации DS workflow «Publish @april DS to GitHub Packages»):
+# cp .npmrc.example .npmrc
+# export NODE_AUTH_TOKEN="$(gh auth token)"   # нужен classic PAT с write:packages для publish, read для ci
+#
+# @ukituki-ps:registry=https://npm.pkg.github.com
+# //npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
