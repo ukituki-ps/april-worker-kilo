@@ -407,11 +407,17 @@ repair_bind_mount_permissions() {
     gid="$(id -g)"
   fi
 
-  log "проверка владельца bind-mount для hub-shell (uid:gid=${uid}:${gid})"
+  log "проверка владельца bind-mount для hub-shell + DisignApril dist (uid:gid=${uid}:${gid})"
   docker run --rm \
     -v "${ROOT}:/workspace" \
     alpine:3.20 \
-    sh -c "chown -R ${uid}:${gid} /workspace/hub-shell >/dev/null 2>&1 || true"
+    sh -c "mkdir -p \
+      /workspace/design-system/DisignApril/packages/ui/dist \
+      /workspace/design-system/DisignApril/packages/tokens/dist; \
+      chown -R ${uid}:${gid} /workspace/hub-shell >/dev/null 2>&1 || true; \
+      chown -R ${uid}:${gid} \
+        /workspace/design-system/DisignApril/packages/ui/dist \
+        /workspace/design-system/DisignApril/packages/tokens/dist >/dev/null 2>&1 || true"
 }
 
 sync_frontend_dependencies() {
