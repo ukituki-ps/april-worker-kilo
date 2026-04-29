@@ -194,14 +194,16 @@ run_submodules() {
     fi
   fi
 
+  # Если URL субмодуля раньше был переопределён локально (например на SSH),
+  # синхронизируем .git/config из актуального .gitmodules перед update.
+  git submodule sync --recursive "${design_april_submodule}" "${profile_submodule}"
+
+  # После sync переопределяем URL обратно на нужные runtime-значения.
+  # Иначе sync вернет URL из .gitmodules (HTTPS) и приватный submodule не клонируется на runner без token prompt.
   git config "submodule.${design_april_submodule}.url" "${disignapril_url}" || true
   if [[ -n "${profile_url}" ]]; then
     git config "submodule.${profile_submodule}.url" "${profile_url}" || true
   fi
-
-  # Если URL субмодуля раньше был переопределён локально (например на SSH),
-  # синхронизируем .git/config из актуального .gitmodules перед update.
-  git submodule sync --recursive "${design_april_submodule}" "${profile_submodule}"
 
   log "git submodule update --init --recursive"
   git submodule update --init --recursive "${design_april_submodule}" "${profile_submodule}"
