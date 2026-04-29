@@ -107,3 +107,10 @@ npm --prefix hub-shell run e2e:smoke
 - В `hub-shell/package.json` добавлен script `ds:check-exports`.
 - Guard включён в quality gate команд `lint` и `build` (до `tsc`/`vite build`), чтобы регрессия ловилась на раннем этапе и в CI.
 - Повторная верификация: `npm run lint && npm run build` (в `hub-shell`) — `ok`, guard возвращает `ok: CardListColumn named export is present`.
+
+## 13) Финальная верификация на dev (post-merge)
+- PR `#95` (fix deploy permissions) вмержен в `develop`; `deploy.sh` выполнен на стенде `192.168.1.42`.
+- Дополнительно выполнен `docker compose up -d --force-recreate hub-shell`, чтобы гарантированно перезапустить `predev -> ds:prepare` после изменения прав.
+- Логи `hub-shell` подтвердили восстановление runtime-экспорта: `restored CardListColumn export in @april/ui dist`.
+- Vite стартовал штатно (`VITE ready`), критический импорт-краш `No matching export ... CardListColumn` снят.
+- Пользовательский smoke-check: сценарий с `ProfilesWidget` подтверждён как рабочий (`заработало`).
