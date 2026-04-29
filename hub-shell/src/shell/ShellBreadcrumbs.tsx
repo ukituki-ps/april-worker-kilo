@@ -15,7 +15,11 @@ export function ShellBreadcrumbs({ match }: Props): JSX.Element {
   if (match.kind === "home") {
     items.push(
       <Text key="cur" size="sm">
+<<<<<<< HEAD
         Рабочая зона
+=======
+        Авторизованный контур
+>>>>>>> parent of 41f02aa (Merge pull request #74 from ukituki-ps/feature/045-profiles-sidebar-widget)
       </Text>,
     );
   } else {

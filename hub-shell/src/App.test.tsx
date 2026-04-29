@@ -94,7 +94,11 @@ describe("App", () => {
     });
   });
 
+<<<<<<< HEAD
   it("renders authorized shell with auth-only placeholder", async () => {
+=======
+  it("renders authorized shell in auth-only mode", async () => {
+>>>>>>> parent of 41f02aa (Merge pull request #74 from ukituki-ps/feature/045-profiles-sidebar-widget)
     keycloakState.authState = true;
     apiRequestMock.mockResolvedValue({
       ok: true,
@@ -116,6 +120,10 @@ describe("App", () => {
       expect(nav).toBeInTheDocument();
       expect(nav.querySelectorAll("a")).toHaveLength(0);
       expect(screen.getByTestId("authorized-empty-placeholder")).toBeInTheDocument();
+<<<<<<< HEAD
+=======
+      expect(screen.getByText("Продуктовые разделы временно отключены в рамках auth-only режима.")).toBeInTheDocument();
+>>>>>>> parent of 41f02aa (Merge pull request #74 from ukituki-ps/feature/045-profiles-sidebar-widget)
     });
   });
 
