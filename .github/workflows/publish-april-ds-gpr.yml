@@ -1,15 +1,19 @@
-# Одноразовая / редкая публикация @april/tokens и @april/ui в GitHub Packages из submodule DisignApril.
-# Нужна для первого появления пакетов в registry и для обновления hub-shell/package-lock.json (npm ci).
+# Публикация @ukituki-ps/april-tokens и @ukituki-ps/april-ui в GitHub Packages (DisignApril submodule).
+#
+# Секрет GPR_PUBLISH_TOKEN (обязателен):
+#   Classic PAT: минимум write:packages + read:packages; для приватного репо — repo.
+#   Организация с SSO: после создания PAT → «Configure SSO» / Authorize для ukituki-ps.
+#   Запись в репозитории:
+#     printf '%s' 'YOUR_PAT' | gh secret set GPR_PUBLISH_TOKEN -R ukituki-ps/april-worker
+#
+# Почему не GITHUB_TOKEN: у многих org токен Actions не получает write в GPR (write_package), даже при Read and write в репо.
 name: Publish @april DS to GitHub Packages
 
 on:
   workflow_dispatch:
 
-# Repo «Read and write» alone is often NOT enough: many orgs cap GITHUB_TOKEN so GPR publish still gets write_package.
-# Fix: add repo secret GPR_PUBLISH_TOKEN = classic PAT with write:packages (+ repo if private); SSO authorize token for org.
 permissions:
   contents: read
-  packages: write
 
 concurrency:
   group: publish-april-ds-gpr
@@ -17,9 +21,14 @@ concurrency:
 
 jobs:
   publish:
-    # GitHub-hosted runners may be unavailable for private org billing; use the same pool as CI.
     runs-on: [self-hosted, ci, profile]
     steps:
+      - name: Require GPR_PUBLISH_TOKEN secret
+        if: ${{ secrets.GPR_PUBLISH_TOKEN == '' }}
+        run: |
+          echo "::error title=Missing GPR_PUBLISH_TOKEN::Add repository secret GPR_PUBLISH_TOKEN (classic PAT: write:packages, read:packages). See workflow header in publish-april-ds-gpr.yml"
+          exit 1
+
       - uses: actions/checkout@v4
         with:
           submodules: recursive
@@ -39,13 +48,11 @@ jobs:
           pnpm install --frozen-lockfile
           pnpm build
 
-      # GitHub Packages requires the npm scope to match the repo owner (@ukituki-ps), not @april.
-      # Consumers keep imports via npm aliases: "@april/ui": "npm:@ukituki-ps/april-ui@^…"
+      # Scope владельца репозитория (@ukituki-ps), не @april. Потребители: npm aliases → @april/ui в hub-shell.
       - name: Publish @ukituki-ps/april-tokens (GPR)
         working-directory: design-system/DisignApril/packages/tokens
         env:
-          # GPR_PUBLISH_TOKEN: optional classic PAT with write:packages (gh auth token scopes are often insufficient).
-          NODE_AUTH_TOKEN: ${{ secrets.GPR_PUBLISH_TOKEN != '' && secrets.GPR_PUBLISH_TOKEN || secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.GPR_PUBLISH_TOKEN }}
         run: |
           node <<'NODE'
           const fs = require('fs');
@@ -62,7 +69,7 @@ jobs:
       - name: Publish @ukituki-ps/april-ui (GPR)
         working-directory: design-system/DisignApril/packages/ui
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GPR_PUBLISH_TOKEN != '' && secrets.GPR_PUBLISH_TOKEN || secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.GPR_PUBLISH_TOKEN }}
         run: |
           node <<'NODE'
           const fs = require('fs');
