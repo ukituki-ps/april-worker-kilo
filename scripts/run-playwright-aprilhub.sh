@@ -133,7 +133,7 @@ if [ "${PLAYWRIGHT_RUNNER:-host}" = "docker" ]; then
     -v "$ROOT_DIR/hub-shell:/workspace/hub-shell" \
     -w /workspace/hub-shell \
     "$PLAYWRIGHT_DOCKER_IMAGE" \
-    sh -lc "npm ci && npx playwright install chromium && npm run ${PLAYWRIGHT_NPM_SCRIPT}"
+    sh -lc "npm ci && PLAYWRIGHT_DOWNLOAD_CONNECTION_TIMEOUT=120000 npx playwright install chromium && npm run ${PLAYWRIGHT_NPM_SCRIPT}"
 else
   PLAYWRIGHT_NPM_SCRIPT="${PLAYWRIGHT_NPM_SCRIPT:-e2e}"
   (
