@@ -22,7 +22,9 @@ jobs:
     runs-on: [self-hosted, dev, profile]
     timeout-minutes: 60
     env:
-      APRIL_DEPLOY_ROOT: ${{ vars.APRIL_DEPLOY_ROOT != '' && vars.APRIL_DEPLOY_ROOT || '/opt/april-profile' }}
+      # Must be a git clone of *this* repo (ukituki-ps/april-worker): github.sha is taken from this workflow's event.
+      # Default /opt/april-worker matches deploy.sh; override with repo variable APRIL_DEPLOY_ROOT if the clone lives elsewhere.
+      APRIL_DEPLOY_ROOT: ${{ vars.APRIL_DEPLOY_ROOT != '' && vars.APRIL_DEPLOY_ROOT || '/opt/april-worker' }}
       APRIL_PROFILE_SUBMODULE_URL: git@github.com:ukituki-ps/april-profile.git
     steps:
       - name: Checkout ref and deploy

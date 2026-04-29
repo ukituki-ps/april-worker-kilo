@@ -2,7 +2,7 @@
 
 Документ для агента и команды: зафиксированные решения и порядок шагов для деплоя на **dev-хост** (`DEV_HOST`). Конкретные значения — в [`guides/PROJECT_DEFAULTS.md`](./guides/PROJECT_DEFAULTS.md); при копировании шаблона замените их по [`guides/FORK_AND_CUSTOMIZE.md`](./guides/FORK_AND_CUSTOMIZE.md).
 
-Ниже для микросервиса **AprilProfile**: `DEV_HOST` = `dev.profile.april.ukituki.tech`, `DEV_HOST_IP` = `192.168.1.42` (Orange Pi), **`DEPLOY_ROOT`** = `/opt/april-profile`. CI self-hosted runner размещён отдельно на `192.168.1.29`.
+Ниже для **AprilHub** (репозиторий `ukituki-ps/april-worker`): типовой **`DEPLOY_ROOT`** на сервере — `/opt/april-worker` (см. `deploy.sh`, workflow **Deploy to dev**). Для микросервиса **AprilProfile** (отдельный репозиторий): `DEV_HOST` = `dev.profile.april.ukituki.tech`, `DEV_HOST_IP` = `192.168.1.42` (Orange Pi), **`DEPLOY_ROOT`** = `/opt/april-profile`. CI self-hosted runner размещён отдельно на `192.168.1.29`.
 
 ## 1. Репозиторий и триггеры
 
@@ -21,7 +21,7 @@
 
 **Практика для GitHub Actions:** workflow запускается на **`push` в `develop`** (merge PR даёт такой push). Чтобы исключить прямой push в `develop`, на GitHub включается **branch protection** для `develop` (запрет прямых push, обязательный PR). Тогда событие `push` в `develop` по смыслу соответствует «приняли PR».
 
-**Реализация в репозитории:** workflow **Deploy to dev** (файл `.github/workflows/dev-deploy.yml`) на **self-hosted** runner с labels **`dev`** и **`RUNNER_LABEL_EXTRA`** (для AprilProfile: `profile`) выполняет в каталоге клона (**`DEPLOY_ROOT`**, для AprilProfile: `/opt/april-profile`) `git fetch`, переход на коммит **`github.sha`**, затем **`SKIP_GIT_PULL=1 ./deploy.sh`**. Путь к клону можно переопределить **repository variable** `APRIL_DEPLOY_ROOT`. Ручной перезапуск того же сценария — **Actions → Deploy to dev → Run workflow** (`workflow_dispatch`).
+**Реализация в репозитории:** workflow **Deploy to dev** (файл `.github/workflows/dev-deploy.yml`) на **self-hosted** runner с labels **`dev`** и **`RUNNER_LABEL_EXTRA`** (для AprilProfile: `profile`) выполняет в каталоге клона **`APRIL_DEPLOY_ROOT`** `git fetch`, переход на коммит **`github.sha`** из **того же** репозитория, что и workflow (для `april-worker` клон на сервере обязан быть `ukituki-ps/april-worker`, иначе `git checkout` по SHA коммита из события workflow завершится ошибкой), затем **`SKIP_GIT_PULL=1 ./deploy.sh`**. Дефолт пути в workflow — `/opt/april-worker`; переопределение — **repository variable** `APRIL_DEPLOY_ROOT`. Ручной перезапуск того же сценария — **Actions → Deploy to dev → Run workflow** (`workflow_dispatch`).
 
 ## 2. Runner
 
@@ -42,7 +42,7 @@ CI jobs (`.github/workflows/ci.yml`) выполняются на отдельн�
 ## 3. Секреты
 
 - **GitHub Secrets** — всё, что нужно CI (логин в ghcr, при необходимости токены).
-- **На сервере** — `.env` и при необходимости отдельные env-файлы вне репозитория в каталоге **`DEPLOY_ROOT`** (для AprilProfile: `/opt/april-profile`).
+- **На сервере** — `.env` и при необходимости отдельные env-файлы в каталоге **`DEPLOY_ROOT`** (AprilHub: путь из **`APRIL_DEPLOY_ROOT`**; AprilProfile: типично `/opt/april-profile`).
 
 Ограничение workflow по путям/файлам: **не используется** — любой merge в `develop` ведёт к полному пайплайну.
 
@@ -58,7 +58,7 @@ CI jobs (`.github/workflows/ci.yml`) выполняются на отдельн�
 
 | Решение | Значение |
 |--------|----------|
-| Путь на сервере | `DEPLOY_ROOT` (для AprilProfile: `/opt/april-profile`) |
+| Путь на сервере | `DEPLOY_ROOT` (AprilHub `april-worker`: `/opt/april-worker`; AprilProfile: `/opt/april-profile`) |
 | Обновление исходников на сервере | **`git pull`** в этом каталоге |
 | Инструмент | **`docker compose` v2** |
 | Файлы | `docker-compose.yml` + overrides |
@@ -67,6 +67,29 @@ CI jobs (`.github/workflows/ci.yml`) выполняются на отдельн�
 
 - **Теги образов (SHA)** задаются через **`.env`** и/или отдельный **`images.env`** на сервере. Compose-файлы в git ссылаются на переменные (например `HUB_BFF_IMAGE` / `HUB_SHELL_IMAGE`), а конкретные значения подставляются из этих файлов.
 - **`images.env` (и при необходимости server-local override)** — **не коммитятся** в репозиторий (или коммитится только шаблон без секретов). Так `git pull` в **`DEPLOY_ROOT`** не перезаписывает задеплоенные версии образов и не требует обратных коммитов из CI.
+
+### 5.1 Что должно быть на сервере один раз (AprilHub)
+
+Чеклист для каталога **`DEPLOY_ROOT`** (клон `ukituki-ps/april-worker` на dev-хосте или путь из GitHub variable **`APRIL_DEPLOY_ROOT`**):
+
+| # | Артефакт | Назначение |
+|---|-----------|------------|
+| 1 | **Git-клон** `april-worker`, `origin` → тот же репозиторий, что и workflow | Иначе `git checkout` по `github.sha` в **Deploy to dev** падает |
+| 2 | **Docker** + **Compose v2**, пользователь runner/деплоя в группе **`docker`** | `deploy.sh` вызывает `docker compose` |
+| 3 | **`.env`** в корне клона (не в git) | Скопировать из **`.env.example`**, выставить порты, Keycloak, `APRIL_PROFILE_ADMIN_URL`, домены под стенд |
+| 4 | **`images.env`** в корне клона (не в git) | Минимум — файл существует (`deploy.sh` с `REQUIRE_IMAGES_ENV=1`); теги **`HUB_BFF_IMAGE`**, **`HUB_SHELL_IMAGE`** (и при необходимости **`APRIL_SHOWCASE_IMAGE`**) в **ghcr.io** только по **git SHA** — см. **`images.env.example`** |
+| 5 | **`./deploy.sh` исполняемый** | При необходимости `chmod +x deploy.sh` |
+| 6 | **GitHub Actions** для job **Deploy to dev** | **Secret** `APRIL_PROFILE_DEPLOY_KEY` (SSH-ключ для `git submodule` **vendor/april-profile** в `deploy.sh`); **Variable** `APRIL_DEPLOY_ROOT` = абсолютный путь к клону на runner |
+| 7 | **Self-hosted runner** с метками **`dev`** и **`RUNNER_LABEL_EXTRA`** (напр. `profile`) | Совпадает с `runs-on` в `.github/workflows/dev-deploy.yml` |
+
+Автоматизация (идемпотентно, не перезаписывает существующие `.env` / `images.env`):
+
+```bash
+cd "$DEPLOY_ROOT"   # например /home/ukituki/april-worker
+./scripts/bootstrap-server-deploy-once.sh
+```
+
+После первого успешного деплоя `deploy.sh` создаёт/обновляет server-local **`.deploy-state/`** (в т.ч. `images.env.last-good`); это не требует ручной подготовки заранее.
 
 ## 6. Data-layer: PostgreSQL + Redis
 
