@@ -10,11 +10,12 @@ KEYCLOAK_HTTP_PORT="${KEYCLOAK_HTTP_PORT:-8080}"
 K6_VUS="${K6_VUS:-4}"
 K6_DURATION="${K6_DURATION:-20s}"
 K6_SUMMARY_EXPORT="${K6_SUMMARY_EXPORT:-}"
+K6_STARTUP_TIMEOUT_SEC="${K6_STARTUP_TIMEOUT_SEC:-300}"
 KC_HOSTNAME="${KC_HOSTNAME:-http://keycloak:${KEYCLOAK_HTTP_PORT}/auth}"
 KEYCLOAK_ISSUER="${KEYCLOAK_ISSUER:-${KC_HOSTNAME}/realms/april}"
 LOCAL_UID="${LOCAL_UID:-$(id -u)}"
 LOCAL_GID="${LOCAL_GID:-$(id -g)}"
-export HUB_BFF_PORT KEYCLOAK_HTTP_PORT KC_HOSTNAME KEYCLOAK_ISSUER K6_VUS K6_DURATION LOCAL_UID LOCAL_GID
+export HUB_BFF_PORT KEYCLOAK_HTTP_PORT KC_HOSTNAME KEYCLOAK_ISSUER K6_VUS K6_DURATION K6_STARTUP_TIMEOUT_SEC LOCAL_UID LOCAL_GID
 
 compose() {
   docker compose -p "$COMPOSE_PROJECT_NAME" "$@"
@@ -22,6 +23,33 @@ compose() {
 
 net_curl() {
   docker run --rm --network "${COMPOSE_PROJECT_NAME}_default" curlimages/curl:8.12.1 "$@"
+}
+
+print_startup_diagnostics() {
+  echo "[k6] startup diagnostics:"
+  compose --profile aprilhub ps || true
+  compose --profile aprilhub logs --no-color --tail 200 hub-bff keycloak keycloak-db || true
+}
+
+wait_for_http() {
+  local name="$1"
+  local url="$2"
+  local attempts=$((K6_STARTUP_TIMEOUT_SEC / 2))
+  if (( attempts < 1 )); then
+    attempts=1
+  fi
+
+  echo "[k6] waiting for ${name}: ${url} (timeout ${K6_STARTUP_TIMEOUT_SEC}s)"
+  for ((i = 1; i <= attempts; i++)); do
+    if net_curl -fsS "$url" >/dev/null; then
+      return 0
+    fi
+    sleep 2
+  done
+
+  echo "[k6] timeout while waiting for ${name}: ${url}"
+  print_startup_diagnostics
+  return 1
 }
 
 cleanup() {
@@ -32,23 +60,8 @@ trap cleanup EXIT
 echo "[k6] starting aprilhub profile"
 compose --profile aprilhub up -d keycloak-db keycloak hub-bff
 
-echo "[k6] waiting for hub-bff health"
-for _ in {1..60}; do
-  if net_curl -fsS "http://hub-bff:${HUB_BFF_PORT}/healthz" >/dev/null; then
-    break
-  fi
-  sleep 2
-done
-net_curl -fsS "http://hub-bff:${HUB_BFF_PORT}/healthz" >/dev/null
-
-echo "[k6] waiting for keycloak openid config"
-for _ in {1..60}; do
-  if net_curl -fsS "http://keycloak:${KEYCLOAK_HTTP_PORT}/auth/realms/april/.well-known/openid-configuration" >/dev/null; then
-    break
-  fi
-  sleep 2
-done
-net_curl -fsS "http://keycloak:${KEYCLOAK_HTTP_PORT}/auth/realms/april/.well-known/openid-configuration" >/dev/null
+wait_for_http "hub-bff health" "http://hub-bff:${HUB_BFF_PORT}/healthz"
+wait_for_http "keycloak openid config" "http://keycloak:${KEYCLOAK_HTTP_PORT}/auth/realms/april/.well-known/openid-configuration"
 
 echo "[k6] obtaining Keycloak dev token"
 TOKEN="$(
