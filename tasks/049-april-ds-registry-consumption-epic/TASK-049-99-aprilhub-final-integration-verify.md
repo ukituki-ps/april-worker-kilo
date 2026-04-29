@@ -13,13 +13,13 @@
 ## Входит в объём
 
 - Чеклист верификации (все пункты зафиксировать в `tasks/049-april-ds-registry-consumption-epic/REPORT.md`):
-  - [ ] `npm view @april/ui version` / `@april/tokens` с read-доступом
-  - [ ] `hub-shell`: `npm ci && npm run lint && npm run build`
-  - [ ] AprilProfile: подтверждение от владельца репо или CI badge / ссылка на PR
-  - [ ] DisignApril: подтверждение publish pipeline / тег релиза
-  - [ ] При наличии dev-стенда: smoke входа в shell без белого экрана (или Playwright smoke из репо)
+  - [x] `npm view` пакетов DS — зафиксировано в REPORT (`npmjs` 404; GPR `@ukituki-ps/*` требует токена; см. [`publish-april-ds-gpr.yml`](../../.github/workflows/publish-april-ds-gpr.yml))
+  - [x] `hub-shell`: `npm ci && npm run lint && npm run build` — ok в `node:20-alpine` с монтированием репо (на хосте возможен EACCES у `node_modules`)
+  - [ ] AprilProfile: подтверждение от владельца репо или CI badge / ссылка на PR — **не получено**
+  - [ ] DisignApril: подтверждение publish pipeline / тег релиза — **не верифицировано**
+  - [ ] При наличии dev-стенда: smoke входа в shell без белого экрана — **не выполнялось** (косвенно: сборка ok)
 - Обновление **`tasks/049-april-ds-registry-consumption-epic/REPORT.md`** по [`docs/AGENT_REPORT_TEMPLATE.md`](../../docs/AGENT_REPORT_TEMPLATE.md)
-- Строка в [`task_list.md`](../../task_list.md) для эпика 049 → ✅ при закрытии
+- Строка в [`task_list.md`](../../task_list.md) для эпика 049 — обновлена (⚠️ до полного закрытия эпика)
 
 ## Не входит
 
@@ -27,9 +27,9 @@
 
 ## Критерии готовности
 
-- [ ] Все подзадачи 049-01…049-04 и внешние постановки выполнены или явно отложены с записью в REPORT
-- [ ] `REPORT.md` эпика заполнен
-- [ ] `task_list.md` обновлён
+- [ ] Все подзадачи 049-01…049-04 и внешние постановки выполнены или явно отложены с записью в REPORT *(частично — см. REPORT §8)*
+- [x] `REPORT.md` эпика заполнен
+- [x] `task_list.md` обновлён *(эпик 049 остаётся ⚠️ до GPR-lock и внешних репо)*
 
 ## Проверка
 
