@@ -270,17 +270,21 @@ jobs:
         run: ./scripts/ci-init-git-submodules.sh
 
       - name: Run Hub Shell startup preflight in node:20-alpine
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GPR_READ_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
           mkdir -p "$HOME/.cache/aprilhub/corepack"
+          hub_install='cp .npmrc.example .npmrc && echo "//npm.pkg.github.com/:_authToken='"$NODE_AUTH_TOKEN"'" >> .npmrc && if [ -f package-lock.json ]; then npm ci; else npm install --no-audit --no-fund; fi && npm run ds:prepare && npm run build'
           docker run --rm \
             --user "$(id -u):$(id -g)" \
+            -e NODE_AUTH_TOKEN \
             -e npm_config_cache=/tmp/.npm \
             -e COREPACK_HOME=/tmp/.corepack \
             -v "$PWD:/workspace" \
             -v "$HOME/.cache/aprilhub/corepack:/tmp/.corepack" \
             -w /workspace/hub-shell \
             node:20-alpine \
-            sh -lc "npm ci && npm run ds:prepare && npm run build"
+            sh -lc "$hub_install"
 
   aprilhub-smoke:
     name: AprilHub runtime smoke

@@ -130,10 +130,11 @@ if [ "${PLAYWRIGHT_RUNNER:-host}" = "docker" ]; then
     -e PLAYWRIGHT_RESTRICTED_USER \
     -e PLAYWRIGHT_RESTRICTED_PASSWORD \
     -e PLAYWRIGHT_NPM_SCRIPT \
+    -e NODE_AUTH_TOKEN \
     -v "$ROOT_DIR/hub-shell:/workspace/hub-shell" \
     -w /workspace/hub-shell \
     "$PLAYWRIGHT_DOCKER_IMAGE" \
-    sh -lc "npm ci && PLAYWRIGHT_DOWNLOAD_CONNECTION_TIMEOUT=120000 npx playwright install chromium && npm run ${PLAYWRIGHT_NPM_SCRIPT}"
+    sh -lc "set -eu; if [ -n \"\${NODE_AUTH_TOKEN:-}\" ]; then cp .npmrc.example .npmrc && echo \"//npm.pkg.github.com/:_authToken=\${NODE_AUTH_TOKEN}\" >> .npmrc; fi; if [ -f package-lock.json ]; then npm ci; else npm install --no-audit --no-fund; fi; PLAYWRIGHT_DOWNLOAD_CONNECTION_TIMEOUT=120000 npx playwright install chromium; npm run ${PLAYWRIGHT_NPM_SCRIPT:-e2e}"
 else
   PLAYWRIGHT_NPM_SCRIPT="${PLAYWRIGHT_NPM_SCRIPT:-e2e}"
   (
