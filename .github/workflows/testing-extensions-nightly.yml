@@ -27,14 +27,6 @@ jobs:
           cache: npm
           cache-dependency-path: hub-shell/package-lock.json
 
-      - name: Install Hub Shell dependencies
-        working-directory: hub-shell
-        run: npm ci
-
-      - name: Install Playwright browser runtime
-        working-directory: hub-shell
-        run: npx playwright install chromium
-
       - name: Setup start time
         run: echo "JOB_STARTED_AT=$(date +%s)" >> "$GITHUB_ENV"
 
@@ -54,6 +46,9 @@ jobs:
           echo "DOCS_HTTP_PORT=${DOCS_HTTP_PORT}" >> "$GITHUB_ENV"
 
       - name: Run Playwright smoke suite
+        env:
+          PLAYWRIGHT_RUNNER: docker
+          PLAYWRIGHT_DOCKER_IMAGE: mcr.microsoft.com/playwright:v1.53.0-noble
         run: ./scripts/run-playwright-aprilhub.sh
 
       - name: Copy Playwright report artifacts
@@ -108,7 +103,7 @@ jobs:
 
       - name: Install Atlas CLI
         run: |
-          go install ariga.io/atlas/cmd/atlas@v0.38.0
+          go install ariga.io/atlas/cmd/atlas@v0.13.1
           echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
 
       - name: Setup start time
