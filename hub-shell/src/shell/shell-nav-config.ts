@@ -9,14 +9,7 @@ export type ShellNavItem = {
 };
 
 export function buildPrimaryShellNav(): ShellNavItem[] {
-  return [
-    {
-      id: "profiles-list",
-      label: "Профили",
-      href: "#/app/profile/entities",
-      activePrefix: "/app/profile/entities",
-    },
-  ];
+  return [];
 }
 
 export function resolveActiveNavId(pathname: string, items: ShellNavItem[]): string | undefined {

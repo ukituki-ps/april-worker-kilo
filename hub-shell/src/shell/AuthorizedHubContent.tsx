@@ -5,8 +5,6 @@ import { matchShellRoute, shellNavigate, shellPaths } from "./shell-paths";
 import { useShellPathname } from "./use-shell-pathname";
 import { ShellBreadcrumbs } from "./ShellBreadcrumbs";
 import { useHubHostContext } from "./hub-host-context";
-import { ProfilesListHostWidget } from "../widgets";
-import { ProfileEntityFrame } from "./ProfileEntityFrame";
 
 type Props = {
   context: ShellUserContext;
@@ -28,7 +26,7 @@ export function AuthorizedHubContent({ context }: Props): JSX.Element {
 
   useEffect(() => {
     if (match.kind === "redirect") {
-      shellNavigate(shellPaths.profilesList);
+      shellNavigate(shellPaths.home);
     }
   }, [match.kind]);
 
@@ -42,26 +40,23 @@ export function AuthorizedHubContent({ context }: Props): JSX.Element {
         state="error"
         message={`Маршрут не найден: ${pathname}`}
         action={
-          <button type="button" className="shell-text-button" onClick={() => shellNavigate(shellPaths.profilesList)}>
-            Перейти к профилям
+          <button type="button" className="shell-text-button" onClick={() => shellNavigate(shellPaths.home)}>
+            Перейти в рабочую зону
           </button>
         }
       />
     );
   }
 
-  if (match.kind === "profiles-list") {
+  if (match.kind === "home") {
     return (
       <RouteChrome>
-        <ProfilesListHostWidget context={context} />
-      </RouteChrome>
-    );
-  }
-
-  if (match.kind === "profile-entity") {
-    return (
-      <RouteChrome>
-        <ProfileEntityFrame context={context} entityId={match.entityId} tab={match.tab} />
+        <article className="widget-card" data-testid="authorized-empty-placeholder">
+          <h3>Рабочая зона готова</h3>
+          <p>Пользователь: {context.user.name || context.user.username}</p>
+          <p>Сервисы авторизации и контекст сессии активны.</p>
+          <p>Продуктовые разделы временно отключены в рамках auth-only режима.</p>
+        </article>
       </RouteChrome>
     );
   }

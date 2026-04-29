@@ -26,10 +26,6 @@ vi.mock("./api", () => ({
   apiRequest: (...args: unknown[]) => apiRequestMock(...args),
 }));
 
-vi.mock("./vendor/april-profile-ui", () => ({
-  ProfilesWidget: () => <div data-testid="profiles-widget-stub">ProfilesWidget</div>,
-}));
-
 function openGuestProfileMenu(): void {
   fireEvent.click(screen.getByLabelText("Меню профиля и настроек"));
 }
@@ -98,7 +94,7 @@ describe("App", () => {
     });
   });
 
-  it("renders authorized shell with profiles section in sidebar", async () => {
+  it("renders authorized shell with auth-only placeholder", async () => {
     keycloakState.authState = true;
     apiRequestMock.mockResolvedValue({
       ok: true,
@@ -118,9 +114,8 @@ describe("App", () => {
       expect(screen.getByTestId("theme-scheme-control")).toBeInTheDocument();
       const nav = screen.getByRole("navigation", { name: "Основная навигация" });
       expect(nav).toBeInTheDocument();
-      const profilesLink = screen.getByRole("link", { name: "Профили" });
-      expect(profilesLink).toBeInTheDocument();
-      expect(profilesLink.getAttribute("href")).toBe("#/app/profile/entities");
+      expect(nav.querySelectorAll("a")).toHaveLength(0);
+      expect(screen.getByTestId("authorized-empty-placeholder")).toBeInTheDocument();
     });
   });
 

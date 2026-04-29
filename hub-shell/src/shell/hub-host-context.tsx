@@ -71,7 +71,7 @@ export function HubHostContextProvider({ context, children }: ProviderProps): JS
   const navigation = useMemo<HubHostNavigationApi>(
     () => ({
       goToProfilesList: () => {
-        navigate(shellPaths.profilesList);
+        navigate(shellPaths.home);
       },
       goBack: () => {
         window.history.back();
