@@ -5,8 +5,9 @@ name: Publish @april DS to GitHub Packages
 on:
   workflow_dispatch:
 
+# Typical GPR publish: packages:write (+ contents:read). contents:write avoids rare link/metadata failures.
 permissions:
-  contents: read
+  contents: write
   packages: write
 
 concurrency:
@@ -17,9 +18,6 @@ jobs:
   publish:
     # GitHub-hosted runners may be unavailable for private org billing; use the same pool as CI.
     runs-on: [self-hosted, ci, profile]
-    permissions:
-      contents: read
-      packages: write
     steps:
       - uses: actions/checkout@v4
         with:
@@ -52,7 +50,10 @@ jobs:
           const fs = require('fs');
           const p = JSON.parse(fs.readFileSync('package.json', 'utf8'));
           p.name = '@ukituki-ps/april-tokens';
-          p.repository = { type: 'git', url: 'git+https://github.com/ukituki-ps/april-worker.git' };
+          p.repository = {
+            type: 'git',
+            url: 'https://github.com/ukituki-ps/april-worker.git',
+          };
           fs.writeFileSync('package.json', JSON.stringify(p, null, 2) + '\n');
           NODE
           npm publish --registry=https://npm.pkg.github.com
@@ -69,7 +70,10 @@ jobs:
           p.dependencies = p.dependencies || {};
           delete p.dependencies['@april/tokens'];
           p.dependencies['@ukituki-ps/april-tokens'] = '^0.1.0';
-          p.repository = { type: 'git', url: 'git+https://github.com/ukituki-ps/april-worker.git' };
+          p.repository = {
+            type: 'git',
+            url: 'https://github.com/ukituki-ps/april-worker.git',
+          };
           fs.writeFileSync('package.json', JSON.stringify(p, null, 2) + '\n');
           NODE
           npm publish --registry=https://npm.pkg.github.com
