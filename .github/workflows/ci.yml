@@ -180,7 +180,18 @@ jobs:
             echo "System cache not writable; switched to $FALLBACK_ROOT"
           fi
 
-      - name: Init git submodules (public DisignApril; avoid GITHUB_TOKEN 404)
+      - name: Generate GitHub App token for april-profile submodule
+        id: app-token-hub-shell
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.APRIL_APP_ID }}
+          private-key: ${{ secrets.APRIL_APP_PRIVATE_KEY }}
+          owner: ukituki-ps
+          repositories: april-profile
+
+      - name: Init git submodules (DisignApril + april-profile)
+        env:
+          APRIL_PROFILE_GH_TOKEN: ${{ steps.app-token-hub-shell.outputs.token }}
         run: ./scripts/ci-init-git-submodules.sh
 
       - name: Enable Corepack (pnpm for design-system build)
@@ -244,7 +255,18 @@ jobs:
             echo "System cache not writable; switched to $FALLBACK_ROOT"
           fi
 
-      - name: Init git submodules (public DisignApril; avoid GITHUB_TOKEN 404)
+      - name: Generate GitHub App token for april-profile submodule
+        id: app-token-hub-shell-alpine
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.APRIL_APP_ID }}
+          private-key: ${{ secrets.APRIL_APP_PRIVATE_KEY }}
+          owner: ukituki-ps
+          repositories: april-profile
+
+      - name: Init git submodules (DisignApril + april-profile)
+        env:
+          APRIL_PROFILE_GH_TOKEN: ${{ steps.app-token-hub-shell-alpine.outputs.token }}
         run: ./scripts/ci-init-git-submodules.sh
 
       - name: Run Hub Shell startup preflight in node:20-alpine
@@ -291,7 +313,18 @@ jobs:
             echo "System cache not writable; switched to $FALLBACK_ROOT"
           fi
 
-      - name: Init git submodules (public DisignApril; avoid GITHUB_TOKEN 404)
+      - name: Generate GitHub App token for april-profile submodule
+        id: app-token-smoke
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.APRIL_APP_ID }}
+          private-key: ${{ secrets.APRIL_APP_PRIVATE_KEY }}
+          owner: ukituki-ps
+          repositories: april-profile
+
+      - name: Init git submodules (DisignApril + april-profile)
+        env:
+          APRIL_PROFILE_GH_TOKEN: ${{ steps.app-token-smoke.outputs.token }}
         run: ./scripts/ci-init-git-submodules.sh
 
       - name: Prepare smoke artifacts directory
@@ -342,7 +375,18 @@ jobs:
             echo "System cache not writable; switched to $FALLBACK_ROOT"
           fi
 
-      - name: Init git submodules (public DisignApril; avoid GITHUB_TOKEN 404)
+      - name: Generate GitHub App token for april-profile submodule
+        id: app-token-k6
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.APRIL_APP_ID }}
+          private-key: ${{ secrets.APRIL_APP_PRIVATE_KEY }}
+          owner: ukituki-ps
+          repositories: april-profile
+
+      - name: Init git submodules (DisignApril + april-profile)
+        env:
+          APRIL_PROFILE_GH_TOKEN: ${{ steps.app-token-k6.outputs.token }}
         run: ./scripts/ci-init-git-submodules.sh
 
       - name: Prepare k6 artifacts directory
