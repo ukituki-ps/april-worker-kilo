@@ -42,7 +42,7 @@ CI jobs (`.github/workflows/ci.yml`) выполняются на отдельн�
 ## 3. Секреты
 
 - **GitHub Secrets** — всё, что нужно CI (логин в ghcr, при необходимости токены).
-- **На сервере** — `.env` и при необходимости отдельные env-файлы вне репозитория в каталоге **`DEPLOY_ROOT`** (для AprilProfile: `/opt/april-profile`).
+- **На сервере** — `.env` и при необходимости отдельные env-файлы в каталоге **`DEPLOY_ROOT`** (AprilHub: путь из **`APRIL_DEPLOY_ROOT`**; AprilProfile: типично `/opt/april-profile`).
 
 Ограничение workflow по путям/файлам: **не используется** — любой merge в `develop` ведёт к полному пайплайну.
 
@@ -67,6 +67,29 @@ CI jobs (`.github/workflows/ci.yml`) выполняются на отдельн�
 
 - **Теги образов (SHA)** задаются через **`.env`** и/или отдельный **`images.env`** на сервере. Compose-файлы в git ссылаются на переменные (например `HUB_BFF_IMAGE` / `HUB_SHELL_IMAGE`), а конкретные значения подставляются из этих файлов.
 - **`images.env` (и при необходимости server-local override)** — **не коммитятся** в репозиторий (или коммитится только шаблон без секретов). Так `git pull` в **`DEPLOY_ROOT`** не перезаписывает задеплоенные версии образов и не требует обратных коммитов из CI.
+
+### 5.1 Что должно быть на сервере один раз (AprilHub)
+
+Чеклист для каталога **`DEPLOY_ROOT`** (клон `ukituki-ps/april-worker` на dev-хосте или путь из GitHub variable **`APRIL_DEPLOY_ROOT`**):
+
+| # | Артефакт | Назначение |
+|---|-----------|------------|
+| 1 | **Git-клон** `april-worker`, `origin` → тот же репозиторий, что и workflow | Иначе `git checkout` по `github.sha` в **Deploy to dev** падает |
+| 2 | **Docker** + **Compose v2**, пользователь runner/деплоя в группе **`docker`** | `deploy.sh` вызывает `docker compose` |
+| 3 | **`.env`** в корне клона (не в git) | Скопировать из **`.env.example`**, выставить порты, Keycloak, `APRIL_PROFILE_ADMIN_URL`, домены под стенд |
+| 4 | **`images.env`** в корне клона (не в git) | Минимум — файл существует (`deploy.sh` с `REQUIRE_IMAGES_ENV=1`); теги **`HUB_BFF_IMAGE`**, **`HUB_SHELL_IMAGE`** (и при необходимости **`APRIL_SHOWCASE_IMAGE`**) в **ghcr.io** только по **git SHA** — см. **`images.env.example`** |
+| 5 | **`./deploy.sh` исполняемый** | При необходимости `chmod +x deploy.sh` |
+| 6 | **GitHub Actions** для job **Deploy to dev** | **Secret** `APRIL_PROFILE_DEPLOY_KEY` (SSH-ключ для `git submodule` **vendor/april-profile** в `deploy.sh`); **Variable** `APRIL_DEPLOY_ROOT` = абсолютный путь к клону на runner |
+| 7 | **Self-hosted runner** с метками **`dev`** и **`RUNNER_LABEL_EXTRA`** (напр. `profile`) | Совпадает с `runs-on` в `.github/workflows/dev-deploy.yml` |
+
+Автоматизация (идемпотентно, не перезаписывает существующие `.env` / `images.env`):
+
+```bash
+cd "$DEPLOY_ROOT"   # например /home/ukituki/april-worker
+./scripts/bootstrap-server-deploy-once.sh
+```
+
+После первого успешного деплоя `deploy.sh` создаёт/обновляет server-local **`.deploy-state/`** (в т.ч. `images.env.last-good`); это не требует ручной подготовки заранее.
 
 ## 6. Data-layer: PostgreSQL + Redis
 
