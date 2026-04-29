@@ -2,9 +2,24 @@
 sidebar_position: 1
 ---
 
-# Проектные значения (AprilProfile)
+# Проектные значения
 
-Значения для репозитория **ukituki-ps/april-profile**; при смене хоста или путей обновите таблицу и связанные документы.
+При смене хоста или путей обновите таблицу для **вашего** репозитория и связанные документы.
+
+## AprilHub (`ukituki-ps/april-worker`)
+
+| Имя | Значение | Назначение |
+| --- | -------- | ---------- |
+| `DEPLOY_ROOT` | `/opt/april-worker` | Каталог **git-клона этого репозитория** на dev-сервере (должен совпадать с remote workflow, иначе `git checkout` по `github.sha` падает) |
+| `GITHUB_REPO_SLUG` | `ukituki-ps/april-worker` | Репозиторий в `git@github.com:` |
+| `RUNNER_LABEL_EXTRA` | `profile` | Доп. label self-hosted runner (для deploy jobs вместе с `dev`) |
+| `CI_RUNNER_HOST_IP` | `192.168.1.29` | Хост self-hosted runner для CI |
+| `CI_RUNNER_LABELS` | `self-hosted, ci, profile` | Labels для CI jobs в `.github/workflows/ci.yml` |
+| `APRIL_DEPLOY_ROOT` | как `DEPLOY_ROOT` | **Repository variable** в GitHub Actions для `.github/workflows/dev-deploy.yml` |
+
+Workflow **Deploy to dev** ожидает runner с `runs-on: [self-hosted, dev, profile]`.
+
+## AprilProfile (`ukituki-ps/april-profile`)
 
 | Имя | Значение | Назначение |
 | --- | -------- | ---------- |

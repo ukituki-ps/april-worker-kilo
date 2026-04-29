@@ -2,7 +2,7 @@
 
 Документ для агента и команды: зафиксированные решения и порядок шагов для деплоя на **dev-хост** (`DEV_HOST`). Конкретные значения — в [`guides/PROJECT_DEFAULTS.md`](./guides/PROJECT_DEFAULTS.md); при копировании шаблона замените их по [`guides/FORK_AND_CUSTOMIZE.md`](./guides/FORK_AND_CUSTOMIZE.md).
 
-Ниже для микросервиса **AprilProfile**: `DEV_HOST` = `dev.profile.april.ukituki.tech`, `DEV_HOST_IP` = `192.168.1.42` (Orange Pi), **`DEPLOY_ROOT`** = `/opt/april-profile`. CI self-hosted runner размещён отдельно на `192.168.1.29`.
+Ниже для **AprilHub** (репозиторий `ukituki-ps/april-worker`): типовой **`DEPLOY_ROOT`** на сервере — `/opt/april-worker` (см. `deploy.sh`, workflow **Deploy to dev**). Для микросервиса **AprilProfile** (отдельный репозиторий): `DEV_HOST` = `dev.profile.april.ukituki.tech`, `DEV_HOST_IP` = `192.168.1.42` (Orange Pi), **`DEPLOY_ROOT`** = `/opt/april-profile`. CI self-hosted runner размещён отдельно на `192.168.1.29`.
 
 ## 1. Репозиторий и триггеры
 
@@ -21,7 +21,7 @@
 
 **Практика для GitHub Actions:** workflow запускается на **`push` в `develop`** (merge PR даёт такой push). Чтобы исключить прямой push в `develop`, на GitHub включается **branch protection** для `develop` (запрет прямых push, обязательный PR). Тогда событие `push` в `develop` по смыслу соответствует «приняли PR».
 
-**Реализация в репозитории:** workflow **Deploy to dev** (файл `.github/workflows/dev-deploy.yml`) на **self-hosted** runner с labels **`dev`** и **`RUNNER_LABEL_EXTRA`** (для AprilProfile: `profile`) выполняет в каталоге клона (**`DEPLOY_ROOT`**, для AprilProfile: `/opt/april-profile`) `git fetch`, переход на коммит **`github.sha`**, затем **`SKIP_GIT_PULL=1 ./deploy.sh`**. Путь к клону можно переопределить **repository variable** `APRIL_DEPLOY_ROOT`. Ручной перезапуск того же сценария — **Actions → Deploy to dev → Run workflow** (`workflow_dispatch`).
+**Реализация в репозитории:** workflow **Deploy to dev** (файл `.github/workflows/dev-deploy.yml`) на **self-hosted** runner с labels **`dev`** и **`RUNNER_LABEL_EXTRA`** (для AprilProfile: `profile`) выполняет в каталоге клона **`APRIL_DEPLOY_ROOT`** `git fetch`, переход на коммит **`github.sha`** из **того же** репозитория, что и workflow (для `april-worker` клон на сервере обязан быть `ukituki-ps/april-worker`, иначе `git checkout` по SHA коммита из события workflow завершится ошибкой), затем **`SKIP_GIT_PULL=1 ./deploy.sh`**. Дефолт пути в workflow — `/opt/april-worker`; переопределение — **repository variable** `APRIL_DEPLOY_ROOT`. Ручной перезапуск того же сценария — **Actions → Deploy to dev → Run workflow** (`workflow_dispatch`).
 
 ## 2. Runner
 
@@ -58,7 +58,7 @@ CI jobs (`.github/workflows/ci.yml`) выполняются на отдельн�
 
 | Решение | Значение |
 |--------|----------|
-| Путь на сервере | `DEPLOY_ROOT` (для AprilProfile: `/opt/april-profile`) |
+| Путь на сервере | `DEPLOY_ROOT` (AprilHub `april-worker`: `/opt/april-worker`; AprilProfile: `/opt/april-profile`) |
 | Обновление исходников на сервере | **`git pull`** в этом каталоге |
 | Инструмент | **`docker compose` v2** |
 | Файлы | `docker-compose.yml` + overrides |
