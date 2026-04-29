@@ -6,7 +6,6 @@ import { useShellPathname } from "./use-shell-pathname";
 import { ShellBreadcrumbs } from "./ShellBreadcrumbs";
 import { useHubHostContext } from "./hub-host-context";
 import { ProfilesListHostWidget } from "../widgets";
-import { ProfileEntityFrame } from "./ProfileEntityFrame";
 
 type Props = {
   context: ShellUserContext;
@@ -54,14 +53,6 @@ export function AuthorizedHubContent({ context }: Props): JSX.Element {
     return (
       <RouteChrome>
         <ProfilesListHostWidget context={context} />
-      </RouteChrome>
-    );
-  }
-
-  if (match.kind === "profile-entity") {
-    return (
-      <RouteChrome>
-        <ProfileEntityFrame context={context} entityId={match.entityId} tab={match.tab} />
       </RouteChrome>
     );
   }

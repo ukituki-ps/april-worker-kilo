@@ -6,7 +6,7 @@ describe("matchShellRoute", () => {
     expect(matchShellRoute("/")).toEqual({ kind: "redirect" });
     expect(matchShellRoute("/app")).toEqual({ kind: "profiles-list" });
     expect(matchShellRoute("/app/profile/entities")).toEqual({ kind: "profiles-list" });
-    expect(matchShellRoute("/app/profile/entities/e-1/card")).toEqual({ kind: "profile-entity", entityId: "e-1", tab: "card" });
+    expect(matchShellRoute("/app/overview")).toEqual({ kind: "not-found" });
     expect(matchShellRoute("/app/any-legacy-route")).toEqual({ kind: "not-found" });
   });
 });

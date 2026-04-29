@@ -1,12 +1,10 @@
 import type { JSX } from "react";
-import { CompositionErrorBoundary } from "./composition-error-boundary";
-import { keycloak } from "./keycloak";
-import { captureRuntimeError } from "./sentry";
-import { useHubHostContext } from "./shell/hub-host-context";
-import { useShellToast } from "./shell/shell-toast-context";
-import { shellNavigate } from "./shell/shell-paths";
+import { ProfilesWidget, type ProfileWidgetTelemetryEvent } from "./integrations/april-profile-ui";
 import type { ShellUserContext } from "./types";
-import { ProfilesWidget, type ProfileWidgetTelemetryEvent, type ProfilesListAction } from "./vendor/april-profile-ui";
+import { keycloak } from "./keycloak";
+import { CompositionErrorBoundary } from "./composition-error-boundary";
+import { useHubHostContext } from "./shell/hub-host-context";
+import { captureRuntimeError } from "./sentry";
 
 type WidgetProps = {
   context: ShellUserContext;
@@ -37,29 +35,7 @@ export function BrokenWidget(_props: WidgetProps): JSX.Element {
 
 export function ProfilesListHostWidget({ context }: WidgetProps): JSX.Element {
   const host = useHubHostContext();
-  const toast = useShellToast();
   const apiBaseUrl = `${window.location.origin}/api/v1/admin/profile/api`;
-
-  const handleAction = (action: ProfilesListAction): void => {
-    if (action.type === "created") {
-      toast.showSuccess("Профиль успешно создан.");
-      return;
-    }
-    if (action.type === "updated") {
-      toast.showSuccess("Профиль успешно обновлен.");
-      return;
-    }
-    toast.showSuccess("Профиль удален.");
-  };
-
-  const handleError = (payload: { message: string; requestId?: string; code?: string }): void => {
-    const requestSuffix = payload.requestId ? ` (request_id: ${payload.requestId})` : "";
-    toast.showError(`${payload.message}${requestSuffix}`);
-  };
-
-  const handleOpenEntity = (entityId: string): void => {
-    shellNavigate(`/app/profile/entities/${encodeURIComponent(entityId)}/card`);
-  };
 
   const handleObservability = (event: ProfileWidgetTelemetryEvent): void => {
     if (event.event.endsWith("_failed")) {
@@ -92,11 +68,8 @@ export function ProfilesListHostWidget({ context }: WidgetProps): JSX.Element {
             correlationId: context.correlationId,
           },
         }}
-        accessToken={keycloak.token}
         apiBaseUrl={apiBaseUrl}
-        onAction={handleAction}
-        onError={handleError}
-        onOpenEntity={handleOpenEntity}
+        accessToken={keycloak.token}
         onObservability={handleObservability}
       />
     </CompositionErrorBoundary>

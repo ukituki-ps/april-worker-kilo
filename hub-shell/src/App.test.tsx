@@ -26,7 +26,7 @@ vi.mock("./api", () => ({
   apiRequest: (...args: unknown[]) => apiRequestMock(...args),
 }));
 
-vi.mock("./vendor/april-profile-ui", () => ({
+vi.mock("./integrations/april-profile-ui", () => ({
   ProfilesWidget: () => <div data-testid="profiles-widget-stub">ProfilesWidget</div>,
 }));
 
@@ -121,6 +121,7 @@ describe("App", () => {
       const profilesLink = screen.getByRole("link", { name: "Профили" });
       expect(profilesLink).toBeInTheDocument();
       expect(profilesLink.getAttribute("href")).toBe("#/app/profile/entities");
+      expect(screen.getByTestId("profiles-widget-stub")).toBeInTheDocument();
     });
   });
 

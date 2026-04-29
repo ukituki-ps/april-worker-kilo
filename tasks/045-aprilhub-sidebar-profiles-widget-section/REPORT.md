@@ -1,22 +1,24 @@
 ## 1) Итого
-- Статус: ✅ выполнено
-- Задача: Раздел `Профили` в sidebar AprilHub + интеграция `profiles-widget`
-- Ветка: `develop`
+- Статус: ⚠️ частично
+- Задача: Новый раздел `Профили` в sidebar + интеграция внешнего `profiles-widget`
+- Ветка: `feature/045-profiles-sidebar-external-widget`
 - Коммиты: `не создавались`
 - PR: не создавался
 
 ## 2) Что сделано
-- [frontend] Восстановлен продуктовый раздел `Профили` в сайдбаре (`#/app/profile/entities`) и активный state навигации.
-- [frontend] Обновлена маршрутизация `hub-shell`: redirect с `#/app` в `#/app/profile/entities`, fallback для неизвестных маршрутов, поддержка host-навигации в legacy entity-route (`/app/profile/entities/:entityId/:tab`).
-- [frontend] В `AuthorizedHubContent` подключен `ProfilesListHostWidget` через `CompositionErrorBoundary`.
-- [frontend] Добавлен vendor adapter `hub-shell/src/vendor/april-profile-ui.tsx` с контрактом `ProfilesWidget` (hostContext, `apiBaseUrl`, `accessToken`, `onAction`, `onError`, `onOpenEntity`, `onObservability`) и базовой telemetry-эмиссией `view/list_*`.
-- [frontend] Интегрированы callbacks host-уровня: toast для успешных действий, user-safe error сообщения с `request_id`, host navigation для `onOpenEntity`.
-- [frontend/tests] Обновлены unit/e2e smoke тесты под новый UX-контракт раздела `Профили`, добавлен отдельный smoke-спек.
-- [docs] Актуализированы `PLAN.md`, `REPORT.md` и статус `045` в `task_list.md`.
+- [frontend] Возвращён раздел `Профили` в sidebar (`#/app/profile/entities`) и активный state навигации.
+- [frontend] Обновлён роутинг shell: redirect c `#/app` на `#/app/profile/entities` и fallback для неизвестных маршрутов.
+- [frontend] В `AuthorizedHubContent` подключён `ProfilesListHostWidget` для рендера внешнего `ProfilesWidget`.
+- [frontend] Интеграция выполнена строго через внешний runtime-артефакт `april-profile-1/frontend/packages/profile-ui/dist` (без локального vendor/shim с логикой виджета).
+- [frontend] В host передаются только контрактные параметры (`hostContext`, `apiBaseUrl`, `accessToken`, `onObservability`); бизнес-логика списка/CRUD остаётся во внешнем виджете.
+- [frontend/tests] Обновлены unit/e2e тесты под новый UX-контракт, добавлен smoke-спек `profile-widgets-smoke.spec.ts`.
+- [docs] Добавлен `PLAN.md`, отчёт оформлен по шаблону.
 
 ## 3) Изменённые файлы
 - `hub-shell/package.json`
+- `hub-shell/package-lock.json`
 - `hub-shell/src/App.test.tsx`
+- `hub-shell/src/integrations/april-profile-ui.ts`
 - `hub-shell/src/shell/AuthorizedHubContent.tsx`
 - `hub-shell/src/shell/ShellBreadcrumbs.tsx`
 - `hub-shell/src/shell/hub-host-context.tsx`
@@ -24,10 +26,8 @@
 - `hub-shell/src/shell/shell-paths.ts`
 - `hub-shell/src/shell/shell-paths.test.ts`
 - `hub-shell/src/widgets.tsx`
-- `hub-shell/src/vendor/april-profile-ui.tsx`
 - `hub-shell/tests/e2e/shell-privileged.spec.ts`
 - `hub-shell/tests/e2e/profile-widgets-smoke.spec.ts`
-- `task_list.md`
 - `tasks/045-aprilhub-sidebar-profiles-widget-section/PLAN.md`
 - `tasks/045-aprilhub-sidebar-profiles-widget-section/REPORT.md`
 
@@ -41,7 +41,7 @@
 - Сборка: ok
 - Unit tests: ok
 - Integration tests: ok (в составе `vitest run`)
-- E2E / smoke: ok
+- E2E / smoke: fail (таймауты стенда в Playwright-прогоне)
 
 Команды (фактически выполненные):
 ```bash
@@ -54,14 +54,16 @@ npm --prefix hub-shell run e2e:smoke
 
 ## 6) Деплой
 - Среда: нет
-- Согласовано с: `docs/DEPLOYMENT_STRATEGY.md`
+- Согласовано с: [`docs/DEPLOYMENT_STRATEGY.md`](../../docs/DEPLOYMENT_STRATEGY.md)
 - Образы: не применялось
 - Health / readiness: не применялось
 - Rollback: нет
 
 ## 7) Риски и ограничения
-- Интеграция `profiles-widget` выполнена через локальный vendor adapter в `hub-shell` (shim), а не через поставку npm-пакета `@april/profile-ui` в runtime, из-за ограничений окружения (`EACCES` при `npm install` в `node_modules`).
-- Для полного production-path желательно заменить shim на прямое подключение внешнего пакета (dist/registry) без локальной адаптации.
+- В текущем окружении `npm --prefix hub-shell install` падает с `EACCES`, поэтому прямое подключение `@april/profile-ui` через `node_modules` не использовано.
+- Использован внешний runtime-артефакт (`dist/index.js`) из соседнего репозитория `april-profile-1`; это соответствует требованию "строго внешний виджет", но требует наличия этого артефакта на рабочей машине/CI.
+- `e2e:smoke` не завершён успешно из-за стендовых таймаутов; перед merge нужен зелёный прогон smoke.
 
 ## 8) Что осталось
-- [ ] Вынести vendor shim на прямую поставку `@april/profile-ui` (при доступном install/runtime контуре).
+- [ ] Повторно прогнать `npm --prefix hub-shell run e2e:smoke` на стабильном dev-стенде и зафиксировать успешный результат.
+- [ ] Создать PR с test plan и рисками после успешного smoke.

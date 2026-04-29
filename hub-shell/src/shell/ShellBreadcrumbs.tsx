@@ -18,17 +18,6 @@ export function ShellBreadcrumbs({ match }: Props): JSX.Element {
         Профили
       </Text>,
     );
-  } else if (match.kind === "profile-entity") {
-    items.push(
-      <Anchor key="profiles" href="#/app/profile/entities" size="sm">
-        Профили
-      </Anchor>,
-    );
-    items.push(
-      <Text key="cur" size="sm">
-        Карточка
-      </Text>,
-    );
   } else {
     items.push(
       <Text key="cur" size="sm">

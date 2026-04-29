@@ -5,7 +5,7 @@ const privilegedUser = process.env.PLAYWRIGHT_USER ?? "april-dev";
 const privilegedPass = process.env.PLAYWRIGHT_PASSWORD ?? "april-dev-pass";
 
 test.describe("Profiles widget smoke", () => {
-  test("сайдбар: Профили открывает список и рендерит виджет", async ({ page }) => {
+  test("сайдбар: Профили открывает список и рендерит внешний виджет", async ({ page }) => {
     await loginThroughKeycloak(page, privilegedUser, privilegedPass);
     await page.goto("/#/app");
 

@@ -1,42 +1,41 @@
-# План: раздел `Профили` в сайдбаре AprilHub + интеграция `profiles-widget`
+# План: новый раздел `Профили` в sidebar, только через внешний widget-контракт
 
 - **Задача:** [`TASK.md`](./TASK.md)
 - **Дата плана:** 2026-04-29
 - **Статус плана:** выполнен
 
 ## Исходные допущения
-- Базовый auth-flow (`check-sso`, `login/logout`, `GET /api/v1/me`) остаётся без изменений и не регрессирует.
-- После `044` в shell сейчас auth-only режим с пустым сайдбаром; нужно вернуть только раздел `Профили`.
-- `profiles-widget` интегрируется через публичный host-контракт, без внедрения backend/IAM-логики в UI.
-- Минимальный тестовый контур задачи: `hub-shell` lint + unit + e2e smoke.
+- Базовый auth-flow (`check-sso`, `login/logout`, `GET /api/v1/me`) не меняется.
+- В `hub-shell` после задачи `044` действует auth-only режим; раздел `Профили` добавляется как новый продуктовый вход.
+- Логику виджета нельзя реализовывать локально в `hub-shell`; используется только внешний runtime-артефакт AprilProfile.
+- В текущем окружении установка npm-зависимости в `hub-shell/node_modules` может быть ограничена (`EACCES`), поэтому допускается подключение согласованного внешнего dist-артефакта.
 
 ## Порядок работ (шаги)
-1. Обновить маршрутизацию shell: добавить маршрут раздела `Профили`, настроить redirect и fallback.
-2. Вернуть пункт `Профили` в primary sidebar и связать active-state с новым маршрутом.
-3. Подключить `ProfilesListHostWidget` в `AuthorizedHubContent` через `CompositionErrorBoundary`, сохранив host context и toast/error handling.
-4. Синхронизировать вспомогательные shell-компоненты (breadcrumb, host navigation API) под новый маршрут.
-5. Обновить unit/e2e smoke тесты под новый UX-контракт (sidebar + рендер виджета + unknown route).
-6. Прогнать проверки, оформить `REPORT.md` по шаблону.
+1. Вернуть IA/роутинг `Профили` в shell: nav item, route match, redirect/fallback.
+2. Подключить внешний `ProfilesWidget` через host-обвязку без локального shim (только контрактные параметры).
+3. Обновить unit/e2e smoke тесты под новый контракт UX.
+4. Прогнать `lint`, `test`, `build`, `e2e:smoke`; зафиксировать фактические результаты в отчёте.
+5. Оформить `REPORT.md` по шаблону.
 
 ## Затрагиваемые области
 | Область | Что меняется (кратко) |
 |--------|------------------------|
 | Backend (Go) | Не меняется |
-| Frontend | `hub-shell`: маршруты, sidebar nav, authorized content, host-context navigation, тесты |
+| Frontend | `hub-shell`: маршруты, sidebar, host-рендер внешнего виджета, тесты |
 | БД / Atlas | Не меняется |
 | Инфра / Compose | Не меняется |
 | Документация / OpenAPI | Артефакты задачи (`PLAN.md`, `REPORT.md`) |
 
 ## Риски и откат
-- **Риск:** несовместимость callback-контракта внешнего `profiles-widget` в текущей версии пакета. → **Митигация:** опираться на текущие типы `@april/profile-ui`, не добавлять неподдерживаемые callbacks.
-- **Риск:** регрессия fallback/redirect при hash-маршрутизации. → **Митигация:** покрыть unit + e2e сценарий неизвестного маршрута.
-- **Риск:** runtime-ошибка виджета блокирует экран. → **Митигация:** рендер через `CompositionErrorBoundary`.
-- Откат: revert изменений в `hub-shell/src/shell/*`, `hub-shell/src/App.test.tsx`, `hub-shell/tests/e2e/*`.
+- **Риск:** недоступность внешнего npm install в локальном окружении. → **Митигация:** подключать внешний runtime-артефакт из `april-profile-1/.../dist`.
+- **Риск:** регрессия hash-роутинга при возврате раздела. → **Митигация:** обновить unit + e2e smoke на sidebar/route.
+- **Риск:** runtime-ошибка внешнего виджета. → **Митигация:** `CompositionErrorBoundary` в host-обвязке.
+- Откат: `git revert` изменений в `hub-shell/src/shell/*`, `hub-shell/src/widgets.tsx`, тестах и артефактах задачи.
 
 ## Проверка после выполнения
-- Команды: `npm --prefix hub-shell run lint`, `npm --prefix hub-shell run test`, `npm --prefix hub-shell run e2e:smoke`.
-- Ручная проверка: логин -> sidebar содержит `Профили` -> экран виджета рендерится; unknown route -> fallback без crash.
+- Команды: `npm --prefix hub-shell run lint`, `npm --prefix hub-shell run test`, `npm --prefix hub-shell run build`, `npm --prefix hub-shell run e2e:smoke`.
+- Ручная проверка: логин -> sidebar содержит `Профили` -> маршрут `#/app/profile/entities` -> виджет рендерится.
 
 ## Примечания
-- Связанные задачи: `042`, `043`, `044`, `045` в `task_list.md`.
-- Обновления плана: первичная версия от 2026-04-29; 2026-04-29 задача переоткрыта после отката реализации; 2026-04-29 повторная реализация выполнена.
+- Связанные задачи: `042`, `043`, `044`, `045`.
+- 2026-04-29: план зафиксирован и выполнен в рамках нового scope "строго внешний виджет, без локальной логики".
