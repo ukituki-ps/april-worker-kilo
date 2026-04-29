@@ -122,6 +122,7 @@ if [ "${PLAYWRIGHT_RUNNER:-host}" = "docker" ]; then
     --network host \
     --user "$(id -u):$(id -g)" \
     -e npm_config_cache=/tmp/.npm \
+    -e PLAYWRIGHT_BROWSERS_PATH=0 \
     -e PLAYWRIGHT_BASE_URL \
     -e PLAYWRIGHT_USER \
     -e PLAYWRIGHT_PASSWORD \
@@ -130,7 +131,7 @@ if [ "${PLAYWRIGHT_RUNNER:-host}" = "docker" ]; then
     -v "$ROOT_DIR/hub-shell:/workspace/hub-shell" \
     -w /workspace/hub-shell \
     "$PLAYWRIGHT_DOCKER_IMAGE" \
-    sh -lc "npm ci && npm run e2e"
+    sh -lc "npm ci && npx playwright install chromium && npm run e2e"
 else
   (
     cd hub-shell
