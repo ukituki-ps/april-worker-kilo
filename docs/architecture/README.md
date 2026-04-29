@@ -15,6 +15,7 @@
 - `structurizr/workspace.dsl`
 - `docs/guides/OBSERVABILITY_INDEX.md` (central observability navigation)
 - `docs/guides/OBSERVABILITY_MULTI_STAND_OPERATING_MODEL.md` (multi-stand operating model)
+- [`ADR-april-design-system-npm-distribution.md`](./ADR-april-design-system-npm-distribution.md) — дистрибуция `@april/ui` / `@april/tokens` через приватный npm (GitHub Packages), роль submodule
 
 ## Назначение файлов
 
@@ -25,6 +26,7 @@
 - `APRILHUB_C3_C4.md` — детальная C3/C4 спецификация `AprilHub`.
 - `APRILWORKER_C3_C4.md` — детальная C3/C4 спецификация `AprilWorker`.
 - `C4_RUNTIME_SEQUENCES.md` — ключевые runtime sequence-сценарии.
+- `ADR-april-design-system-npm-distribution.md` — ADR: registry, semver, submodule vs npm для дизайн-системы.
 
 ## Правило актуализации
 

@@ -1,10 +1,8 @@
 ## 1) Итого
 
-- Статус: ⚠️ частично — выполнена **финальная верификация по [`TASK-049-99`](./TASK-049-99-aprilhub-final-integration-verify.md)**; **полное закрытие эпика 049** по [`TASK.md`](./TASK.md) (registry-only lock, подтверждённые публикации, AprilProfile/DisignApril) **ещё не зафиксировано**
-- Задача: 049-99 — AprilHub: финальная сквозная проверка и сборка эпика registry-DS
-- Ветка: `feature/049-99-epic-final-verify`
-- Коммиты: ветка `feature/049-99-epic-final-verify` — см. последний коммит на GitHub
-- PR: https://github.com/ukituki-ps/april-worker/compare/develop...feature/049-99-epic-final-verify
+- **Эпик 049:** частично — зафиксирована **финальная верификация** по [`TASK-049-99`](./TASK-049-99-aprilhub-final-integration-verify.md); **полное закрытие** по [`TASK.md`](./TASK.md) (registry-only lock, подтверждённые публикации, AprilProfile/DisignApril) **ещё не зафиксировано**. Параллельно в `develop` вливаются артефакты **049-01** (ADR), **049-02** (гайды), **049-03/04** (hub-shell / CI / отчёты).
+- **049-99:** AprilHub: финальная сквозная проверка и сборка эпика registry-DS (таблица ниже).
+- **049-01:** ADR и граница «исходники DisignApril vs npm-пакеты» — см. раздел «ADR (049-01)» и [`TASK-049-01-aprilhub-architecture-adr.md`](./TASK-049-01-aprilhub-architecture-adr.md).
 
 ## 2) Что сделано
 
@@ -24,22 +22,33 @@
 - **[compose / docs]** `docker-compose.yml` (`hub-shell`: `NODE_AUTH_TOKEN`), `.env.example`, `docs/DEPLOYMENT_STRATEGY.md` §3.1.
 - Подробнее: ветка `feature/049-04-aprilhub-ci-compose-deploy`, ключевой коммит **`1da019a`**, compare: https://github.com/ukituki-ps/april-worker/compare/develop...feature/049-04-aprilhub-ci-compose-deploy
 
-## 3) Изменённые файлы (текущая выкладка 049-99)
+### ADR (049-01)
 
-- `task_list.md`
+- [docs] ADR [`docs/architecture/ADR-april-design-system-npm-distribution.md`](../../docs/architecture/ADR-april-design-system-npm-distribution.md): контекст (`file:` + submodule, инциденты stale `dist`), решение (**registry URL** `https://npm.pkg.github.com`, **scope** `@april`), semver/breaking, роль submodule, релизы, откат, альтернативы, миграция.
+- [docs] В [`docs/architecture/README.md`](../../docs/architecture/README.md) добавлены ссылки на ADR.
+- [tasks] В [`TASK-049-01-aprilhub-architecture-adr.md`](./TASK-049-01-aprilhub-architecture-adr.md) отмечен выполненный критерий по содержанию ADR.
+
+## 3) Изменённые файлы
+
+- `task_list.md` (прогоны 049-99)
 - `tasks/049-april-ds-registry-consumption-epic/REPORT.md`
 - `tasks/049-april-ds-registry-consumption-epic/TASK.md`
 - `tasks/049-april-ds-registry-consumption-epic/TASK-049-99-aprilhub-final-integration-verify.md`
+- `docs/architecture/ADR-april-design-system-npm-distribution.md`
+- `docs/architecture/README.md`
+- `tasks/049-april-ds-registry-consumption-epic/TASK-049-01-aprilhub-architecture-adr.md`
 
 ## 4) Миграции и данные
 
 - Миграции Atlas: нет
-- Обратимость: да (документированные правки списка задач и отчёта)
+- Какие таблицы/индексы изменены: не применялось
+- Обратимость: да (документированные правки markdown / списков задач)
 
 ## 5) Проверка качества
 
-- Линтер hub-shell: ok (в контейнере, см. ниже)
+- Линтер hub-shell: ok (в контейнере `node:20-alpine`, см. 049-99)
 - Сборка hub-shell: ok (в контейнере)
+- Для правок **только ADR/markdown (049-01):** отдельный прогон линтера `hub-shell` не требовался
 - Unit tests: не запускались отдельно в этой задаче (`npm run test` не входил в минимальный чеклист 049-99)
 - E2E / smoke: не запускались (опционально в постановке)
 
@@ -54,7 +63,7 @@ npm view @april/tokens version
 npm view @ukituki-ps/april-ui version --registry=https://npm.pkg.github.com
 
 # hub-shell: чистая сборка как в CI (обход EACCES на хосте)
-docker run --rm -v "/home/ukituki/april-worker:/workspace" -w /workspace/hub-shell node:20-alpine \
+docker run --rm -v "$(pwd):/workspace" -w /workspace/hub-shell node:20-alpine \
   sh -lc "npm ci && npm run lint && npm run build"
 ```
 
@@ -69,6 +78,8 @@ docker run --rm -v "/home/ukituki/april-worker:/workspace" -w /workspace/hub-she
 
 - До перехода **`hub-shell`** на зависимости из lock (`semver` из GPR) эпик остаётся на **`file:`** + submodule — цель **049** по фиксации артефакта только через registry **не достигнута**.
 - Без **`GPR_READ_TOKEN`** / PAT в проверяющей среде нельзя подтвердить версии в GPR через `npm view`.
+- Текст ADR ссылается на GitHub Packages как на согласованный целевой registry эпика `049`; смена провайдера потребует правки ADR.
+- Каноническое описание потребления для разработчиков — [`docs/guides/DESIGN_SYSTEM.md`](../../docs/guides/DESIGN_SYSTEM.md) (обновляется в **049-02**); ADR не должен противоречить гайду.
 
 ## 8) Что осталось
 
@@ -77,3 +88,4 @@ docker run --rm -v "/home/ukituki/april-worker:/workspace" -w /workspace/hub-she
 - [ ] Подтвердить миграцию **AprilProfile** (PR / CI).
 - [ ] Повторить **`npm view`** с read-токеном и зелёный **CI** на PR после смены зависимостей.
 - [ ] При необходимости: smoke на dev и/или **Playwright** из репозитория.
+- [ ] Задача [`049-02`](./TASK-049-02-aprilhub-documentation.md): обновить `DESIGN_SYSTEM.md` под registry-модель (если ещё не сделано вливаемым коммитом).

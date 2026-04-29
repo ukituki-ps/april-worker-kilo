@@ -22,8 +22,8 @@
 
 ## Критерии готовности
 
-- [ ] ADR смержен в целевую ветку согласно `DEPLOYMENT_STRATEGY.md`
-- [ ] В ADR явно указаны: registry URL, scope `@april`, ответственный за релизы DS, откат
+- [ ] ADR смержен в целевую ветку согласно `DEPLOYMENT_STRATEGY.md` *(выполняется при merge PR; артефакт: `docs/architecture/ADR-april-design-system-npm-distribution.md`)*
+- [x] В ADR явно указаны: registry URL, scope `@april`, ответственный за релизы DS, откат
 
 ## Проверка
 
