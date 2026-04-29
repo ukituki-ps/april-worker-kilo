@@ -1,0 +1,55 @@
+# Одноразовая / редкая публикация @april/tokens и @april/ui в GitHub Packages из submodule DisignApril.
+# Нужна для первого появления пакетов в registry и для обновления hub-shell/package-lock.json (npm ci).
+name: Publish @april DS to GitHub Packages
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: publish-april-ds-gpr
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: https://npm.pkg.github.com
+          scope: "@april"
+
+      - name: Enable Corepack (pnpm in DisignApril)
+        run: corepack enable
+
+      - name: Build design system (pnpm workspace)
+        working-directory: design-system/DisignApril
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm build
+
+      - name: Publish @april/tokens
+        working-directory: design-system/DisignApril/packages/tokens
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          jq '. + {"repository":{"type":"git","url":"git+https://github.com/ukituki-ps/april-worker.git"}}' package.json > package.json.tmp
+          mv package.json.tmp package.json
+          npm publish --registry=https://npm.pkg.github.com
+
+      - name: Publish @april/ui
+        working-directory: design-system/DisignApril/packages/ui
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          jq '.dependencies["@april/tokens"]="^0.1.0" | . + {"repository":{"type":"git","url":"git+https://github.com/ukituki-ps/april-worker.git"}}' package.json > package.json.tmp
+          mv package.json.tmp package.json
+          npm publish --registry=https://npm.pkg.github.com
