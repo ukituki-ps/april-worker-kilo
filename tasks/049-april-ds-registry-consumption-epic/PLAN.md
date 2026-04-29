@@ -75,7 +75,7 @@
 - **`.npmrc`** в `hub-shell` (или корень — по принятому в CI): `@april:registry=https://npm.pkg.github.com` + `always-auth` через env.
 - **CI** (`.github/workflows/ci.yml`, bootstrap): перед `npm ci` экспорт `NODE_AUTH_TOKEN`; убрать или ослабить обязательность полного `ds:prepare` build submodule для gate shell (оставить `ds:check-exports` только если ещё используется `file:` на переходный период — см. подзадачи).
 - **`docs/guides/DESIGN_SYSTEM.md`**, **`DEPLOYMENT_STRATEGY.md`**, при необходимости **`AGENT_ARCHITECTURE_CONTEXT.md`**: потребление через registry; чеклист сервера (токен для pull пакетов в CI runner и при необходимости на self-hosted build).
-- **`docker-compose.yml` / deploy:** образы hub-shell должны получать зависимости при build из registry (не полагаться на `@fs` из хоста для продукта).
+- **`docker-compose.yml` / deploy:** образы hub-shell должны получать зависимости при build из registry (не полагаться на `@fs` из хоста для продукта). Реализация CI/compose/token для установки: задача **049-04** (`NODE_AUTH_TOKEN`, `permissions.packages: read`, `GPR_READ_TOKEN`, переменная в compose и §3.1 в `DEPLOYMENT_STRATEGY.md`).
 - **Submodule:** оставить для `april-showcase` и локальной разработки; описать в доке, что bump UI для shell = PR с обновлением lock, а не только submodule SHA.
 
 ### 6.3 AprilProfile (`april-profile-1`)

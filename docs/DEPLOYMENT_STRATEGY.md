@@ -44,6 +44,12 @@ CI jobs (`.github/workflows/ci.yml`) выполняются на отдельн�
 - **GitHub Secrets** — всё, что нужно CI (логин в ghcr, при необходимости токены).
 - **На сервере** — `.env` и при необходимости отдельные env-файлы в каталоге **`DEPLOY_ROOT`** (AprilHub: путь из **`APRIL_DEPLOY_ROOT`**; AprilProfile: типично `/opt/april-profile`).
 
+### 3.1 GitHub Packages (npm): зависимости `hub-shell` (`@ukituki-ps/*`)
+
+- **CI (GitHub Actions):** в workflow заданы `permissions.packages: read` и **`NODE_AUTH_TOKEN`**: по умолчанию **`GITHUB_TOKEN`**, при необходимости доступа к пакетам из другого репозитория org — добавьте secret **`GPR_READ_TOKEN`** (classic PAT: `read:packages`, при приватном репозитории пакета — `repo`; для org с SSO — authorize). Workflow использует выражение `secrets.GPR_READ_TOKEN || secrets.GITHUB_TOKEN`. Токены не выводить в логи шагов.
+- **Self-hosted CI runner** (`192.168.1.29`, labels `ci`, `profile`): секреты подтягиваются из настроек репозитория так же, как на GitHub-hosted; runner должен иметь исходящий доступ к `https://npm.pkg.github.com`.
+- **Dev-хост / ручной `npm ci` в `hub-shell`:** экспортируйте **`NODE_AUTH_TOKEN`** в окружение или добавьте в **`.env`** в **`DEPLOY_ROOT`** (см. `.env.example`), чтобы `docker compose` передал переменную в сервис `hub-shell` (см. `docker-compose.yml`).
+
 Ограничение workflow по путям/файлам: **не используется** — любой merge в `develop` ведёт к полному пайплайну.
 
 ### 3.1. GitHub Packages: приватные npm-пакеты `@april/*` (дизайн-система)
@@ -93,6 +99,7 @@ CI jobs (`.github/workflows/ci.yml`) выполняются на отдельн�
 | 5 | **`./deploy.sh` исполняемый** | При необходимости `chmod +x deploy.sh` |
 | 6 | **GitHub Actions** для job **Deploy to dev** | **Secret** `APRIL_PROFILE_DEPLOY_KEY` (SSH-ключ для `git submodule` **vendor/april-profile** в `deploy.sh`); **Variable** `APRIL_DEPLOY_ROOT` = абсолютный путь к клону на runner |
 | 7 | **Self-hosted runner** с метками **`dev`** и **`RUNNER_LABEL_EXTRA`** (напр. `profile`) | Совпадает с `runs-on` в `.github/workflows/dev-deploy.yml` |
+| 8 | **`NODE_AUTH_TOKEN` в `.env` на dev-хосте** (опционально, если без него `hub-shell` не может выполнить `npm ci` к приватным пакетам) | PAT только `read:packages`; тот же смысл, что в CI — см. §3.1; значение не коммитить |
 
 Автоматизация (идемпотентно, не перезаписывает существующие `.env` / `images.env`):
 

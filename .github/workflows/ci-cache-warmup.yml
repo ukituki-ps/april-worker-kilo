@@ -5,12 +5,17 @@ on:
     - cron: "20 */6 * * *"
   workflow_dispatch:
 
+permissions:
+  contents: read
+  packages: read
+
 env:
   GOMODCACHE: /var/cache/aprilhub/go/pkg/mod
   GOCACHE: /var/cache/aprilhub/go/build
   npm_config_cache: /var/cache/aprilhub/npm
   APRIL_DOCKER_MIRROR: 127.0.0.1:5000
   APRIL_GCR_MIRROR: 127.0.0.1:5001
+  NODE_AUTH_TOKEN: ${{ secrets.GPR_READ_TOKEN || secrets.GITHUB_TOKEN }}
 
 jobs:
   warmup:

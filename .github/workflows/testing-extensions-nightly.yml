@@ -5,6 +5,13 @@ on:
     - cron: "30 1 * * *"
   workflow_dispatch:
 
+permissions:
+  contents: read
+  packages: read
+
+env:
+  NODE_AUTH_TOKEN: ${{ secrets.GPR_READ_TOKEN || secrets.GITHUB_TOKEN }}
+
 jobs:
   hub-shell-playwright-smoke:
     name: Hub Shell Playwright smoke

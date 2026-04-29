@@ -29,10 +29,11 @@
 - [docs] [`docs/guides/VERSIONS.md`](../../docs/guides/VERSIONS.md): строка April DS согласована с registry + ADR.
 - [docs] [`docs/AGENT_ARCHITECTURE_CONTEXT.md`](../../docs/AGENT_ARCHITECTURE_CONTEXT.md): ссылка на ADR по дистрибуции `@april/*`.
 
-### Ранее: CI / compose / отчётность (049-04 — по факту ветки)
+### Ранее: CI / compose / отчётность (049-04)
 
-- **[infra / CI]** `permissions: packages: read`, `NODE_AUTH_TOKEN: ${{ secrets.GPR_READ_TOKEN || secrets.GITHUB_TOKEN }}` в `ci.yml`, `bootstrap-ci.yml`, `ci-cache-warmup.yml`, `testing-extensions-nightly.yml`; проброс в **hub-shell-alpine-runtime** (`docker run -e NODE_AUTH_TOKEN`).
-- **[compose / docs]** `docker-compose.yml` (`hub-shell`: `NODE_AUTH_TOKEN`), `.env.example`, `docs/DEPLOYMENT_STRATEGY.md` §3.1 — см. ключевой коммит **`1da019a`** после вливания ветки `feature/049-04-aprilhub-ci-compose-deploy`.
+- **[infra / CI]** В `ci.yml`, `bootstrap-ci.yml`, `ci-cache-warmup.yml`, `testing-extensions-nightly.yml`: `permissions: contents: read`, `packages: read`, env `NODE_AUTH_TOKEN: ${{ secrets.GPR_READ_TOKEN || secrets.GITHUB_TOKEN }}`; проброс `-e NODE_AUTH_TOKEN` в `docker run` (включая **hub-shell-alpine-runtime**, Playwright-хелпер из `scripts/run-playwright-aprilhub.sh`).
+- **[infra / compose]** `docker-compose.yml` (`hub-shell`: `NODE_AUTH_TOKEN`), `.env.example` — пример без секрета в репо.
+- **[docs]** `docs/DEPLOYMENT_STRATEGY.md` §3.1 и чеклист dev-хоста; эпик [`PLAN.md`](./PLAN.md) §6.2 — ссылка на реализацию 049-04.
 
 ## 3) Изменённые файлы (накопительно)
 
@@ -48,6 +49,14 @@
 - `docs/DEPLOYMENT_STRATEGY.md`
 - `docs/guides/VERSIONS.md`
 - `docs/AGENT_ARCHITECTURE_CONTEXT.md`
+- `.github/workflows/ci.yml`
+- `.github/workflows/bootstrap-ci.yml`
+- `.github/workflows/ci-cache-warmup.yml`
+- `.github/workflows/testing-extensions-nightly.yml`
+- `docker-compose.yml`
+- `.env.example`
+- `tasks/049-april-ds-registry-consumption-epic/PLAN.md`
+- `scripts/run-playwright-aprilhub.sh`
 
 ## 4) Миграции и данные
 
@@ -82,7 +91,8 @@ make docs-build
 ## 7) Риски и ограничения
 
 - До **049-03** `hub-shell` может оставаться на **`file:`** + submodule; документация разводит текущее и целевое состояние.
-- Без **`GPR_READ_TOKEN`** / PAT нельзя подтвердить версии в GPR через `npm view`.
+- Без **`GPR_READ_TOKEN`** / PAT нельзя подтвердить версии в GPR через `npm view`; при ограничениях `GITHUB_TOKEN` на GPR укажите отдельный PAT с `read:packages`.
+- Fork PR не получают секреты форка-родителя — ожидаемое ограничение GitHub.
 - ADR задаёт GPR как цель эпика; смена провайдера потребует пересмотра ADR и гайдов.
 
 ## 8) Что осталось

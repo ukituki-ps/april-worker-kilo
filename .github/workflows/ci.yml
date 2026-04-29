@@ -11,6 +11,10 @@ concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+  packages: read
+
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
   GOMODCACHE: /var/cache/aprilhub/go/pkg/mod
@@ -18,6 +22,8 @@ env:
   npm_config_cache: /var/cache/aprilhub/npm
   APRIL_DOCKER_MIRROR: 127.0.0.1:5000
   APRIL_GCR_MIRROR: 127.0.0.1:5001
+  # GitHub Packages (hub-shell .npmrc): не логировать; при недоступности GPR_READ_TOKEN — GITHUB_TOKEN + packages:read
+  NODE_AUTH_TOKEN: ${{ secrets.GPR_READ_TOKEN || secrets.GITHUB_TOKEN }}
 
 jobs:
   openapi-compatibility:
