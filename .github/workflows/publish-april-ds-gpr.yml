@@ -45,7 +45,8 @@ jobs:
       - name: Publish @ukituki-ps/april-tokens (GPR)
         working-directory: design-system/DisignApril/packages/tokens
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Optional PAT with write:packages when org restricts GITHUB_TOKEN (see repo secrets GPR_PUBLISH_TOKEN).
+          NODE_AUTH_TOKEN: ${{ secrets.GPR_PUBLISH_TOKEN != '' && secrets.GPR_PUBLISH_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
           node <<'NODE'
           const fs = require('fs');
@@ -59,7 +60,7 @@ jobs:
       - name: Publish @ukituki-ps/april-ui (GPR)
         working-directory: design-system/DisignApril/packages/ui
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.GPR_PUBLISH_TOKEN != '' && secrets.GPR_PUBLISH_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
           node <<'NODE'
           const fs = require('fs');
