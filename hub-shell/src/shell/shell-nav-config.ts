@@ -9,10 +9,7 @@ export type ShellNavItem = {
 };
 
 export function buildPrimaryShellNav(): ShellNavItem[] {
-<<<<<<< HEAD
-=======
   // Auth-only режим: sidebar остаётся как структурный контейнер, но без продуктовых пунктов.
->>>>>>> parent of 41f02aa (Merge pull request #74 from ukituki-ps/feature/045-profiles-sidebar-widget)
   return [];
 }
 

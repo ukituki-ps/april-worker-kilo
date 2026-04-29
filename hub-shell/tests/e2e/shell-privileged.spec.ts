@@ -14,11 +14,7 @@ test.describe("AprilHub shell (привилегированная персона
     await expect(page.getByText("Авторизовано")).toBeVisible();
   });
 
-<<<<<<< HEAD
   test("держит пустой сайдбар и auth-only placeholder", async ({ page }) => {
-=======
-  test("показывает пустой сайдбар в auth-only режиме", async ({ page }) => {
->>>>>>> parent of 41f02aa (Merge pull request #74 from ukituki-ps/feature/045-profiles-sidebar-widget)
     await page.goto("/#/app");
     const nav = page.getByRole("navigation", { name: "Основная навигация" });
     await expect(nav).toBeVisible();
