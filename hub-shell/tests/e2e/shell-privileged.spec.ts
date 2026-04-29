@@ -14,16 +14,16 @@ test.describe("AprilHub shell (привилегированная персона
     await expect(page.getByText("Авторизовано")).toBeVisible();
   });
 
-  test("показывает минимальный сайдбар только с профилем", async ({ page }) => {
-    await page.goto("/#/app/profile/entities");
+  test("показывает пустой сайдбар в auth-only режиме", async ({ page }) => {
+    await page.goto("/#/app");
     const nav = page.getByRole("navigation", { name: "Основная навигация" });
     await expect(nav).toBeVisible();
-    await expect(nav.getByRole("link", { name: "Профиль — список" })).toHaveCount(1);
-    await expect(nav.getByRole("link")).toHaveCount(1);
+    await expect(nav.getByRole("link")).toHaveCount(0);
+    await expect(page.getByTestId("authorized-empty-placeholder")).toBeVisible();
   });
 
   test("выход из сессии возвращает в гостевую зону", async ({ page }) => {
-    await page.goto("/#/app/profile/entities");
+    await page.goto("/#/app");
     await page.getByLabel("Меню профиля и настроек").click();
     await page.getByRole("menuitem", { name: "Выйти" }).click();
     await expect(page.getByTestId("guest-landing")).toBeVisible({ timeout: 30_000 });

@@ -94,7 +94,7 @@ describe("App", () => {
     });
   });
 
-  it("renders authorized shell and composition widgets", async () => {
+  it("renders authorized shell in auth-only mode", async () => {
     keycloakState.authState = true;
     apiRequestMock.mockResolvedValue({
       ok: true,
@@ -112,10 +112,11 @@ describe("App", () => {
     await waitFor(() => {
       expect(screen.getByText("Рабочая зона AprilHub")).toBeInTheDocument();
       expect(screen.getByTestId("theme-scheme-control")).toBeInTheDocument();
-      expect(screen.getByRole("navigation", { name: "Основная навигация" })).toBeInTheDocument();
-      expect(screen.getByText("Профиль — список")).toBeInTheDocument();
-      expect(screen.getByRole("heading", { name: "Profiles list widget" })).toBeInTheDocument();
-      expect(screen.getByText(/Tenant:/)).toBeInTheDocument();
+      const nav = screen.getByRole("navigation", { name: "Основная навигация" });
+      expect(nav).toBeInTheDocument();
+      expect(nav.querySelectorAll("a")).toHaveLength(0);
+      expect(screen.getByTestId("authorized-empty-placeholder")).toBeInTheDocument();
+      expect(screen.getByText("Продуктовые разделы временно отключены в рамках auth-only режима.")).toBeInTheDocument();
     });
   });
 

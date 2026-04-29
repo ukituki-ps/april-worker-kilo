@@ -1,20 +1,10 @@
-/**
- * Информационная архитектура авторизованной зоны AprilHub (домен «Профиль» и платформа).
- * Канонические пути — без query; параметры сущностей — в сегменте пути.
- *
- * Политика: список сущностей и вкладки одной сущности разведены по отдельным маршрутам;
- * другая сущность или
- * экземпляр профиля — отдельный
- * префикс `/app/profile/instances/:instanceId`.
- */
-
 export const shellPaths = {
-  profilesList: "/app/profile/entities",
+  home: "/app",
 } as const;
 
 export type ShellRouteMatch =
   | { kind: "redirect" }
-  | { kind: "profile-list" }
+  | { kind: "home" }
   | { kind: "not-found" };
 
 /** Текущий путь из location.hash (без #), всегда начинается с /. */
@@ -29,8 +19,8 @@ export function matchShellRoute(pathname: string): ShellRouteMatch {
   if (p === "/" || p === "") {
     return { kind: "redirect" };
   }
-  if (p === "/app/profile/entities") {
-    return { kind: "profile-list" };
+  if (p === shellPaths.home) {
+    return { kind: "home" };
   }
 
   return { kind: "not-found" };

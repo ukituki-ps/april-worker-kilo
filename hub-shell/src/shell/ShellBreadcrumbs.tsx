@@ -7,15 +7,15 @@ type Props = {
 
 export function ShellBreadcrumbs({ match }: Props): JSX.Element {
   const items: JSX.Element[] = [
-    <Anchor key="hub" href="#/app/profile/entities" size="sm">
+    <Anchor key="hub" href="#/app" size="sm">
       AprilHub
     </Anchor>,
   ];
 
-  if (match.kind === "profile-list") {
+  if (match.kind === "home") {
     items.push(
       <Text key="cur" size="sm">
-        Профиль / Список
+        Авторизованный контур
       </Text>,
     );
   } else {

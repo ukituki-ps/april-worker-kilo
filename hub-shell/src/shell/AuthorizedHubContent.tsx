@@ -1,6 +1,4 @@
 import { useEffect } from "react";
-import { CompositionErrorBoundary } from "../composition-error-boundary";
-import { ProfilesListHostWidget } from "../widgets";
 import type { ShellUserContext } from "../types";
 import { SharedState } from "../shared-ux";
 import { matchShellRoute, shellNavigate, shellPaths } from "./shell-paths";
@@ -28,12 +26,12 @@ export function AuthorizedHubContent({ context }: Props): JSX.Element {
 
   useEffect(() => {
     if (match.kind === "redirect") {
-      shellNavigate(shellPaths.profilesList);
+      shellNavigate(shellPaths.home);
     }
   }, [match.kind]);
 
   if (match.kind === "redirect") {
-    return <SharedState state="loading" message="Перенаправляем в раздел «Профиль — список»…" />;
+    return <SharedState state="loading" message="Перенаправляем в авторизованный контур…" />;
   }
 
   if (match.kind === "not-found") {
@@ -42,20 +40,23 @@ export function AuthorizedHubContent({ context }: Props): JSX.Element {
         state="error"
         message={`Маршрут не найден: ${pathname}`}
         action={
-          <button type="button" className="shell-text-button" onClick={() => shellNavigate(shellPaths.profilesList)}>
-            Перейти к списку профилей
+          <button type="button" className="shell-text-button" onClick={() => shellNavigate(shellPaths.home)}>
+            Перейти в рабочую зону
           </button>
         }
       />
     );
   }
 
-  if (match.kind === "profile-list") {
+  if (match.kind === "home") {
     return (
       <RouteChrome>
-        <CompositionErrorBoundary moduleName="Профиль (список)">
-          <ProfilesListHostWidget context={context} />
-        </CompositionErrorBoundary>
+        <article className="widget-card" data-testid="authorized-empty-placeholder">
+          <h3>Рабочая зона готова</h3>
+          <p>Пользователь: {context.user.name || context.user.username}</p>
+          <p>Сервисы авторизации и контекст сессии активны.</p>
+          <p>Продуктовые разделы временно отключены в рамках auth-only режима.</p>
+        </article>
       </RouteChrome>
     );
   }
