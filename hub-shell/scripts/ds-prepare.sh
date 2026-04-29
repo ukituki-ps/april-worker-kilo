@@ -108,31 +108,11 @@ ensure_ui_runtime_exports() {
     return
   fi
 
-  has_card_list_column_export="false"
-  if node -e '
-const fs = require("fs");
-const filePath = process.argv[1];
-const source = fs.readFileSync(filePath, "utf8");
-const exportBlocks = source.matchAll(/export\s*\{([^}]*)\}/g);
-const hasNamedExport = Array.from(exportBlocks).some((match) => {
-  const parts = match[1].split(",").map((part) => part.trim());
-  return parts.some(
-    (part) =>
-      part === "CardListColumn" ||
-      part.startsWith("CardListColumn as ") ||
-      part.endsWith(" as CardListColumn")
-  );
-});
-process.exit(hasNamedExport ? 0 : 1);
-' "${ui_dist_file}"; then
-    has_card_list_column_export="true"
-  fi
-
-  if [ "${has_card_list_column_export}" = "true" ]; then
+  if node "${SCRIPT_DIR}/assert-ui-dist-exports.mjs" "${ui_dist_file}"; then
     return
   fi
 
-  echo "[ds:prepare] CardListColumn export missing in @april/ui dist, try runtime-only rebuild"
+  echo "[ds:prepare] required named exports missing in @april/ui dist, try runtime-only rebuild"
   if command -v pnpm >/dev/null 2>&1; then
     pnpm_cmd="pnpm"
   elif command -v corepack >/dev/null 2>&1; then
@@ -149,32 +129,12 @@ process.exit(hasNamedExport ? 0 : 1);
     echo "[ds:prepare] warning: runtime-only rebuild failed, keep existing dist"
   fi
 
-  has_card_list_column_export="false"
-  if node -e '
-const fs = require("fs");
-const filePath = process.argv[1];
-const source = fs.readFileSync(filePath, "utf8");
-const exportBlocks = source.matchAll(/export\s*\{([^}]*)\}/g);
-const hasNamedExport = Array.from(exportBlocks).some((match) => {
-  const parts = match[1].split(",").map((part) => part.trim());
-  return parts.some(
-    (part) =>
-      part === "CardListColumn" ||
-      part.startsWith("CardListColumn as ") ||
-      part.endsWith(" as CardListColumn")
-  );
-});
-process.exit(hasNamedExport ? 0 : 1);
-' "${ui_dist_file}"; then
-    has_card_list_column_export="true"
-  fi
-
-  if [ "${has_card_list_column_export}" = "true" ]; then
-    echo "[ds:prepare] restored CardListColumn export in @april/ui dist"
+  if node "${SCRIPT_DIR}/assert-ui-dist-exports.mjs" "${ui_dist_file}"; then
+    echo "[ds:prepare] restored required exports in @april/ui dist"
     return
   fi
 
-  echo "[ds:prepare] warning: CardListColumn export still missing after rebuild"
+  echo "[ds:prepare] warning: required exports still missing after rebuild"
 }
 
 if [ ! -d "${DS_DIR}" ]; then
