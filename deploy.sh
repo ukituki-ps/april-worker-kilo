@@ -32,8 +32,8 @@ EOF
   SKIP_OBSERVABILITY_ONBOARD=1 пропустить авто-onboarding стенда в central observability
   SKIP_HEALTHCHECK=1   пропустить health/readiness проверки
   INGRESS_BASE_URL     базовый URL ingress-check (по умолчанию http://127.0.0.1:${DOCS_HTTP_PORT:-8080})
-  DEPLOY_INGRESS_RETRIES количество попыток ingress-check (по умолчанию 20)
-  DEPLOY_INGRESS_SLEEP_SEC задержка между попытками ingress-check (по умолчанию 2)
+  DEPLOY_INGRESS_RETRIES количество попыток ingress-check (по умолчанию 60)
+  DEPLOY_INGRESS_SLEEP_SEC задержка между попытками ingress-check (по умолчанию 3)
   SKIP_SMOKE=1         пропустить scripts/smoke-after-deploy.sh
   AUTO_ROLLBACK=0      отключить авто-rollback (по умолчанию включён)
   REQUIRE_IMAGES_ENV=0 не требовать images.env (по умолчанию REQUIRE_IMAGES_ENV=1)
@@ -434,6 +434,18 @@ sync_frontend_dependencies() {
     "${state_dir}/hub-shell-git-tree.rev"
 }
 
+reload_nginx_docs_if_running() {
+  # После force-recreate hub-shell у nginx может остаться кратковременный 502 на `/`
+  # (см. resolver в infra/nginx/default.conf). Reload сбрасывает upstream state.
+  if ! is_service_running "nginx-docs"; then
+    return 0
+  fi
+  log "nginx-docs: nginx -s reload (обновление upstream после compose)"
+  if ! "${compose_files[@]}" exec -T nginx-docs nginx -s reload; then
+    log "предупреждение: nginx -s reload не выполнен, продолжаем"
+  fi
+}
+
 sync_keycloak_on_theme_or_realm_change() {
   if [[ "${SKIP_KEYCLOAK_RECREATE:-}" == "1" ]]; then
     log "пропуск keycloak force-recreate (SKIP_KEYCLOAK_RECREATE=1)"
@@ -513,15 +525,21 @@ run_ingress_checks() {
   fi
 
   local ingress_base="${INGRESS_BASE_URL:-http://127.0.0.1:${DOCS_HTTP_PORT:-8080}}"
-  local retries="${DEPLOY_INGRESS_RETRIES:-20}"
-  local sleep_s="${DEPLOY_INGRESS_SLEEP_SEC:-2}"
+  local retries="${DEPLOY_INGRESS_RETRIES:-60}"
+  local sleep_s="${DEPLOY_INGRESS_SLEEP_SEC:-3}"
   local code=""
 
-  log "ingress-check ${ingress_base}/ (ожидается не 5xx)"
-  for _ in $(seq 1 "$retries"); do
+  log "ingress-check ${ingress_base}/ (ожидается не 5xx, до ${retries} попыток по ${sleep_s}s)"
+  for attempt in $(seq 1 "$retries"); do
     code="$(curl -sS -o /tmp/deploy-ingress.out -w "%{http_code}" "${ingress_base}/" || true)"
     if [[ "$code" =~ ^[1234][0-9][0-9]$ ]]; then
+      if [[ "$attempt" -gt 1 ]]; then
+        log "ingress-check успешен с попытки ${attempt}: HTTP ${code}"
+      fi
       return 0
+    fi
+    if [[ "$((attempt % 5))" -eq 0 ]]; then
+      log "ingress-check попытка ${attempt}/${retries}: HTTP ${code:-n/a} для ${ingress_base}/"
     fi
     sleep "$sleep_s"
   done
@@ -619,6 +637,7 @@ main() {
   run_compose
   sync_keycloak_on_theme_or_realm_change
   sync_frontend_dependencies
+  reload_nginx_docs_if_running
   sync_go_service_on_git_tree_change \
     "hub-bff" \
     "hub-bff" \
