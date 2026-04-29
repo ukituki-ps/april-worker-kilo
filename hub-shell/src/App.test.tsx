@@ -94,7 +94,7 @@ describe("App", () => {
     });
   });
 
-  it("renders authorized shell with profiles section", async () => {
+  it("renders authorized shell with auth-only placeholder", async () => {
     keycloakState.authState = true;
     apiRequestMock.mockResolvedValue({
       ok: true,
@@ -114,9 +114,8 @@ describe("App", () => {
       expect(screen.getByTestId("theme-scheme-control")).toBeInTheDocument();
       const nav = screen.getByRole("navigation", { name: "Основная навигация" });
       expect(nav).toBeInTheDocument();
-      expect(nav.querySelectorAll("a")).toHaveLength(1);
-      expect(screen.getByRole("link", { name: "Профили" })).toBeInTheDocument();
-      expect(screen.getByTestId("profiles-widget-card")).toBeInTheDocument();
+      expect(nav.querySelectorAll("a")).toHaveLength(0);
+      expect(screen.getByTestId("authorized-empty-placeholder")).toBeInTheDocument();
     });
   });
 

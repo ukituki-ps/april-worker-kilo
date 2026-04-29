@@ -14,13 +14,12 @@ test.describe("AprilHub shell (привилегированная персона
     await expect(page.getByText("Авторизовано")).toBeVisible();
   });
 
-  test("показывает раздел Профили в сайдбаре", async ({ page }) => {
-    await page.goto("/#/app/profile/entities");
+  test("держит пустой сайдбар и auth-only placeholder", async ({ page }) => {
+    await page.goto("/#/app");
     const nav = page.getByRole("navigation", { name: "Основная навигация" });
     await expect(nav).toBeVisible();
-    await expect(nav.getByRole("link")).toHaveCount(1);
-    await expect(nav.getByRole("link", { name: "Профили" })).toBeVisible();
-    await expect(page.getByTestId("profiles-widget-card")).toBeVisible();
+    await expect(nav.getByRole("link")).toHaveCount(0);
+    await expect(page.getByTestId("authorized-empty-placeholder")).toBeVisible();
   });
 
   test("выход из сессии возвращает в гостевую зону", async ({ page }) => {

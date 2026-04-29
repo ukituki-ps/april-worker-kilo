@@ -1,5 +1,4 @@
 import { createContext, useContext, useMemo, type ReactNode } from "react";
-import type { ProfileWidgetHostContext } from "../profile-widget";
 import type { ShellUserContext } from "../types";
 import { matchShellRoute, shellPaths, type ShellRouteMatch } from "./shell-paths";
 import { useShellNavigate, useShellPathname } from "./use-shell-pathname";
@@ -16,7 +15,22 @@ export type HubHostRouteSlice = {
   match: ShellRouteMatch;
 };
 
-export type HubHostContextValue = ProfileWidgetHostContext & {
+type HubHostBaseContext = {
+  tenant: { id: string };
+  auth?: {
+    subject?: string;
+    roles?: string[];
+    tokenRef?: string;
+  };
+  locale?: string;
+  telemetry?: {
+    requestId: string;
+    traceId?: string;
+    spanId?: string;
+  };
+};
+
+export type HubHostContextValue = HubHostBaseContext & {
   navigation: HubHostNavigationApi;
   route: HubHostRouteSlice;
   theme: "light" | "dark" | "system";
@@ -38,7 +52,7 @@ export function HubHostContextProvider({ context, children }: ProviderProps): JS
     return { pathname, match };
   }, [match, pathname]);
 
-  const hostContext = useMemo<ProfileWidgetHostContext>(
+  const hostContext = useMemo<HubHostBaseContext>(
     () => ({
       tenant: { id: context.orgScope },
       auth: {
@@ -57,7 +71,7 @@ export function HubHostContextProvider({ context, children }: ProviderProps): JS
   const navigation = useMemo<HubHostNavigationApi>(
     () => ({
       goToProfilesList: () => {
-        navigate(shellPaths.profilesList);
+        navigate(shellPaths.home);
       },
       goBack: () => {
         window.history.back();

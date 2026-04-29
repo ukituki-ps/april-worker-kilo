@@ -1,5 +1,3 @@
-import { shellPaths } from "./shell-paths";
-
 export type ShellNavItem = {
   id: string;
   label: string;
@@ -10,17 +8,8 @@ export type ShellNavItem = {
   requiresRole?: string;
 };
 
-const toHash = (path: string): string => `#${path}`;
-
 export function buildPrimaryShellNav(): ShellNavItem[] {
-  return [
-    {
-      id: "profiles",
-      label: "Профили",
-      href: toHash(shellPaths.profilesList),
-      activePrefix: shellPaths.profilesList,
-    },
-  ];
+  return [];
 }
 
 export function resolveActiveNavId(pathname: string, items: ShellNavItem[]): string | undefined {

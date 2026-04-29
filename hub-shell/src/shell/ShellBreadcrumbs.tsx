@@ -12,10 +12,10 @@ export function ShellBreadcrumbs({ match }: Props): JSX.Element {
     </Anchor>,
   ];
 
-  if (match.kind === "profiles-list") {
+  if (match.kind === "home") {
     items.push(
       <Text key="cur" size="sm">
-        Профили
+        Рабочая зона
       </Text>,
     );
   } else {
