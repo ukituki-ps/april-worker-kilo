@@ -59,6 +59,7 @@
 - [ ] `042`: Интеграция внешнего `profiles-widget` в сайдбар AprilHub (замена legacy списка профилей, host-обвязка, e2e smoke)
 - [ ] `043`: Минималистичный сайдбар AprilHub — оставить только `Профиль — список`, убрать остальные разделы/маршруты/запросы
 - [x] `044`: Auth-only контур AprilHub — оставить авторизацию и пустой сайдбар, убрать весь продуктовый runtime
+- [ ] `045`: Вернуть в AprilHub раздел `Профили` в сайдбаре и встроить `profiles-widget` как production-ready модуль (host-context/auth/tenant/error/telemetry/release-gate)
 
 ## Текущий фокус
 
@@ -105,6 +106,7 @@
 - [ ] `042-aprilhub-profiles-widget-sidebar-integration`: перевести пункт сайдбара `Профиль — список` на внешний `profiles-widget` из `april-profile-1`, удалить legacy host-list реализацию и закрепить e2e smoke
 - [ ] `043-aprilhub-sidebar-minimal-profile-list-only`: упростить sidebar/routing AprilHub до единственного раздела `Профиль — список`, удалить runtime legacy-маршруты и лишние host-виджеты
 - [x] `044-aprilhub-auth-only-empty-sidebar`: радикально упростить authorized shell до auth-only (пустой sidebar, без профильных маршрутов/виджетов/запросов)
+- [ ] `045-aprilhub-sidebar-profiles-widget-section`: вернуть в sidebar раздел `Профили` и встроить `profiles-widget` с production-ready host-обвязкой (auth/tenant/correlation, callbacks, e2e smoke, release-gate)
 
 ## План реализации AprilHub: статусы
 
@@ -153,3 +155,4 @@
 | `042` | Интеграция внешнего `profiles-widget` в сайдбар AprilHub (замена legacy host-list, host-обвязка, smoke) | ⏳ В работе | [`tasks/042-aprilhub-profiles-widget-sidebar-integration/TASK.md`](./tasks/042-aprilhub-profiles-widget-sidebar-integration/TASK.md), [`tasks/042-aprilhub-profiles-widget-sidebar-integration/PLAN.md`](./tasks/042-aprilhub-profiles-widget-sidebar-integration/PLAN.md), [`tasks/042-aprilhub-profiles-widget-sidebar-integration/REPORT.md`](./tasks/042-aprilhub-profiles-widget-sidebar-integration/REPORT.md) |
 | `043` | Минималистичный сайдбар AprilHub: только `Профиль — список` (удаление лишних разделов/маршрутов/host-runtime) | ⏳ Не начато | [`tasks/043-aprilhub-sidebar-minimal-profile-list-only/TASK.md`](./tasks/043-aprilhub-sidebar-minimal-profile-list-only/TASK.md) |
 | `044` | Auth-only контур AprilHub: только авторизация и пустой сайдбар (без продуктовых маршрутов/виджетов/API) | ✅ Выполнено | [`tasks/044-aprilhub-auth-only-empty-sidebar/TASK.md`](./tasks/044-aprilhub-auth-only-empty-sidebar/TASK.md), [`tasks/044-aprilhub-auth-only-empty-sidebar/PLAN.md`](./tasks/044-aprilhub-auth-only-empty-sidebar/PLAN.md), [`tasks/044-aprilhub-auth-only-empty-sidebar/REPORT.md`](./tasks/044-aprilhub-auth-only-empty-sidebar/REPORT.md) |
+| `045` | Раздел `Профили` в sidebar AprilHub + интеграция `profiles-widget` (production-ready host wiring и release-gate) | ⏳ Не начато | [`tasks/045-aprilhub-sidebar-profiles-widget-section/TASK.md`](./tasks/045-aprilhub-sidebar-profiles-widget-section/TASK.md) |
