@@ -39,24 +39,21 @@ fi
 # In local/docker mixed workflows node_modules/dist may be root-owned.
 # In that case we keep current installed artifacts and avoid failing hub-shell checks.
 if [ -d "${DS_DIR}/node_modules" ] && [ ! -w "${DS_DIR}/node_modules" ]; then
-  echo "[ds:prepare] ${DS_DIR}/node_modules is read-only, skip install/build"
-  exit 0
+  echo "[ds:prepare] ${DS_DIR}/node_modules is read-only, skip design-system install/build"
+elif [ -d "${DS_DIR}/packages/tokens/dist" ] && [ ! -w "${DS_DIR}/packages/tokens/dist" ]; then
+  echo "[ds:prepare] ${DS_DIR}/packages/tokens/dist is read-only, skip design-system install/build"
+else
+  # Expose pnpm shim in PATH so nested package scripts can invoke `pnpm`.
+  # Version remains synchronized via packageManager in DisignApril/package.json.
+  COREPACK_INSTALL_DIR="${COREPACK_INSTALL_DIR:-/tmp/.local/bin}"
+  mkdir -p "${COREPACK_INSTALL_DIR}"
+  export PATH="${COREPACK_INSTALL_DIR}:$PATH"
+  corepack enable --install-directory "${COREPACK_INSTALL_DIR}"
+
+  (
+    cd "${DS_DIR}"
+    CI=true pnpm install --frozen-lockfile
+    pnpm build
+  )
 fi
 
-if [ -d "${DS_DIR}/packages/tokens/dist" ] && [ ! -w "${DS_DIR}/packages/tokens/dist" ]; then
-  echo "[ds:prepare] ${DS_DIR}/packages/tokens/dist is read-only, skip install/build"
-  exit 0
-fi
-
-# Expose pnpm shim in PATH so nested package scripts can invoke `pnpm`.
-# Version remains synchronized via packageManager in DisignApril/package.json.
-COREPACK_INSTALL_DIR="${COREPACK_INSTALL_DIR:-/tmp/.local/bin}"
-mkdir -p "${COREPACK_INSTALL_DIR}"
-export PATH="${COREPACK_INSTALL_DIR}:$PATH"
-corepack enable --install-directory "${COREPACK_INSTALL_DIR}"
-
-(
-  cd "${DS_DIR}"
-  CI=true pnpm install --frozen-lockfile
-  pnpm build
-)
