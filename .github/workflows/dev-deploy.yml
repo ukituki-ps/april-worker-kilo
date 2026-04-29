@@ -23,6 +23,7 @@ jobs:
     timeout-minutes: 60
     env:
       APRIL_DEPLOY_ROOT: ${{ vars.APRIL_DEPLOY_ROOT != '' && vars.APRIL_DEPLOY_ROOT || '/opt/april-profile' }}
+      APRIL_PROFILE_SUBMODULE_URL: git@github.com:ukituki-ps/april-profile.git
     steps:
       - name: Checkout ref and deploy
         run: |
