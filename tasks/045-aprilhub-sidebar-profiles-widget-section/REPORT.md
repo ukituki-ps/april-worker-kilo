@@ -81,3 +81,13 @@ npm --prefix hub-shell run e2e:smoke
 - Root cause classification: **frontend runtime integration defect** (рассинхронизация артефактов `@april/ui`: внешний `ProfilesWidget` ожидает экспорт `CardListColumn`, а установленный runtime-пакет мог не содержать актуальный `dist`).
 - Исправление: в `hub-shell/scripts/ds-prepare.sh` добавлена принудительная синхронизация `@april/ui` из `design-system/DisignApril/packages/ui/dist` в `hub-shell/node_modules/@april/ui` (с безопасными skip-ветками для read-only и symlink-сценариев), чтобы исключить stale-артефакты перед `dev/build/test`.
 - Верификация: `npm --prefix hub-shell run ds:prepare`, `npm --prefix hub-shell run lint`, `npm --prefix hub-shell run build` — `ok`; экспорт `CardListColumn` присутствует в `design-system/.../packages/ui/dist/index.js`.
+
+## 10) Incident triage (повтор, export `CardListColumn`)
+- Инцидент: повторный frontend runtime crash в `dev` на маршруте авторизованного shell (`ProfilesListHostWidget`), окно triage `2026-04-29`.
+- Корреляция: из предоставленного stacktrace доступны `route`/`module` (`ProfilesWidget`), но `requestId`/`correlationId`/`tenant`/`roleSet` и Sentry issue URL в инциденте отсутствуют (падение на этапе module import до прикладного API).
+- Sentry: зафиксирован runtime `SyntaxError` (`does not provide an export named 'CardListColumn'`) с деревом компонентов под `CompositionErrorBoundary`; release/tag-данные не приложены.
+- Loki: по `service=hub-shell` за 6h прямых записей с `does not provide an export named` и `CardListColumn` не найдено (ошибка клиентская, в браузерном runtime и не всегда попадает в server logs).
+- Prometheus: активен `AprilHubTargetDown` для `192.168.1.42:8081`, но паттерн не коррелирует с конкретным импорт-ошибочным сценарием виджета.
+- Классификация: **UI/runtime defect**, owner: AprilHub frontend integration + DisignApril build artifacts.
+- Изменения: в `hub-shell/scripts/ds-prepare.sh` добавлена проверка экспортов runtime-бандла `@april/ui` и auto-rebuild (`pnpm exec tsup --dts false`), если в `dist/index.js` отсутствует `CardListColumn`.
+- Верификация: `npm --prefix hub-shell run ds:prepare`, `npm --prefix hub-shell run lint`, `npm --prefix hub-shell run build` — `ok`; сборка формирует chunk `april-profile-ui-*.js`.

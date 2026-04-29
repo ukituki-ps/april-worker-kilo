@@ -99,6 +99,33 @@ EOF
   echo "[ds:prepare] prepared fallback @april/ui dist/index.d.ts"
 }
 
+ensure_ui_runtime_exports() {
+  ui_pkg_dir="${DS_DIR}/packages/ui"
+  ui_dist_file="${ui_pkg_dir}/dist/index.js"
+
+  if [ ! -f "${ui_dist_file}" ]; then
+    echo "[ds:prepare] ${ui_dist_file} not found, skip ui runtime export check"
+    return
+  fi
+
+  if grep -q "CardListColumn" "${ui_dist_file}"; then
+    return
+  fi
+
+  echo "[ds:prepare] CardListColumn export missing in @april/ui dist, try runtime-only rebuild"
+  (
+    cd "${ui_pkg_dir}"
+    pnpm exec tsup --dts false
+  )
+
+  if grep -q "CardListColumn" "${ui_dist_file}"; then
+    echo "[ds:prepare] restored CardListColumn export in @april/ui dist"
+    return
+  fi
+
+  echo "[ds:prepare] warning: CardListColumn export still missing after rebuild"
+}
+
 if [ ! -d "${DS_DIR}" ]; then
   echo "[ds:prepare] design system directory not found, skip"
   prepare_tokens_fallback
@@ -133,6 +160,7 @@ else
 fi
 
 sync_design_system_package_dist "ui"
+ensure_ui_runtime_exports
 ensure_ui_types_stub
 prepare_tokens_fallback
 
