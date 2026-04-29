@@ -11,6 +11,12 @@ jobs:
     runs-on: [self-hosted, ci, profile]
     timeout-minutes: 35
     steps:
+      - name: Pre-clean workspace (best effort)
+        run: |
+          WORKDIR="${GITHUB_WORKSPACE:-$PWD}"
+          chown -R "$(id -u):$(id -g)" "$WORKDIR" 2>/dev/null || true
+          rm -rf "$WORKDIR/.pnpm-store" "$WORKDIR/hub-shell/node_modules" "$WORKDIR/hub-shell/dist" || true
+
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -66,6 +72,12 @@ jobs:
     runs-on: [self-hosted, ci, profile]
     timeout-minutes: 20
     steps:
+      - name: Pre-clean workspace (best effort)
+        run: |
+          WORKDIR="${GITHUB_WORKSPACE:-$PWD}"
+          chown -R "$(id -u):$(id -g)" "$WORKDIR" 2>/dev/null || true
+          rm -rf "$WORKDIR/.pnpm-store" "$WORKDIR/hub-shell/node_modules" "$WORKDIR/hub-shell/dist" || true
+
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -76,7 +88,7 @@ jobs:
 
       - name: Install Atlas CLI
         run: |
-          curl -sSf https://atlasgo.sh | sh
+          curl -fsSL --retry 3 --retry-delay 2 --connect-timeout 15 --max-time 120 https://atlasgo.sh | sh
           echo "$HOME/.atlas/bin" >> "$GITHUB_PATH"
 
       - name: Setup start time
@@ -116,6 +128,12 @@ jobs:
     runs-on: [self-hosted, ci, profile]
     timeout-minutes: 30
     steps:
+      - name: Pre-clean workspace (best effort)
+        run: |
+          WORKDIR="${GITHUB_WORKSPACE:-$PWD}"
+          chown -R "$(id -u):$(id -g)" "$WORKDIR" 2>/dev/null || true
+          rm -rf "$WORKDIR/.pnpm-store" "$WORKDIR/hub-shell/node_modules" "$WORKDIR/hub-shell/dist" || true
+
       - name: Checkout
         uses: actions/checkout@v4
 
