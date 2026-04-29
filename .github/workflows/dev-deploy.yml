@@ -24,9 +24,10 @@ jobs:
     env:
       APRIL_DEPLOY_ROOT: ${{ vars.APRIL_DEPLOY_ROOT != '' && vars.APRIL_DEPLOY_ROOT || '/opt/april-profile' }}
       APRIL_PROFILE_SUBMODULE_URL: git@github.com:ukituki-ps/april-profile.git
-      GIT_SSH_COMMAND: ssh -i /home/ukituki/.ssh/id_ed25519_april_profile_submodule -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new
     steps:
       - name: Checkout ref and deploy
+        env:
+          APRIL_PROFILE_DEPLOY_KEY: ${{ secrets.APRIL_PROFILE_DEPLOY_KEY }}
         run: |
           set -euo pipefail
           ROOT="${APRIL_DEPLOY_ROOT}"
@@ -34,6 +35,12 @@ jobs:
           echo "Commit: ${{ github.sha }}"
           test -d "${ROOT}/.git"
           cd "${ROOT}"
+          test -n "${APRIL_PROFILE_DEPLOY_KEY}"
+          KEY_FILE="$(mktemp)"
+          trap 'rm -f "${KEY_FILE}"' EXIT
+          printf '%s\n' "${APRIL_PROFILE_DEPLOY_KEY}" > "${KEY_FILE}"
+          chmod 600 "${KEY_FILE}"
+          export GIT_SSH_COMMAND="ssh -i ${KEY_FILE} -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new"
           # Self-hosted deploy root may contain local drift from previous runs.
           # Ensure deterministic checkout of the target commit.
           git reset --hard
