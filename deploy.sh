@@ -408,6 +408,13 @@ sync_frontend_dependencies() {
     "april-showcase" \
     "${ROOT}/design-system/DisignApril/pnpm-lock.yaml" \
     "${state_dir}/april-showcase-pnpm-lock.sha256"
+
+  # Для hub-shell lock-файл может не меняться, но runtime-конфиг (vite alias/routes/integrations) меняется.
+  # Тогда dev-сервис должен быть пересоздан, чтобы новый Vite-процесс перечитал конфигурацию.
+  sync_go_service_on_git_tree_change \
+    "hub-shell" \
+    "hub-shell" \
+    "${state_dir}/hub-shell-git-tree.rev"
 }
 
 sync_keycloak_on_theme_or_realm_change() {
