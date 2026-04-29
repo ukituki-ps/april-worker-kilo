@@ -198,6 +198,10 @@ run_submodules() {
   # синхронизируем .git/config из актуального .gitmodules перед update.
   git submodule sync --recursive "${design_april_submodule}" "${profile_submodule}"
 
+  # На self-hosted окружениях внутри submodule может остаться локальный мусор
+  # после предыдущих запусков. Чистим рабочие деревья, чтобы checkout не падал.
+  git submodule foreach --recursive 'git reset --hard || true; git clean -fd || true'
+
   # После sync переопределяем URL обратно на нужные runtime-значения.
   # Иначе sync вернет URL из .gitmodules (HTTPS) и приватный submodule не клонируется на runner без token prompt.
   git config "submodule.${design_april_submodule}.url" "${disignapril_url}" || true
