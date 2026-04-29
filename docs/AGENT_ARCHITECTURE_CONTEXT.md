@@ -5,7 +5,7 @@
 - **Backend**: Go, REST, modular monolith
 - **Workflow Engine**: Temporal (Go SDK, Workflow as Code)
 - **Frontend**: React + TypeScript + Vite
-- **UI Kit**: Mantine; дизайн-система April — пакеты **`@april/tokens`**, **`@april/ui`** ([репозиторий DisignApril](https://github.com/ukituki-ps/DisignApril), см. [`guides/DESIGN_SYSTEM.md`](./guides/DESIGN_SYSTEM.md))
+- **UI Kit**: Mantine; дизайн-система April — пакеты **`@april/tokens`**, **`@april/ui`** (исходники [DisignApril](https://github.com/ukituki-ps/DisignApril); дистрибуция и граница submodule vs npm — [`architecture/ADR-april-design-system-npm-distribution.md`](./architecture/ADR-april-design-system-npm-distribution.md), потребление — [`guides/DESIGN_SYSTEM.md`](./guides/DESIGN_SYSTEM.md))
 - **Process Editor**: React Flow (`@xyflow/react`)
 - **IAM**: Keycloak (RBAC источник ролей/прав)
 - **DB**: PostgreSQL 17

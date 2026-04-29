@@ -46,6 +46,18 @@ CI jobs (`.github/workflows/ci.yml`) выполняются на отдельн�
 
 Ограничение workflow по путям/файлам: **не используется** — любой merge в `develop` ведёт к полному пайплайну.
 
+### 3.1. GitHub Packages: приватные npm-пакеты `@april/*` (дизайн-система)
+
+Контур **образов приложений** остаётся в **ghcr.io** по git SHA (раздел **«4. Сборка и registry»** ниже в этом документе). Отдельно для **`hub-shell`** после эпика **`049`** и задачи **`049-03`**: зависимости **`@april/tokens`** / **`@april/ui`** ставятся из **npm registry GitHub Packages** (`https://npm.pkg.github.com`, scope `@april`; см. [`ADR-april-design-system-npm-distribution.md`](./architecture/ADR-april-design-system-npm-distribution.md), [`guides/DESIGN_SYSTEM.md`](./guides/DESIGN_SYSTEM.md)).
+
+| Где | Переменная / механизм | Заметки |
+|-----|------------------------|---------|
+| **GitHub Actions** (job `hub-shell`, сборка образа) | **`NODE_AUTH_TOKEN`** | Токен с правом **`read:packages`** для организации, где опубликованы пакеты (часто **`GITHUB_TOKEN`** workflow или отдельный **PAT** в **Repository secret**). Передаётся в шаги `npm ci` / `npm run build` и при **`docker build`** через **`--build-arg NODE_AUTH_TOKEN=...`** (значение не логировать). |
+| **Локально / агент на runner** | тот же **`NODE_AUTH_TOKEN`** + **`hub-shell/.npmrc`** по шаблону **`.npmrc.example`** | Шаблон без секретов в git; реальный `.npmrc` с токеном — только в среде исполнения и в **`.gitignore`**, если создаётся вручную. |
+| **Сервер `DEPLOY_ROOT` (dev)** | Обычно **не нужен** токен npm на сервере | Образ **`HUB_SHELL_IMAGE`** уже собран в CI с вшитым `node_modules`; сервер делает **`docker compose pull`**, а не `npm ci` для shell. Если когда-либо сборка shell переносится на сервер — на build-хосте нужны те же переменные, что в CI. |
+
+**Чеклист при внедрении registry:** завести secret / переменные для **`NODE_AUTH_TOKEN`**, проверить **`npm view @april/ui version`** с read-доступом, убедиться, что в логах CI нет утечки токена; ротация PAT — по владельцу секретов (см. ADR, раздел об ответственности).
+
 ## 4. Сборка и registry
 
 | Решение | Значение |
