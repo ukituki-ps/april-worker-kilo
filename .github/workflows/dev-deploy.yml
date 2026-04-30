@@ -44,15 +44,17 @@ jobs:
           trap 'rm -f "${KEY_FILE}"' EXIT
           printf '%s\n' "${APRIL_PROFILE_DEPLOY_KEY}" > "${KEY_FILE}"
           chmod 600 "${KEY_FILE}"
-          export GIT_SSH_COMMAND="ssh -i ${KEY_FILE} -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new"
+          DEPLOY_KEY_SSH="ssh -i ${KEY_FILE} -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new"
           # git checkout тянет новые gitlink субмодулей; URL из .gitmodules — HTTPS без токена → "could not read Username".
-          # Совпадает с deploy.sh / scripts/ci-init-git-submodules.sh: для fetch нужен SSH + APRIL_PROFILE_DEPLOY_KEY.
+          # Для субмодулей нужен APRIL_PROFILE_DEPLOY_KEY, но тот же GIT_SSH_COMMAND ломает `git fetch origin`,
+          # если origin — SSH на этот репозиторий: deploy-key только для april-profile → "Repository not found".
           git config submodule.vendor/april-profile.url "${APRIL_PROFILE_SUBMODULE_URL}"
           git config submodule.design-system/DisignApril.url "${DISIGNAPRIL_SUBMODULE_URL}"
-          # Self-hosted deploy root may contain local drift from previous runs.
           git reset --hard
           git clean -fd
+          unset GIT_SSH_COMMAND || true
           git fetch origin
+          export GIT_SSH_COMMAND="${DEPLOY_KEY_SSH}"
           git checkout "${{ github.sha }}"
           SKIP_GIT_PULL=1 DEPLOY_ARTIFACTS_DIR="${ROOT}/.deploy-artifacts" ./deploy.sh
 
