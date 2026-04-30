@@ -214,6 +214,19 @@ run_submodules() {
   # Вложенный DisignApril внутри vendor/april-profile (см. april-profile/.gitmodules) — тот же HTTPS из sync.
   git config "submodule.${profile_submodule}/design-system/DisignApril.url" "${disignapril_url}" 2>/dev/null || true
 
+  # submodule.<path>.url только в родительском .git — у уже клонированных субмодулей origin может оставаться HTTPS → fetch без credential helper.
+  _deploy_remote_set_origin_ssh() {
+    local rel="$1"
+    local url="$2"
+    local abs="${ROOT}/${rel}"
+    if git -C "${abs}" rev-parse --git-dir >/dev/null 2>&1; then
+      git -C "${abs}" remote set-url origin "${url}" 2>/dev/null || true
+    fi
+  }
+  _deploy_remote_set_origin_ssh "${design_april_submodule}" "${disignapril_url}"
+  _deploy_remote_set_origin_ssh "${profile_submodule}" "${profile_url}"
+  _deploy_remote_set_origin_ssh "${profile_submodule}/design-system/DisignApril" "${disignapril_url}"
+
   log "git submodule update --init --recursive"
   git submodule update --init --recursive "${design_april_submodule}" "${profile_submodule}"
 }
