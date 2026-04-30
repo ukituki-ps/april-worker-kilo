@@ -51,7 +51,7 @@ jobs:
           eval "$(ssh-agent -s)"
           ssh-add "${APRIL_PROFILE_KEY_FILE}"
           ssh-add "${DISIGNAPRIL_KEY_FILE}"
-          DEPLOY_KEY_SSH="ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new"
+          DEPLOY_KEY_SSH="ssh -o StrictHostKeyChecking=accept-new"
           # git checkout тянет новые gitlink субмодулей; URL из .gitmodules — HTTPS без токена → "could not read Username".
           # Для субмодулей нужен APRIL_PROFILE_DEPLOY_KEY, но тот же GIT_SSH_COMMAND ломает `git fetch origin`,
           # если origin — SSH на этот репозиторий: deploy-key только для april-profile → "Repository not found".
