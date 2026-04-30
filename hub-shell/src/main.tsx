@@ -17,11 +17,14 @@ void (async () => {
     authInitError = error instanceof Error ? error.message : "Не удалось инициализировать сессию идентификации.";
   }
 
+  const appTree = (
+    <AprilProviders>
+      <App authInitError={authInitError} />
+    </AprilProviders>
+  );
+
+  // StrictMode double-invokes effects in dev only; keep production free of extra mounts/network.
   ReactDOM.createRoot(document.getElementById("root")!).render(
-    <React.StrictMode>
-      <AprilProviders>
-        <App authInitError={authInitError} />
-      </AprilProviders>
-    </React.StrictMode>,
+    import.meta.env.DEV ? <React.StrictMode>{appTree}</React.StrictMode> : appTree,
   );
 })();
