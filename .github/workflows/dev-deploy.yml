@@ -25,8 +25,8 @@ jobs:
       # Must be a git clone of *this* repo (ukituki-ps/april-worker): github.sha is taken from this workflow's event.
       # Default /opt/april-worker matches deploy.sh; override with repo variable APRIL_DEPLOY_ROOT if the clone lives elsewhere.
       APRIL_DEPLOY_ROOT: ${{ vars.APRIL_DEPLOY_ROOT != '' && vars.APRIL_DEPLOY_ROOT || '/opt/april-worker' }}
-      APRIL_PROFILE_SUBMODULE_URL: git@github-april-profile:ukituki-ps/april-profile.git
-      DISIGNAPRIL_SUBMODULE_URL: git@github-disignapril:ukituki-ps/DisignApril.git
+      APRIL_PROFILE_SUBMODULE_URL: git@github.com:ukituki-ps/april-profile.git
+      DISIGNAPRIL_SUBMODULE_URL: git@github.com:ukituki-ps/DisignApril.git
     steps:
       - name: Checkout ref and deploy
         env:
@@ -44,27 +44,14 @@ jobs:
           test -n "${DISIGNAPRIL_DEPLOY_KEY}"
           APRIL_PROFILE_KEY_FILE="$(mktemp)"
           DISIGNAPRIL_KEY_FILE="$(mktemp)"
-          SSH_CONFIG_FILE="$(mktemp)"
-          trap 'rm -f "${APRIL_PROFILE_KEY_FILE}" "${DISIGNAPRIL_KEY_FILE}" "${SSH_CONFIG_FILE}"' EXIT
+          trap 'rm -f "${APRIL_PROFILE_KEY_FILE}" "${DISIGNAPRIL_KEY_FILE}"; if [ -n "${SSH_AGENT_PID:-}" ]; then ssh-agent -k >/dev/null 2>&1 || true; fi' EXIT
           printf '%s\n' "${APRIL_PROFILE_DEPLOY_KEY}" > "${APRIL_PROFILE_KEY_FILE}"
           printf '%s\n' "${DISIGNAPRIL_DEPLOY_KEY}" > "${DISIGNAPRIL_KEY_FILE}"
           chmod 600 "${APRIL_PROFILE_KEY_FILE}" "${DISIGNAPRIL_KEY_FILE}"
-          cat > "${SSH_CONFIG_FILE}" <<EOF
-          Host github-april-profile
-            HostName github.com
-            User git
-            IdentityFile ${APRIL_PROFILE_KEY_FILE}
-            IdentitiesOnly yes
-            StrictHostKeyChecking accept-new
-
-          Host github-disignapril
-            HostName github.com
-            User git
-            IdentityFile ${DISIGNAPRIL_KEY_FILE}
-            IdentitiesOnly yes
-            StrictHostKeyChecking accept-new
-          EOF
-          DEPLOY_KEY_SSH="ssh -F ${SSH_CONFIG_FILE}"
+          eval "$(ssh-agent -s)"
+          ssh-add "${APRIL_PROFILE_KEY_FILE}"
+          ssh-add "${DISIGNAPRIL_KEY_FILE}"
+          DEPLOY_KEY_SSH="ssh -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new"
           # git checkout тянет новые gitlink субмодулей; URL из .gitmodules — HTTPS без токена → "could not read Username".
           # Для субмодулей нужен APRIL_PROFILE_DEPLOY_KEY, но тот же GIT_SSH_COMMAND ломает `git fetch origin`,
           # если origin — SSH на этот репозиторий: deploy-key только для april-profile → "Repository not found".
