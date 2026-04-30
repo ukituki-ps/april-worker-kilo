@@ -14,7 +14,7 @@ type Props = {
 function RouteChrome({ children }: { children: React.ReactNode }): JSX.Element {
   const host = useHubHostContext();
   return (
-    <div className="shell-route-chrome">
+    <div className="shell-route-chrome shell-route-chrome-fill">
       <ShellBreadcrumbs match={host.route.match} />
       {children}
     </div>
