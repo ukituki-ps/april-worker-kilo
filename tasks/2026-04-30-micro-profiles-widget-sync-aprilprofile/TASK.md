@@ -13,7 +13,7 @@
 
 ## Цель
 
-Актуализировать внешний `profiles-widget` в AprilHub после обновления в `april-profile`: обновить submodule `vendor/april-profile`, убедиться в совместимости интеграции и подтвердить сборочный контур `hub-shell`.
+Актуализировать внешний `profiles-widget` в AprilHub после следующего обновления в `april-profile`: обновить submodule `vendor/april-profile`, убедиться в совместимости интеграции и подтвердить сборочный контур `hub-shell`.
 
 ## Scope
 
@@ -45,7 +45,7 @@
 
 ## Acceptance criteria
 
-- [x] `vendor/april-profile` указывает на актуальный коммит `develop` из `april-profile`.
+- [x] `vendor/april-profile` указывает на актуальный коммит `develop` из `april-profile` (`ba0b1536d061ed6a7743a298043ee8083aa6de8c`).
 - [x] `hub-shell` успешно проходит `npm run lint`, `npm run test`, `npm run build`.
 - [x] Обновлены артефакты `hub-shell/dist`, соответствующие новой сборке.
 - [x] Подготовлен отчёт с изменениями, проверками, рисками и follow-up.
