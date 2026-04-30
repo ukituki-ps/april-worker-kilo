@@ -1,4 +1,4 @@
-import { lazy, Suspense, useMemo, type JSX } from "react";
+import { lazy, Suspense, useCallback, useMemo, type JSX } from "react";
 import type { ProfileWidgetTelemetryEvent } from "./integrations/april-profile-ui";
 import type { ShellUserContext } from "./types";
 import { keycloak } from "./keycloak";
@@ -74,7 +74,7 @@ export function EntityTypesListHostWidget({ context }: WidgetProps): JSX.Element
     ],
   );
 
-  const handleObservability = (event: ProfileWidgetTelemetryEvent): void => {
+  const handleObservability = useCallback((event: ProfileWidgetTelemetryEvent): void => {
     if (event.event.endsWith("_failed")) {
       captureRuntimeError(new Error(`[entity-types-widget] ${event.event}`), {
         mechanism: "manual",
@@ -86,7 +86,7 @@ export function EntityTypesListHostWidget({ context }: WidgetProps): JSX.Element
         extra: event.meta ? { meta: event.meta } : undefined,
       });
     }
-  };
+  }, [context.orgScope]);
 
   return (
     <div className="entity-types-widget-host">
@@ -107,8 +107,34 @@ export function EntityTypesListHostWidget({ context }: WidgetProps): JSX.Element
 export function ProfilesListHostWidget({ context }: WidgetProps): JSX.Element {
   const host = useHubHostContext();
   const apiBaseUrl = `${window.location.origin}/api/v1/admin/profile/api`;
+  const widgetHostContext = useMemo(
+    () => ({
+      tenant: { id: host.tenant.id },
+      auth: {
+        subject: host.auth?.subject,
+        roles: host.auth?.roles,
+        tokenRef: host.auth?.tokenRef,
+      },
+      theme: host.theme,
+      locale: host.locale,
+      telemetry: {
+        requestId: host.telemetry?.requestId ?? context.correlationId,
+        correlationId: context.correlationId,
+      },
+    }),
+    [
+      context.correlationId,
+      host.auth?.roles,
+      host.auth?.subject,
+      host.auth?.tokenRef,
+      host.locale,
+      host.telemetry?.requestId,
+      host.tenant.id,
+      host.theme,
+    ],
+  );
 
-  const handleObservability = (event: ProfileWidgetTelemetryEvent): void => {
+  const handleObservability = useCallback((event: ProfileWidgetTelemetryEvent): void => {
     if (event.event.endsWith("_failed")) {
       captureRuntimeError(new Error(`[profiles-widget] ${event.event}`), {
         mechanism: "manual",
@@ -120,27 +146,14 @@ export function ProfilesListHostWidget({ context }: WidgetProps): JSX.Element {
         extra: event.meta ? { meta: event.meta } : undefined,
       });
     }
-  };
+  }, [context.orgScope]);
 
   return (
     <div className="profiles-widget-host">
       <CompositionErrorBoundary moduleName="ProfilesWidget" tenant={context.orgScope} correlationId={context.correlationId}>
         <Suspense fallback={<SharedState state="loading" message="Подключаем модуль профилей…" />}>
           <ProfilesWidget
-            hostContext={{
-              tenant: { id: host.tenant.id },
-              auth: {
-                subject: host.auth?.subject,
-                roles: host.auth?.roles,
-                tokenRef: host.auth?.tokenRef,
-              },
-              theme: host.theme,
-              locale: host.locale,
-              telemetry: {
-                requestId: host.telemetry?.requestId ?? context.correlationId,
-                correlationId: context.correlationId,
-              },
-            }}
+            hostContext={widgetHostContext}
             apiBaseUrl={apiBaseUrl}
             accessToken={keycloak.token}
             onObservability={handleObservability}
