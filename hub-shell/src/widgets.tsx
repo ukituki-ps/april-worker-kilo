@@ -1,7 +1,8 @@
-import { lazy, Suspense, useCallback, useMemo, type JSX } from "react";
+import { lazy, Suspense, useCallback, useEffect, useMemo, useState, type JSX } from "react";
 import type { ProfileWidgetTelemetryEvent } from "./integrations/april-profile-ui";
 import type { ShellUserContext } from "./types";
 import { keycloak } from "./keycloak";
+import { subscribeKeycloakTokenRotation } from "./keycloak-token-subscribers";
 import { CompositionErrorBoundary } from "./composition-error-boundary";
 import { useHubHostContext } from "./shell/hub-host-context";
 import { captureRuntimeError } from "./sentry";
@@ -10,6 +11,19 @@ import { SharedState } from "./shared-ux";
 type WidgetProps = {
   context: ShellUserContext;
 };
+
+/** Прокидывает актуальный Bearer в profile-ui: ref в виджете обновляется только при ререндере после ротации токена в keycloak-js. */
+function useProfileWidgetAccessToken(): string | undefined {
+  const [accessToken, setAccessToken] = useState(() => keycloak.token);
+
+  useEffect(() => {
+    return subscribeKeycloakTokenRotation(() => {
+      setAccessToken(keycloak.token);
+    });
+  }, []);
+
+  return accessToken;
+}
 
 const ProfilesWidget = lazy(async () => {
   const module = await import("./integrations/april-profile-ui");
@@ -46,6 +60,7 @@ export function BrokenWidget(_props: WidgetProps): JSX.Element {
 
 export function EntityTypesListHostWidget({ context }: WidgetProps): JSX.Element {
   const host = useHubHostContext();
+  const accessToken = useProfileWidgetAccessToken();
   const apiBaseUrl = useMemo(
     () => `${window.location.origin}/api/v1/admin/profile/api`,
     [],
@@ -98,7 +113,7 @@ export function EntityTypesListHostWidget({ context }: WidgetProps): JSX.Element
           <EntityTypesWidget
             hostContext={widgetHostContext}
             apiBaseUrl={apiBaseUrl}
-            accessToken={keycloak.token}
+            accessToken={accessToken}
             onObservability={handleObservability}
           />
         </Suspense>
@@ -109,6 +124,7 @@ export function EntityTypesListHostWidget({ context }: WidgetProps): JSX.Element
 
 export function ProfilesListHostWidget({ context }: WidgetProps): JSX.Element {
   const host = useHubHostContext();
+  const accessToken = useProfileWidgetAccessToken();
   const apiBaseUrl = useMemo(
     () => `${window.location.origin}/api/v1/admin/profile/api`,
     [],
@@ -161,7 +177,7 @@ export function ProfilesListHostWidget({ context }: WidgetProps): JSX.Element {
           <ProfilesWidget
             hostContext={widgetHostContext}
             apiBaseUrl={apiBaseUrl}
-            accessToken={keycloak.token}
+            accessToken={accessToken}
             onObservability={handleObservability}
           />
         </Suspense>

@@ -1,5 +1,6 @@
 import { authConfig } from "./auth";
 import { keycloak } from "./keycloak";
+import { notifyKeycloakTokenRotated } from "./keycloak-token-subscribers";
 import { captureHttpError } from "./sentry";
 
 export type ApiTelemetryContext = {
@@ -68,6 +69,7 @@ export async function authorizedFetch(
       await keycloak.login();
       throw new Error("Token refresh failed");
     }
+    notifyKeycloakTokenRotated();
     // Retry must not inherit an aborted AbortSignal from the initial attempt (e.g. StrictMode teardown).
     const { signal: _retryIgnoreSignal, ...retryInit } = init;
     return authorizedFetch(input, retryInit, { ...options, canRetry: false });

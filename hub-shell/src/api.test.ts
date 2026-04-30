@@ -26,6 +26,12 @@ vi.mock("./sentry", () => ({
   captureHttpError: keycloakState.captureHttpErrorMock,
 }));
 
+const notifyKeycloakTokenRotatedMock = vi.hoisted(() => vi.fn());
+
+vi.mock("./keycloak-token-subscribers", () => ({
+  notifyKeycloakTokenRotated: notifyKeycloakTokenRotatedMock,
+}));
+
 describe("apiRequest", () => {
   const originalFetch = globalThis.fetch;
 
@@ -35,6 +41,7 @@ describe("apiRequest", () => {
     keycloakState.loginMock.mockClear();
     keycloakState.updateTokenMock.mockClear();
     keycloakState.captureHttpErrorMock.mockClear();
+    notifyKeycloakTokenRotatedMock.mockClear();
     globalThis.fetch = vi.fn();
   });
 
@@ -61,6 +68,7 @@ describe("apiRequest", () => {
 
     expect(keycloakState.updateTokenMock).toHaveBeenCalledWith(30);
     expect(globalThis.fetch).toHaveBeenCalledTimes(2);
+    expect(notifyKeycloakTokenRotatedMock).toHaveBeenCalledTimes(1);
   });
 
   it("falls back to login when refresh fails on 401", async () => {
