@@ -223,6 +223,18 @@
   gap: 14px;
 }
 
+.shell-route-chrome-fill {
+  height: 100%;
+  min-height: 0;
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.profiles-widget-host {
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
 .shell-profile-tab {
   display: inline-flex;
   align-items: center;

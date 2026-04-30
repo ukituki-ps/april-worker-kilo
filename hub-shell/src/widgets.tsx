@@ -58,28 +58,30 @@ export function ProfilesListHostWidget({ context }: WidgetProps): JSX.Element {
   };
 
   return (
-    <CompositionErrorBoundary moduleName="ProfilesWidget" tenant={context.orgScope} correlationId={context.correlationId}>
-      <Suspense fallback={<SharedState state="loading" message="Подключаем модуль профилей…" />}>
-        <ProfilesWidget
-          hostContext={{
-            tenant: { id: host.tenant.id },
-            auth: {
-              subject: host.auth?.subject,
-              roles: host.auth?.roles,
-              tokenRef: host.auth?.tokenRef,
-            },
-            theme: host.theme,
-            locale: host.locale,
-            telemetry: {
-              requestId: host.telemetry?.requestId ?? context.correlationId,
-              correlationId: context.correlationId,
-            },
-          }}
-          apiBaseUrl={apiBaseUrl}
-          accessToken={keycloak.token}
-          onObservability={handleObservability}
-        />
-      </Suspense>
-    </CompositionErrorBoundary>
+    <div className="profiles-widget-host">
+      <CompositionErrorBoundary moduleName="ProfilesWidget" tenant={context.orgScope} correlationId={context.correlationId}>
+        <Suspense fallback={<SharedState state="loading" message="Подключаем модуль профилей…" />}>
+          <ProfilesWidget
+            hostContext={{
+              tenant: { id: host.tenant.id },
+              auth: {
+                subject: host.auth?.subject,
+                roles: host.auth?.roles,
+                tokenRef: host.auth?.tokenRef,
+              },
+              theme: host.theme,
+              locale: host.locale,
+              telemetry: {
+                requestId: host.telemetry?.requestId ?? context.correlationId,
+                correlationId: context.correlationId,
+              },
+            }}
+            apiBaseUrl={apiBaseUrl}
+            accessToken={keycloak.token}
+            onObservability={handleObservability}
+          />
+        </Suspense>
+      </CompositionErrorBoundary>
+    </div>
   );
 }
