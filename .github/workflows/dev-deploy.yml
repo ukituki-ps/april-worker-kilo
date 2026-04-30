@@ -25,12 +25,13 @@ jobs:
       # Must be a git clone of *this* repo (ukituki-ps/april-worker): github.sha is taken from this workflow's event.
       # Default /opt/april-worker matches deploy.sh; override with repo variable APRIL_DEPLOY_ROOT if the clone lives elsewhere.
       APRIL_DEPLOY_ROOT: ${{ vars.APRIL_DEPLOY_ROOT != '' && vars.APRIL_DEPLOY_ROOT || '/opt/april-worker' }}
-      APRIL_PROFILE_SUBMODULE_URL: git@github.com:ukituki-ps/april-profile.git
-      DISIGNAPRIL_SUBMODULE_URL: git@github.com:ukituki-ps/DisignApril.git
+      APRIL_PROFILE_SUBMODULE_URL: git@github-april-profile:ukituki-ps/april-profile.git
+      DISIGNAPRIL_SUBMODULE_URL: git@github-disignapril:ukituki-ps/DisignApril.git
     steps:
       - name: Checkout ref and deploy
         env:
           APRIL_PROFILE_DEPLOY_KEY: ${{ secrets.APRIL_PROFILE_DEPLOY_KEY }}
+          DISIGNAPRIL_DEPLOY_KEY: ${{ secrets.DISIGNAPRIL_DEPLOY_KEY }}
         run: |
           set -euo pipefail
           ROOT="${APRIL_DEPLOY_ROOT}"
@@ -40,11 +41,30 @@ jobs:
           cd "${ROOT}"
           test -x ./deploy.sh
           test -n "${APRIL_PROFILE_DEPLOY_KEY}"
-          KEY_FILE="$(mktemp)"
-          trap 'rm -f "${KEY_FILE}"' EXIT
-          printf '%s\n' "${APRIL_PROFILE_DEPLOY_KEY}" > "${KEY_FILE}"
-          chmod 600 "${KEY_FILE}"
-          DEPLOY_KEY_SSH="ssh -i ${KEY_FILE} -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new"
+          test -n "${DISIGNAPRIL_DEPLOY_KEY}"
+          APRIL_PROFILE_KEY_FILE="$(mktemp)"
+          DISIGNAPRIL_KEY_FILE="$(mktemp)"
+          SSH_CONFIG_FILE="$(mktemp)"
+          trap 'rm -f "${APRIL_PROFILE_KEY_FILE}" "${DISIGNAPRIL_KEY_FILE}" "${SSH_CONFIG_FILE}"' EXIT
+          printf '%s\n' "${APRIL_PROFILE_DEPLOY_KEY}" > "${APRIL_PROFILE_KEY_FILE}"
+          printf '%s\n' "${DISIGNAPRIL_DEPLOY_KEY}" > "${DISIGNAPRIL_KEY_FILE}"
+          chmod 600 "${APRIL_PROFILE_KEY_FILE}" "${DISIGNAPRIL_KEY_FILE}"
+          cat > "${SSH_CONFIG_FILE}" <<EOF
+          Host github-april-profile
+            HostName github.com
+            User git
+            IdentityFile ${APRIL_PROFILE_KEY_FILE}
+            IdentitiesOnly yes
+            StrictHostKeyChecking accept-new
+
+          Host github-disignapril
+            HostName github.com
+            User git
+            IdentityFile ${DISIGNAPRIL_KEY_FILE}
+            IdentitiesOnly yes
+            StrictHostKeyChecking accept-new
+          EOF
+          DEPLOY_KEY_SSH="ssh -F ${SSH_CONFIG_FILE}"
           # git checkout тянет новые gitlink субмодулей; URL из .gitmodules — HTTPS без токена → "could not read Username".
           # Для субмодулей нужен APRIL_PROFILE_DEPLOY_KEY, но тот же GIT_SSH_COMMAND ломает `git fetch origin`,
           # если origin — SSH на этот репозиторий: deploy-key только для april-profile → "Repository not found".
