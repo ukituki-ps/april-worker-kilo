@@ -442,6 +442,13 @@ sync_frontend_dependencies() {
     "hub-shell" \
     "hub-shell" \
     "${state_dir}/hub-shell-git-tree.rev"
+
+  # Submodule `vendor/april-profile` (источник profile-ui для Vite alias): дерево `hub-shell/` при этом не меняется,
+  # но без пересоздания контейнера процесс `vite dev` может не подхватить обновлённые исходники виджета.
+  sync_go_service_on_git_tree_change \
+    "hub-shell" \
+    "vendor/april-profile" \
+    "${state_dir}/hub-shell-vendor-april-profile.rev"
 }
 
 reload_nginx_docs_if_running() {

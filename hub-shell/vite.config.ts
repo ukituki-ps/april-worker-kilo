@@ -36,6 +36,8 @@ export default defineConfig(({ mode }) => {
         "@april/tokens": path.join(hubShellDir, "node_modules/@april/tokens"),
         "@mantine/core": path.join(hubShellDir, "node_modules/@mantine/core"),
         "@mantine/hooks": path.join(hubShellDir, "node_modules/@mantine/hooks"),
+        // Импорты из vendor/profile-ui (вне root Vite) иначе не резолвятся к hub-shell/node_modules.
+        "@tabler/icons-react": path.join(hubShellDir, "node_modules/@tabler/icons-react"),
         "@april/profile-ui-external": path.join(
           hubShellDir,
           "../vendor/april-profile/frontend/packages/profile-ui/src/index.ts",
