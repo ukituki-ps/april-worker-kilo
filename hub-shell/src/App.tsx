@@ -43,29 +43,43 @@ export default function App({ authInitError = "" }: AppProps) {
       return;
     }
 
+    const ac = new AbortController();
+
     const loadData = async (): Promise<void> => {
       setZone("transition");
       setTransitionReason("Возвращаемся от провайдера идентификации и инициализируем пользовательский контекст...");
       setError("");
 
-      const meResponse = await apiRequest("/v1/me");
-      if (!meResponse.ok) {
-        if (meResponse.status === 403) {
-          setZone("forbidden");
+      try {
+        const meResponse = await apiRequest("/v1/me", { signal: ac.signal });
+        if (ac.signal.aborted) {
           return;
         }
-        setError(`Не удалось загрузить профиль: ${meResponse.status}`);
+        if (!meResponse.ok) {
+          if (meResponse.status === 403) {
+            setZone("forbidden");
+            return;
+          }
+          setError(`Не удалось загрузить профиль: ${meResponse.status}`);
+          setZone("guest");
+          return;
+        }
+        setMe((await meResponse.json()) as UserProfile);
+        setZone("authorized");
+      } catch (loadError: unknown) {
+        if (ac.signal.aborted || (loadError instanceof DOMException && loadError.name === "AbortError")) {
+          return;
+        }
         setZone("guest");
-        return;
+        setError(loadError instanceof Error ? loadError.message : "Непредвиденная ошибка авторизации в runtime.");
       }
-      setMe((await meResponse.json()) as UserProfile);
-      setZone("authorized");
     };
 
-    void loadData().catch((loadError: unknown) => {
-      setZone("guest");
-      setError(loadError instanceof Error ? loadError.message : "Непредвиденная ошибка авторизации в runtime.");
-    });
+    void loadData();
+
+    return () => {
+      ac.abort();
+    };
   }, []);
 
   const context: ShellUserContext | null = useMemo(() => (me ? buildShellUserContext(me) : null), [me]);
