@@ -1,70 +1,66 @@
 ## 1) Итого
 
-- Статус: ✅ выполнено
-- Задача: актуализация `entity-types-widget` из `april-profile` в `april-worker`
-- Ветка: `develop` (рекомендуемый PR branch: `fix/entity-types-widget-sync-aprilprofile`)
+- Статус: ⚠️ частично (локализована и уменьшена причина лишних `canceled`, но для полной incident-корреляции нужны доступы к Sentry/Loki/Prometheus)
+- Задача: triage/fix сценария `entity-types-widget`: `2 canceled` + `1x 200` при открытии
+- Ветка: `develop`
 - Коммиты: не создавались
 - PR: не создавался
 
-## 2) Что сделано
+## 2) Инцидент и корреляция
 
-- [frontend] Обновлён git submodule `vendor/april-profile`:
-  - было: `0b18686698951d949963721376844d102119eeea`
-  - стало: `76ff32a5aab810d08d8d39185eb382b83e822e82`
-  - источник: `origin/develop` (`Merge pull request #101 ... entity-types-widget-mantine-textarea-cardlist`)
-- [frontend] Выполнен полный quality gate `hub-shell` после bump submodule.
-- [frontend] Пересобран `hub-shell`, обновлены `dist`-артефакты под новый bundle `@april/profile-ui-external`.
-- [docs] Добавлены `TASK.md` и `REPORT.md` для текущей micro-задачи.
+- Инцидент: повторные отменённые запросы `GET /api/v1/admin/profile/api/v1/entity-types` при открытии `entity-types-widget` в `dev`.
+- Route: экран списка типов сущностей (`entity-types-list`) в `hub-shell`.
+- Environment: `dev`.
+- Tenant: `00000000-0000-0000-0000-000000000001` (из контекста токена).
+- Role set (Keycloak): присутствуют `admin`, `manager`, `user` (агрегированный набор).
+- `requestId`/`correlationId`: требуется извлечь из Sentry issue / Loki, в предоставленном фрагменте сети эти значения не даны.
 
-## 3) Изменённые файлы
+## 3) Наблюдения Sentry → Loki → Prometheus
 
-- `vendor/april-profile`
-- `hub-shell/dist/index.html`
-- `hub-shell/dist/assets/april-profile-ui-BbQL8HcK.js`
-- `hub-shell/dist/assets/index-BfAj0Klf.js`
-- `hub-shell/dist/assets/april-profile-ui-Bl4_m_Y4.js` (удалён)
-- `hub-shell/dist/assets/index-D26cnCmo.js` (удалён)
-- `tasks/2026-04-30-micro-entity-types-widget-sync-aprilprofile/TASK.md`
+- Sentry: URL issue не предоставлен, прямой runtime stacktrace/issue tags (`requestId`, `correlationId`) недоступны.
+- Loki: без `requestId`/`correlationId` и доступа к стенду невозможно выполнить точную сквозную корреляцию по сервисам.
+- Prometheus/Grafana: по этой сессии нет данных о росте `5xx/503`/latency; инфраструктурная деградация не подтверждена.
+
+## 4) Классификация root cause (предварительная)
+
+- Слой: **frontend/widget lifecycle**.
+- Причина:
+  - в `EntityTypesWidgetCore` используется `AbortController` с отменой предыдущего запроса;
+  - в `hub-shell` активен `React.StrictMode` (dev), что даёт дополнительный mount/unmount и как минимум один `canceled`;
+  - дополнительно `hostContext` передавался как новый объект на ререндер, что могло запускать ещё один перезапрос с отменой.
+
+## 5) Изменения
+
+- [frontend] Стабилизирован проп `hostContext` в `hub-shell/src/widgets.tsx` через `useMemo`.
+- [frontend] Убрана лишняя триггерная причина повторного `loadFamilies()` при ререндерах host-компонента.
+- [docs] Обновлён отчёт triage по этой задаче.
+
+## 6) Изменённые файлы
+
+- `hub-shell/src/widgets.tsx`
 - `tasks/2026-04-30-micro-entity-types-widget-sync-aprilprofile/REPORT.md`
 
-## 4) Миграции и данные
+## 7) Проверка качества
 
-- Миграции Atlas: нет
-- Изменения данных: нет
-- Обратимость: да, через возврат submodule на предыдущий SHA и пересборку `hub-shell`
-
-## 5) Проверка качества
-
-- Линтер: ok
-- Сборка: ok
-- Unit tests: ok
-- Integration tests: n/a (не требовались scope задачи)
-- E2E / smoke: n/a (не требовались scope задачи)
+- Линтер: `ReadLints` для `hub-shell/src/widgets.tsx` — `ok`
+- Сборка: не запускалась в этой micro-итерации
+- Unit tests: не запускались в этой micro-итерации
+- Integration tests: n/a
+- E2E / smoke: n/a
 
 Команды (фактически выполненные):
 
 ```bash
-git ls-remote --heads origin develop
-git -C vendor/april-profile fetch origin develop
-git -C vendor/april-profile checkout 76ff32a5aab810d08d8d39185eb382b83e822e82
-npm --prefix hub-shell run lint
-npm --prefix hub-shell run test
-npm --prefix hub-shell run build
+git status --short
+git diff -- hub-shell/src/widgets.tsx
 ```
 
-## 6) Деплой
+## 8) Риски и ограничения
 
-- Среда: не применялось
-- Согласовано с: `docs/DEPLOYMENT_STRATEGY.md`
-- Образы: не применялось
-- Health / readiness: не применялось
-- Rollback: не применялось
+- Без обязательной триады `Sentry issue -> Loki -> Prometheus` классификация остаётся предварительной.
+- В dev всё ещё возможен один `canceled` из-за `React.StrictMode` (нормальное поведение в development).
 
-## 7) Риски и ограничения
+## 9) Что осталось
 
-- В рабочем дереве присутствуют несвязанные изменения (`design-system/DisignApril`, `hub-shell/core.151`, `hub-shell/core.188`), поэтому перед коммитом потребуется аккуратный selective staging.
-- `dist`-артефакты зависят от окружения сборки; рекомендуется собирать в том же контуре, что принят в команде для релизных изменений фронтенда.
-
-## 8) Что осталось
-
-- [ ] При необходимости оформить отдельный commit в `fix/*` ветке и открыть PR в `develop`.
+- [ ] Дособрать обязательную корреляцию по конкретному инциденту: Sentry issue URL + `requestId`/`correlationId` -> Loki -> Prometheus.
+- [ ] После получения observability-данных подтвердить финальную owner-классификацию (UI/BFF/downstream/infra).
