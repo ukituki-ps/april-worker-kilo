@@ -2,8 +2,8 @@
 
 - Статус: ⚠️ частично (локальный quality gate `hub-shell` не выполнен из‑за `EACCES` на `hub-shell/node_modules`; ожидается прогон в CI или после исправления прав на машине разработчика)
 - Задача: обновление внешнего `profiles-widget` через submodule `vendor/april-profile` и автоматический перезапуск `hub-shell` на dev при bump submodule
-- Ветка: `feature/050-aprilhub-profiles-widget-submodule-bump` (создать и запушить для PR)
-- Коммиты: `a8a5f0e`
+- Ветка: `feature/050-aprilhub-profiles-widget-submodule-bump` (запушить и открыть PR в `develop`)
+- Коммиты: `143124fd69c01356a915e7e21199575aa8cb888c`
 - PR: не создавался
 
 ## 2) Что сделано
@@ -60,6 +60,6 @@ cd hub-shell && npm ci && npm run check:profile-ui-semver && npm run lint && npm
 
 ## 8) Что осталось
 
-- [ ] Создать ветку `feature/050-aprilhub-profiles-widget-submodule-bump`, закоммитить изменения, открыть PR в `develop`.
+- [ ] Запушить ветку `feature/050-aprilhub-profiles-widget-submodule-bump`, открыть PR в `develop`.
 - [ ] Убедиться, что CI (`hub-shell` job) зелёный.
 - [ ] Опционально: на dev после деплоя визуально проверить `/app/profile/entities` (список профилей через внешний виджет).
