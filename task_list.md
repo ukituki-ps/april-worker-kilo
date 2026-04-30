@@ -111,6 +111,7 @@
 - [x] `050-aprilhub-profiles-widget-submodule-bump`: обновление внешнего `profiles-widget` через submodule `vendor/april-profile`, quality gate `hub-shell`, перезапуск `hub-shell` на dev — см. PR [#102](https://github.com/ukituki-ps/april-worker/pull/102), [`REPORT.md`](./tasks/050-aprilhub-profiles-widget-submodule-bump/REPORT.md)
 - [x] `2026-04-30-micro-profiles-widget-host-fill-height`: закрыт micro-инцидент fixed-height `ProfilesWidget` на `#/app/profile/entities`; подтверждена рабочая цепочка fill-height + восстановлена стабильность dev runtime/containers — [`TASK.md`](./tasks/2026-04-30-micro-profiles-widget-host-fill-height/TASK.md), [`REPORT.md`](./tasks/2026-04-30-micro-profiles-widget-host-fill-height/REPORT.md)
 - [x] `2026-04-30-micro-profiles-widget-sync-aprilprofile`: актуализирован `profiles-widget` после обновления `april-profile` (`vendor/april-profile` -> `ebbc8fc`), прогнан quality gate `hub-shell`, обновлены `dist`-артефакты — [`TASK.md`](./tasks/2026-04-30-micro-profiles-widget-sync-aprilprofile/TASK.md), [`REPORT.md`](./tasks/2026-04-30-micro-profiles-widget-sync-aprilprofile/REPORT.md)
+- [x] `2026-04-30-micro-keycloak-theme-rollback-restore`: устранён rollback Keycloak на стоковые страницы через принудительное выравнивание realm theme (`loginTheme/accountTheme=aprilhub`) в deploy-контуре — [`TASK.md`](./tasks/2026-04-30-micro-keycloak-theme-rollback-restore/TASK.md), [`REPORT.md`](./tasks/2026-04-30-micro-keycloak-theme-rollback-restore/REPORT.md)
 
 ## План реализации AprilHub: статусы
 

@@ -29,6 +29,7 @@ EOF
   SKIP_FRONTEND_RECREATE=1 пропустить force-recreate frontend-сервисов при изменении lock-файлов
   SKIP_HUB_BFF_RECREATE=1 пропустить force-recreate hub-bff при изменениях в Go-коде hub-bff/
   SKIP_KEYCLOAK_RECREATE=1 пропустить force-recreate keycloak при изменении theme/realm/compose
+  SKIP_KEYCLOAK_THEME_ENSURE=1 пропустить принудительную проверку login/account theme в realm
   SKIP_OBSERVABILITY_ONBOARD=1 пропустить авто-onboarding стенда в central observability
   SKIP_HEALTHCHECK=1   пропустить health/readiness проверки
   INGRESS_BASE_URL     базовый URL ingress-check (по умолчанию http://127.0.0.1:${DOCS_HTTP_PORT:-8080})
@@ -527,6 +528,29 @@ sync_keycloak_on_theme_or_realm_change() {
   printf '%s\n' "$merged_hash" >"$state_file"
 }
 
+ensure_keycloak_realm_theme() {
+  if [[ "${SKIP_KEYCLOAK_THEME_ENSURE:-}" == "1" ]]; then
+    log "пропуск keycloak theme ensure (SKIP_KEYCLOAK_THEME_ENSURE=1)"
+    return 0
+  fi
+
+  if ! is_service_running "keycloak"; then
+    log "keycloak не запущен — пропуск keycloak theme ensure"
+    return 0
+  fi
+
+  if [[ ! -x "${ROOT}/scripts/keycloak-ensure-april-theme.sh" ]]; then
+    fail "scripts/keycloak-ensure-april-theme.sh не найден или не исполняемый"
+  fi
+
+  log "проверка и принудительное выравнивание Keycloak theme для realm april"
+  if ! "${ROOT}/scripts/keycloak-ensure-april-theme.sh" >"${deploy_artifacts_dir}/keycloak-theme-ensure.log" 2>&1; then
+    log "keycloak theme ensure завершился с ошибкой, содержимое keycloak-theme-ensure.log:"
+    sed 's/^/[keycloak-theme-ensure] /' "${deploy_artifacts_dir}/keycloak-theme-ensure.log" >&2 || true
+    return 1
+  fi
+}
+
 run_health_checks() {
   if [[ "${SKIP_HEALTHCHECK:-}" == "1" ]]; then
     log "пропуск health/readiness (SKIP_HEALTHCHECK=1)"
@@ -671,6 +695,7 @@ main() {
   run_docs_build
   run_compose
   sync_keycloak_on_theme_or_realm_change
+  ensure_keycloak_realm_theme
   sync_frontend_dependencies
   reload_nginx_docs_if_running
   sync_go_service_on_git_tree_change \
