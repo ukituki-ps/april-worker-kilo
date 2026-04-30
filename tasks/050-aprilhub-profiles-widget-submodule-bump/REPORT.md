@@ -1,65 +1,63 @@
 ## 1) Итого
 
-- Статус: ⚠️ частично (локальный quality gate `hub-shell` не выполнен из‑за `EACCES` на `hub-shell/node_modules`; ожидается прогон в CI или после исправления прав на машине разработчика)
-- Задача: обновление внешнего `profiles-widget` через submodule `vendor/april-profile` и автоматический перезапуск `hub-shell` на dev при bump submodule
-- Ветка: `feature/050-aprilhub-profiles-widget-submodule-bump` (запушить и открыть PR в `develop`)
-- Коммиты: `143124fd69c01356a915e7e21199575aa8cb888c` (основной), `1cd6f12` (правка REPORT)
-- PR: не создавался
+- Статус: ✅ выполнено (PR открыт; CI **Hub Shell lint, test and build** и **Hub Shell alpine runtime preflight** зелёные на последнем push)
+- Задача: обновление внешнего `profiles-widget` через submodule `vendor/april-profile`, перезапуск `hub-shell` на dev при bump submodule, совместимость сборки с новым `profile-ui`
+- Ветка: `feature/050-aprilhub-profiles-widget-submodule-bump`
+- Коммиты (ключевые): bump submodule + `deploy.sh` — история ветки до `67a637f`; исправление сборки — **`c734204`** (`fix(hub-shell): bundle @tabler/icons-react for vendored profile-ui`)
+- PR: https://github.com/ukituki-ps/april-worker/pull/102 → base **`develop`**
 
 ## 2) Что сделано
 
-- [frontend] Обновлён git submodule **`vendor/april-profile`** до **`e2cee03a80b221fa75fe1e8dbfd3c87adfae9bb5`** (ветка `develop` upstream на момент выполнения: `origin/develop`).
-- [infra / compose / nginx] В **`deploy.sh`**, функция `sync_frontend_dependencies`: добавлен второй вызов `sync_go_service_on_git_tree_change` для пути **`vendor/april-profile`** и сервиса **`hub-shell`**, чтобы при изменении только указателя submodule контейнер `hub-shell` пересоздавался и Vite подхватывал новые исходники `profile-ui`.
-- [docs] Добавлен [`PLAN.md`](./PLAN.md) по шаблону агента.
+- [frontend] Обновлён git submodule **`vendor/april-profile`** до **`e2cee03a80b221fa75fe1e8dbfd3c87adfae9bb5`** (`origin/develop` на момент bump).
+- [frontend] После bump **`profile-ui`** стал импортировать **`@tabler/icons-react`**; из исходников под `vendor/` Vite не резолвил bare module. Добавлены зависимость **`@tabler/icons-react`** в [`hub-shell/package.json`](../../hub-shell/package.json), обновлён **`hub-shell/package-lock.json`**, в [`hub-shell/vite.config.ts`](../../hub-shell/vite.config.ts) — **alias** на `node_modules/@tabler/icons-react` (тот же приём, что для `@mantine/*`).
+- [infra / compose / nginx] В **`deploy.sh`**, `sync_frontend_dependencies`: второй **`sync_go_service_on_git_tree_change`** для **`vendor/april-profile`** → **`force-recreate`** **`hub-shell`** при смене только submodule.
+- [docs] [`PLAN.md`](./PLAN.md), постановка [`TASK.md`](./TASK.md).
 
-Проверка совместимости host-слоя: экспорт `ProfilesWidget` / типов в обновлённом пакете сохраняет прежнюю схему (`ProfilesWidgetProps` → OpenAPI provider); правки в [`hub-shell/src/integrations/april-profile-ui.ts`](../../hub-shell/src/integrations/april-profile-ui.ts) не потребовались.
+Проверка host-слоя [`hub-shell/src/integrations/april-profile-ui.ts`](../../hub-shell/src/integrations/april-profile-ui.ts): правок контракта не потребовалось.
 
 ## 3) Изменённые файлы
 
 - `vendor/april-profile` (submodule pointer)
 - `deploy.sh`
-- `tasks/050-aprilhub-profiles-widget-submodule-bump/PLAN.md`
-- `tasks/050-aprilhub-profiles-widget-submodule-bump/REPORT.md`
+- `hub-shell/package.json`, `hub-shell/package-lock.json`, `hub-shell/vite.config.ts`
+- `tasks/050-aprilhub-profiles-widget-submodule-bump/{TASK,PLAN,REPORT}.md`
+- `task_list.md` (индекс задачи 050)
 
 ## 4) Миграции и данные
 
 - Миграции Atlas: нет
-- Обратимость: да — revert коммита или возврат submodule на предыдущий SHA
+- Обратимость: да — revert PR или возврат submodule на предыдущий SHA
 
 ## 5) Проверка качества
 
-- Линтер: fail (локально: `ds:prepare` → `cp` в `node_modules/@april/tokens/css`, отказ в доступе)
-- Сборка: не выполнена локально
-- Unit tests: не выполнены локально
-- E2E / smoke: не выполнялись
+- Линтер / `tsc` / сборка Vite: **ok** в CI (job **Hub Shell lint, test and build** на run после push `c734204`)
+- Unit tests (Vitest): **ok** (тот же job)
+- Hub Shell alpine preflight: **ok**
+- Локально на машине агента ранее был **EACCES** на `node_modules`; воспроизводимая проверка: **`docker run` node:20 + `npm ci && npm run build`** в смонтированном репозитории — **ok** после alias + зависимости
 
-Команды (фактически выполненные):
-
-```bash
-cd /home/ukituki/april-worker && git submodule update --remote vendor/april-profile
-cd /home/ukituki/april-worker/hub-shell && npm ci && npm run ds:prepare && npm run lint && npm run test && npm run build
-# npm ci / ds:prepare завершились ошибкой EACCES (часть node_modules принадлежит root)
-```
-
-Ожидаемый полный gate (как в [`README.md`](../../README.md)):
+Команды (эталон для ручной проверки):
 
 ```bash
 cd hub-shell && npm ci && npm run check:profile-ui-semver && npm run lint && npm run test && npm run build
 ```
 
+Проверка CI по PR:
+
+```bash
+gh pr checks 102
+```
+
 ## 6) Деплой
 
-- Среда: не выполнялся
-- Согласовано с: [`docs/DEPLOYMENT_STRATEGY.md`](../../docs/DEPLOYMENT_STRATEGY.md)
-- После merge в `develop`: workflow **Deploy to dev** подтянет новый указатель submodule и при следующем деплое **`deploy.sh`** должен выполнить `force-recreate hub-shell`, если изменился git-tree **`vendor/april-profile`** относительно сохранённого state в `.deploy-state/hub-shell-vendor-april-profile.rev`.
+- Среда: не выполнялся из этого отчёта (merge в `develop` → типовой **Deploy to dev** по [`DEPLOYMENT_STRATEGY.md`](../../docs/DEPLOYMENT_STRATEGY.md))
+- После merge: обновлённый **`deploy.sh`** должен пересоздавать **`hub-shell`**, если изменился git-tree **`vendor/april-profile`**
 
 ## 7) Риски и ограничения
 
-- Локальное окружение с повреждёнными правами на `hub-shell/node_modules` не позволило подтвердить сборку до PR; CI на self-hosted runner должен пройти при чистом `npm ci`.
-- При первом деплое после обновления `deploy.sh` файл state `hub-shell-vendor-april-profile.rev` отсутствует — сравнение инициализируется и при расхождении сработает пересоздание (см. логику `sync_go_service_on_git_tree_change`).
+- Новые peer-подобные зависимости во **`profile-ui`**, объявленные только во внешнем `package.json`, при vendored source нужно дублировать в **`hub-shell`** или добавлять alias — иначе **Vite build** падает; при следующих bump стоит смотреть diff зависимостей `profile-ui`.
+- Первый деплой после появления state-файла для нового шага в `deploy.sh`: см. логику `sync_go_service_on_git_tree_change`.
 
 ## 8) Что осталось
 
-- [ ] Запушить ветку `feature/050-aprilhub-profiles-widget-submodule-bump`, открыть PR в `develop`.
-- [ ] Убедиться, что CI (`hub-shell` job) зелёный.
-- [ ] Опционально: на dev после деплоя визуально проверить `/app/profile/entities` (список профилей через внешний виджет).
+- [ ] Смержить PR **#102** в **`develop`** (после ревью)
+- [ ] Опционально: на dev после деплоя проверить **`/app/profile/entities`** (внешний виджет списка профилей)
