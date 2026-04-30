@@ -194,20 +194,25 @@ run_submodules() {
     fi
   fi
 
+  # Без переменной окружения на dev-runner fetch всё равно должен идти по SSH (как для DisignApril).
+  if [[ -z "${profile_url}" ]]; then
+    profile_url="git@github.com:ukituki-ps/april-profile.git"
+  fi
+
   # Если URL субмодуля раньше был переопределён локально (например на SSH),
   # синхронизируем .git/config из актуального .gitmodules перед update.
   git submodule sync --recursive "${design_april_submodule}" "${profile_submodule}"
+
+  # Сразу после sync вернуть SSH иначе следующие шаги тянут по HTTPS без credential helper.
+  git config "submodule.${design_april_submodule}.url" "${disignapril_url}" || true
+  git config "submodule.${profile_submodule}.url" "${profile_url}" || true
 
   # На self-hosted окружениях внутри submodule может остаться локальный мусор
   # после предыдущих запусков. Чистим рабочие деревья, чтобы checkout не падал.
   git submodule foreach --recursive 'git reset --hard || true; git clean -fd || true'
 
-  # После sync переопределяем URL обратно на нужные runtime-значения.
-  # Иначе sync вернет URL из .gitmodules (HTTPS) и приватный submodule не клонируется на runner без token prompt.
-  git config "submodule.${design_april_submodule}.url" "${disignapril_url}" || true
-  if [[ -n "${profile_url}" ]]; then
-    git config "submodule.${profile_submodule}.url" "${profile_url}" || true
-  fi
+  # Вложенный DisignApril внутри vendor/april-profile (см. april-profile/.gitmodules) — тот же HTTPS из sync.
+  git config "submodule.${profile_submodule}/design-system/DisignApril.url" "${disignapril_url}" 2>/dev/null || true
 
   log "git submodule update --init --recursive"
   git submodule update --init --recursive "${design_april_submodule}" "${profile_submodule}"
