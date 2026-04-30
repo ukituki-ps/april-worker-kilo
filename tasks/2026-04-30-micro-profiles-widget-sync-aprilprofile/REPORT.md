@@ -9,9 +9,9 @@
 ## 2) Что сделано
 
 - [frontend] Обновлён git submodule `vendor/april-profile`:
-  - было: `eaeafb12d1cc2fc7abd0c06c51ef8ba1938c8638`
-  - стало: `ebbc8fc34b9808b39447309fce362c5700ad94ed`
-  - источник: `origin/develop` (`Merge pull request #97 ... profiles-widget-list-layout-actions`)
+  - было: `ebbc8fc34b9808b39447309fce362c5700ad94ed`
+  - стало: `ba0b1536d061ed6a7743a298043ee8083aa6de8c`
+  - источник: `origin/develop` (`Merge pull request #98 ... profiles-widget-textarea-wrapper-height`)
 - [frontend] Выполнен полный quality gate `hub-shell` после bump submodule.
 - [frontend] Пересобран `hub-shell`, обновлены `dist`-артефакты под новый `profiles-widget` bundle.
 - [docs] Добавлены `TASK.md` и `REPORT.md` для текущей micro-задачи.
@@ -20,10 +20,10 @@
 
 - `vendor/april-profile`
 - `hub-shell/dist/index.html`
-- `hub-shell/dist/assets/april-profile-ui-B8SS0gaT.js`
-- `hub-shell/dist/assets/index-B_SmpIJU.js`
-- `hub-shell/dist/assets/april-profile-ui-DfnOOgKG.js` (удалён)
-- `hub-shell/dist/assets/index-D-bYJYOT.js` (удалён)
+- `hub-shell/dist/assets/april-profile-ui-K_wdpHCl.js`
+- `hub-shell/dist/assets/index-CKzJ2vVp.js`
+- `hub-shell/dist/assets/april-profile-ui-C4FahQOG.js` (удалён)
+- `hub-shell/dist/assets/index-CQSXH0lp.js` (удалён)
 - `tasks/2026-04-30-micro-profiles-widget-sync-aprilprofile/TASK.md`
 - `tasks/2026-04-30-micro-profiles-widget-sync-aprilprofile/REPORT.md`
 
@@ -46,6 +46,8 @@
 ```bash
 cd hub-shell && npm ci
 cd hub-shell && npm run lint && npm run test && npm run build
+git -C vendor/april-profile fetch origin develop
+git -C vendor/april-profile checkout ba0b1536d061ed6a7743a298043ee8083aa6de8c
 ```
 
 ## 6) Деплой
