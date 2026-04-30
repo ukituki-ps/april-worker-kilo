@@ -11,7 +11,11 @@ test.describe("Profiles widget smoke", () => {
 
     await page.getByRole("link", { name: "Профили" }).click();
     await expect(page).toHaveURL(/#\/app\/profile\/entities$/);
-    await expect(page.getByRole("heading", { name: "Profiles list widget" })).toBeVisible();
+    await expect(page.getByText("Profiles", { exact: true })).toBeVisible();
+    await expect(page.getByLabel("profiles-list-loading")).not.toBeVisible({ timeout: 60_000 });
+    await expect(
+      page.getByText(/Loaded \d+ of \d+|No items for current|No profiles found for current query/),
+    ).toBeVisible();
   });
 
   test("сайдбар: Шаблоны открывает маршрут и рендерит виджет типов сущностей", async ({ page }) => {
