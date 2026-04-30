@@ -1,11 +1,13 @@
 export const shellPaths = {
   home: "/app",
   profilesList: "/app/profile/entities",
+  entityTypesList: "/app/profile/entity-types",
 } as const;
 
 export type ShellRouteMatch =
   | { kind: "redirect" }
   | { kind: "profiles-list" }
+  | { kind: "entity-types-list" }
   | { kind: "not-found" };
 
 /** Текущий путь из location.hash (без #), всегда начинается с /. */
@@ -22,6 +24,9 @@ export function matchShellRoute(pathname: string): ShellRouteMatch {
   }
   if (p === shellPaths.home || p === shellPaths.profilesList) {
     return { kind: "profiles-list" };
+  }
+  if (p === shellPaths.entityTypesList) {
+    return { kind: "entity-types-list" };
   }
 
   return { kind: "not-found" };

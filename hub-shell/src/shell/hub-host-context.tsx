@@ -7,6 +7,7 @@ import { useShellNavigate, useShellPathname } from "./use-shell-pathname";
 export type HubHostNavigationApi = {
   /** Возврат к базовому экрану авторизованного shell. */
   goToProfilesList: () => void;
+  goToEntityTypesList: () => void;
   goBack: () => void;
 };
 
@@ -72,6 +73,9 @@ export function HubHostContextProvider({ context, children }: ProviderProps): JS
     () => ({
       goToProfilesList: () => {
         navigate(shellPaths.profilesList);
+      },
+      goToEntityTypesList: () => {
+        navigate(shellPaths.entityTypesList);
       },
       goBack: () => {
         window.history.back();

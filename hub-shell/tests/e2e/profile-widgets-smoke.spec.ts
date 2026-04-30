@@ -13,4 +13,13 @@ test.describe("Profiles widget smoke", () => {
     await expect(page).toHaveURL(/#\/app\/profile\/entities$/);
     await expect(page.getByRole("heading", { name: "Profiles list widget" })).toBeVisible();
   });
+
+  test("сайдбар: Шаблоны открывает маршрут и рендерит виджет типов сущностей", async ({ page }) => {
+    await loginThroughKeycloak(page, privilegedUser, privilegedPass);
+    await page.goto("/#/app");
+
+    await page.getByRole("link", { name: "Шаблоны" }).click();
+    await expect(page).toHaveURL(/#\/app\/profile\/entity-types$/);
+    await expect(page.getByText("Entity types", { exact: true })).toBeVisible();
+  });
 });

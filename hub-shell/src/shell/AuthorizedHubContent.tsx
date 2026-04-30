@@ -5,7 +5,7 @@ import { matchShellRoute, shellNavigate, shellPaths } from "./shell-paths";
 import { useShellPathname } from "./use-shell-pathname";
 import { ShellBreadcrumbs } from "./ShellBreadcrumbs";
 import { useHubHostContext } from "./hub-host-context";
-import { ProfilesListHostWidget } from "../widgets";
+import { EntityTypesListHostWidget, ProfilesListHostWidget } from "../widgets";
 
 type Props = {
   context: ShellUserContext;
@@ -53,6 +53,14 @@ export function AuthorizedHubContent({ context }: Props): JSX.Element {
     return (
       <RouteChrome>
         <ProfilesListHostWidget context={context} />
+      </RouteChrome>
+    );
+  }
+
+  if (match.kind === "entity-types-list") {
+    return (
+      <RouteChrome>
+        <EntityTypesListHostWidget context={context} />
       </RouteChrome>
     );
   }
