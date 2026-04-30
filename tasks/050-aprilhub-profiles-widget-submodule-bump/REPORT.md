@@ -3,7 +3,7 @@
 - Статус: ⚠️ частично (локальный quality gate `hub-shell` не выполнен из‑за `EACCES` на `hub-shell/node_modules`; ожидается прогон в CI или после исправления прав на машине разработчика)
 - Задача: обновление внешнего `profiles-widget` через submodule `vendor/april-profile` и автоматический перезапуск `hub-shell` на dev при bump submodule
 - Ветка: `feature/050-aprilhub-profiles-widget-submodule-bump` (запушить и открыть PR в `develop`)
-- Коммиты: `143124fd69c01356a915e7e21199575aa8cb888c`
+- Коммиты: `143124fd69c01356a915e7e21199575aa8cb888c` (основной), `1cd6f12` (правка REPORT)
 - PR: не создавался
 
 ## 2) Что сделано
