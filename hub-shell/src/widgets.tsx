@@ -46,7 +46,10 @@ export function BrokenWidget(_props: WidgetProps): JSX.Element {
 
 export function EntityTypesListHostWidget({ context }: WidgetProps): JSX.Element {
   const host = useHubHostContext();
-  const apiBaseUrl = `${window.location.origin}/api/v1/admin/profile/api`;
+  const apiBaseUrl = useMemo(
+    () => `${window.location.origin}/api/v1/admin/profile/api`,
+    [],
+  );
   const widgetHostContext = useMemo(
     () => ({
       tenant: { id: host.tenant.id },
@@ -106,7 +109,10 @@ export function EntityTypesListHostWidget({ context }: WidgetProps): JSX.Element
 
 export function ProfilesListHostWidget({ context }: WidgetProps): JSX.Element {
   const host = useHubHostContext();
-  const apiBaseUrl = `${window.location.origin}/api/v1/admin/profile/api`;
+  const apiBaseUrl = useMemo(
+    () => `${window.location.origin}/api/v1/admin/profile/api`,
+    [],
+  );
   const widgetHostContext = useMemo(
     () => ({
       tenant: { id: host.tenant.id },

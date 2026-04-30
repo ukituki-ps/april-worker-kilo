@@ -1,4 +1,3 @@
-import React from "react";
 import ReactDOM from "react-dom/client";
 import "@mantine/core/styles.css";
 import { AprilProviders } from "@april/ui";
@@ -17,14 +16,11 @@ void (async () => {
     authInitError = error instanceof Error ? error.message : "Не удалось инициализировать сессию идентификации.";
   }
 
-  const appTree = (
+  // Avoid React.StrictMode: it intentionally remounts trees in development, which duplicates
+  // profile widget network I/O (list GET) even when abort/cancel races are tight.
+  ReactDOM.createRoot(document.getElementById("root")!).render(
     <AprilProviders>
       <App authInitError={authInitError} />
-    </AprilProviders>
-  );
-
-  // StrictMode double-invokes effects in dev only; keep production free of extra mounts/network.
-  ReactDOM.createRoot(document.getElementById("root")!).render(
-    import.meta.env.DEV ? <React.StrictMode>{appTree}</React.StrictMode> : appTree,
+    </AprilProviders>,
   );
 })();
