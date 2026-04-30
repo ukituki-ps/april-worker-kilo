@@ -16,6 +16,12 @@ export function buildPrimaryShellNav(): ShellNavItem[] {
       href: "#/app/profile/entities",
       activePrefix: "/app/profile/entities",
     },
+    {
+      id: "entity-types-list",
+      label: "Шаблоны",
+      href: "#/app/profile/entity-types",
+      activePrefix: "/app/profile/entity-types",
+    },
   ];
 }
 

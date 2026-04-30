@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { AprilProviders } from "@april/ui";
 import App from "./App";
@@ -28,6 +28,7 @@ vi.mock("./api", () => ({
 
 vi.mock("./integrations/april-profile-ui", () => ({
   ProfilesWidget: () => <div data-testid="profiles-widget-stub">ProfilesWidget</div>,
+  EntityTypesWidget: () => <div data-testid="entity-types-widget-stub">EntityTypesWidget</div>,
 }));
 
 function openGuestProfileMenu(): void {
@@ -121,8 +122,37 @@ describe("App", () => {
       const profilesLink = screen.getByRole("link", { name: "Профили" });
       expect(profilesLink).toBeInTheDocument();
       expect(profilesLink.getAttribute("href")).toBe("#/app/profile/entities");
+      const templatesLink = screen.getByRole("link", { name: "Шаблоны" });
+      expect(templatesLink).toBeInTheDocument();
+      expect(templatesLink.getAttribute("href")).toBe("#/app/profile/entity-types");
       expect(screen.getByTestId("profiles-widget-stub")).toBeInTheDocument();
     });
+  });
+
+  it("renders entity types widget when navigating to Шаблоны", async () => {
+    keycloakState.authState = true;
+    apiRequestMock.mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        sub: "u-1",
+        username: "demo",
+        email: "demo@april.local",
+        name: "Demo User",
+        roles: ["user"],
+      }),
+    });
+
+    renderApp();
+
+    const templatesLink = await screen.findByRole("link", { name: "Шаблоны" });
+    fireEvent.click(templatesLink);
+
+    await waitFor(() => {
+      expect(screen.getByTestId("entity-types-widget-stub")).toBeInTheDocument();
+    });
+    expect(window.location.hash).toBe("#/app/profile/entity-types");
+    const crumbs = screen.getByLabelText("Навигационная цепочка");
+    expect(within(crumbs).getByText("Шаблоны")).toBeInTheDocument();
   });
 
   it("renders forbidden state for /me with 403", async () => {

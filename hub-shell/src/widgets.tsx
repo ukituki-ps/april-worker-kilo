@@ -16,6 +16,11 @@ const ProfilesWidget = lazy(async () => {
   return { default: module.ProfilesWidget };
 });
 
+const EntityTypesWidget = lazy(async () => {
+  const module = await import("./integrations/april-profile-ui");
+  return { default: module.EntityTypesWidget };
+});
+
 export function OverviewWidget({ context }: WidgetProps) {
   return (
     <article className="widget-card" data-testid="shell-overview-widget">
@@ -37,6 +42,53 @@ export function RolesWidget({ context }: WidgetProps) {
 
 export function BrokenWidget(_props: WidgetProps): JSX.Element {
   throw new Error("Widget crash");
+}
+
+export function EntityTypesListHostWidget({ context }: WidgetProps): JSX.Element {
+  const host = useHubHostContext();
+  const apiBaseUrl = `${window.location.origin}/api/v1/admin/profile/api`;
+
+  const handleObservability = (event: ProfileWidgetTelemetryEvent): void => {
+    if (event.event.endsWith("_failed")) {
+      captureRuntimeError(new Error(`[entity-types-widget] ${event.event}`), {
+        mechanism: "manual",
+        moduleName: "entity-types-widget",
+        widget: event.widget,
+        tenant: context.orgScope,
+        correlationId: event.correlation_id,
+        requestId: event.request_id,
+        extra: event.meta ? { meta: event.meta } : undefined,
+      });
+    }
+  };
+
+  return (
+    <div className="entity-types-widget-host">
+      <CompositionErrorBoundary moduleName="EntityTypesWidget" tenant={context.orgScope} correlationId={context.correlationId}>
+        <Suspense fallback={<SharedState state="loading" message="Подключаем модуль шаблонов…" />}>
+          <EntityTypesWidget
+            hostContext={{
+              tenant: { id: host.tenant.id },
+              auth: {
+                subject: host.auth?.subject,
+                roles: host.auth?.roles,
+                tokenRef: host.auth?.tokenRef,
+              },
+              theme: host.theme,
+              locale: host.locale,
+              telemetry: {
+                requestId: host.telemetry?.requestId ?? context.correlationId,
+                correlationId: context.correlationId,
+              },
+            }}
+            apiBaseUrl={apiBaseUrl}
+            accessToken={keycloak.token}
+            onObservability={handleObservability}
+          />
+        </Suspense>
+      </CompositionErrorBoundary>
+    </div>
+  );
 }
 
 export function ProfilesListHostWidget({ context }: WidgetProps): JSX.Element {

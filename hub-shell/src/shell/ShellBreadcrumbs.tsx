@@ -18,6 +18,12 @@ export function ShellBreadcrumbs({ match }: Props): JSX.Element {
         Профили
       </Text>,
     );
+  } else if (match.kind === "entity-types-list") {
+    items.push(
+      <Text key="cur" size="sm">
+        Шаблоны
+      </Text>,
+    );
   } else {
     items.push(
       <Text key="cur" size="sm">

@@ -1,5 +1,8 @@
 import type { ComponentType } from "react";
-import { ProfilesWidget as ExternalProfilesWidget } from "@april/profile-ui-external";
+import {
+  EntityTypesWidget as ExternalEntityTypesWidget,
+  ProfilesWidget as ExternalProfilesWidget,
+} from "@april/profile-ui-external";
 
 export type ProfileWidgetHostContext = {
   tenant: { id: string };
@@ -24,7 +27,7 @@ export type ProfilesListAction =
   | { type: "deleted"; entityId: string };
 
 export type ProfileWidgetTelemetryEvent = {
-  widget: "profiles_list";
+  widget: "profiles_list" | "entity_types";
   event: string;
   request_id?: string;
   correlation_id?: string;
@@ -45,3 +48,13 @@ export type ProfilesWidgetProps = {
 };
 
 export const ProfilesWidget = ExternalProfilesWidget as ComponentType<ProfilesWidgetProps>;
+
+export type EntityTypesWidgetProps = {
+  hostContext: ProfileWidgetHostContext;
+  apiBaseUrl: string;
+  accessToken?: string;
+  onError?: (payload: { message: string; requestId?: string; code?: string }) => void;
+  onObservability?: ProfileWidgetObservabilityHandler;
+};
+
+export const EntityTypesWidget = ExternalEntityTypesWidget as ComponentType<EntityTypesWidgetProps>;

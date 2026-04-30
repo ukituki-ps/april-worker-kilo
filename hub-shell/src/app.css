@@ -233,7 +233,8 @@
   grid-template-rows: auto minmax(0, 1fr);
 }
 
-.profiles-widget-host {
+.profiles-widget-host,
+.entity-types-widget-host {
   height: 100%;
   min-height: 0;
   overflow: hidden;

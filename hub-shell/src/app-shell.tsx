@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { ComponentType, ReactNode } from "react";
 import { VisuallyHidden } from "@mantine/core";
 import {
   ProductHeaderToolbar,
@@ -8,7 +8,8 @@ import {
 } from "@april/ui";
 import { ProfileAccountMenu, type ProfileAccountMenuProps } from "./shell-header/ProfileAccountMenu";
 import type { ShellNavItem } from "./shell/shell-nav-config";
-import { ProfilesSidebarIcon } from "./shell/shell-sidebar-icons";
+import type { SidebarGlyphProps } from "./shell/shell-sidebar-icons";
+import { EntityTypesSidebarIcon, ProfilesSidebarIcon } from "./shell/shell-sidebar-icons";
 
 type Props = {
   navigationItems: ShellNavItem[];
@@ -27,13 +28,20 @@ const HEADER_LABELS_RU: ProductHeaderToolbarLabels = {
   help: "Справка",
 };
 
+function sidebarIconForNavId(id: string): ComponentType<SidebarGlyphProps> {
+  if (id === "entity-types-list") {
+    return EntityTypesSidebarIcon;
+  }
+  return ProfilesSidebarIcon;
+}
+
 function buildSidebarItems(items: ShellNavItem[]): ProductSidebarNavEntry[] {
   return items.map((item) => ({
     id: item.id,
     type: "link" as const,
     label: item.label,
     href: item.href,
-    icon: ProfilesSidebarIcon,
+    icon: sidebarIconForNavId(item.id),
   }));
 }
 
