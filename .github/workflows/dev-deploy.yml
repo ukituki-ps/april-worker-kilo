@@ -26,6 +26,7 @@ jobs:
       # Default /opt/april-worker matches deploy.sh; override with repo variable APRIL_DEPLOY_ROOT if the clone lives elsewhere.
       APRIL_DEPLOY_ROOT: ${{ vars.APRIL_DEPLOY_ROOT != '' && vars.APRIL_DEPLOY_ROOT || '/opt/april-worker' }}
       APRIL_PROFILE_SUBMODULE_URL: git@github.com:ukituki-ps/april-profile.git
+      DISIGNAPRIL_SUBMODULE_URL: git@github.com:ukituki-ps/DisignApril.git
     steps:
       - name: Checkout ref and deploy
         env:
@@ -37,12 +38,6 @@ jobs:
           echo "Commit: ${{ github.sha }}"
           test -d "${ROOT}/.git"
           cd "${ROOT}"
-          # Self-hosted deploy root may contain local drift from previous runs.
-          # Ensure deterministic checkout of the target commit.
-          git reset --hard
-          git clean -fd
-          git fetch origin
-          git checkout "${{ github.sha }}"
           test -x ./deploy.sh
           test -n "${APRIL_PROFILE_DEPLOY_KEY}"
           KEY_FILE="$(mktemp)"
@@ -50,6 +45,15 @@ jobs:
           printf '%s\n' "${APRIL_PROFILE_DEPLOY_KEY}" > "${KEY_FILE}"
           chmod 600 "${KEY_FILE}"
           export GIT_SSH_COMMAND="ssh -i ${KEY_FILE} -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new"
+          # git checkout тянет новые gitlink субмодулей; URL из .gitmodules — HTTPS без токена → "could not read Username".
+          # Совпадает с deploy.sh / scripts/ci-init-git-submodules.sh: для fetch нужен SSH + APRIL_PROFILE_DEPLOY_KEY.
+          git config submodule.vendor/april-profile.url "${APRIL_PROFILE_SUBMODULE_URL}"
+          git config submodule.design-system/DisignApril.url "${DISIGNAPRIL_SUBMODULE_URL}"
+          # Self-hosted deploy root may contain local drift from previous runs.
+          git reset --hard
+          git clean -fd
+          git fetch origin
+          git checkout "${{ github.sha }}"
           SKIP_GIT_PULL=1 DEPLOY_ARTIFACTS_DIR="${ROOT}/.deploy-artifacts" ./deploy.sh
 
       - name: Upload deploy artifacts
