@@ -35,13 +35,23 @@
 - Сборка: ok
 - Unit tests: ok
 - Integration tests: не применимо
-- E2E / smoke: не применимо
+- E2E / smoke: частично (runtime-проверка на dev)
 
 Команды (фактически выполненные):
 
 ```bash
 cd hub-shell && npm run lint && npm run test && npm run build
+# ad-hoc runtime probe через Playwright (one-off node heredoc)
+node <<'EOF'
+# ...скрипт авторизации april-admin и проверки inline height:520px на /#/app/profile/entities...
+EOF
 ```
+
+Результат runtime-проверки на `dev.april.ukituki.tech`:
+
+- под `april-admin` (`password: admin`) маршрут `#/app/profile/entities` открывается штатно;
+- host-цепочка применена корректно (`.shell-route-chrome-fill` и `.profiles-widget-host`, `min-height: 0`, `overflow: hidden`);
+- внутри виджета присутствует inline-стиль `height: 520px` (минимум один узел `Paper`), т.е. фиксированная высота идет из внешнего `ProfilesWidget`/его режима рендера.
 
 ## 6) Деплой
 
@@ -51,9 +61,9 @@ cd hub-shell && npm run lint && npm run test && npm run build
 
 ## 7) Риски и ограничения
 
-- Без правки внешнего `ProfilesWidget` host-часть может быть корректной, но если в upstream вернут фиксированную высоту, поведение снова изменится.
-- Для финальной валидации нужен визуальный smoke на `dev.april.ukituki.tech`.
+- Без правки внешнего `ProfilesWidget` host-часть не может убрать фиксированную высоту, если виджет выставляет `height: 520px` во внутреннем контейнере.
+- Поведение различается по данным/персоне: под `april-admin` зафиксирован `height: 520px` внутри виджета даже при корректной host-цепочке.
 
 ## 8) Что осталось
 
-- [ ] Визуально проверить поведение списка профилей на `dev.april.ukituki.tech` (что список тянется на доступную высоту и скролл остается внутри виджета).
+- [ ] Вынести follow-up в `april-profile`: проверить режим рендера `CardListColumn` под `april-admin` и убрать внутренний fixed-height (`heightMode="fill"` + parent chain в самом виджете).
