@@ -115,6 +115,7 @@
 - [x] `2026-04-30-micro-profiles-widget-sync-aprilprofile`: актуализирован `profiles-widget` после обновления `april-profile` (`vendor/april-profile` -> `ebbc8fc`), прогнан quality gate `hub-shell`, обновлены `dist`-артефакты — [`TASK.md`](./tasks/2026-04-30-micro-profiles-widget-sync-aprilprofile/TASK.md), [`REPORT.md`](./tasks/2026-04-30-micro-profiles-widget-sync-aprilprofile/REPORT.md)
 - [x] `2026-04-30-micro-entity-types-widget-sync-aprilprofile`: актуализирован `entity-types-widget` после обновления `april-profile` (`vendor/april-profile` -> `76ff32a`), прогнан quality gate `hub-shell`, обновлены `dist`-артефакты — [`TASK.md`](./tasks/2026-04-30-micro-entity-types-widget-sync-aprilprofile/TASK.md), [`REPORT.md`](./tasks/2026-04-30-micro-entity-types-widget-sync-aprilprofile/REPORT.md)
 - [x] `2026-04-30-micro-keycloak-theme-rollback-restore`: устранён rollback Keycloak на стоковые страницы через принудительное выравнивание realm theme (`loginTheme/accountTheme=aprilhub`) в deploy-контуре — [`TASK.md`](./tasks/2026-04-30-micro-keycloak-theme-rollback-restore/TASK.md), [`REPORT.md`](./tasks/2026-04-30-micro-keycloak-theme-rollback-restore/REPORT.md)
+- [x] `2026-05-01-micro-aprilprofile-ds-015-bump`: submodule `DisignApril` **0.1.5** + `vendor/april-profile` (DS 0.1.5 / виджеты), quality gate `hub-shell` + `dist` — [`TASK.md`](./tasks/2026-05-01-micro-aprilprofile-ds-015-bump/TASK.md), [`REPORT.md`](./tasks/2026-05-01-micro-aprilprofile-ds-015-bump/REPORT.md)
 
 ## План реализации AprilHub: статусы
 
