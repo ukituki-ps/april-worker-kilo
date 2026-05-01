@@ -192,6 +192,8 @@ run_hub_shell_ds_prepare() {
     fi
     log "hub-shell: npm ci && npm run ds:prepare (docker node:20-bookworm-slim, user ${uid}:${gid})"
     # Без --user контейнер пишет в bind-mount от root → hub-shell compose (LOCAL_UID) ломается с EACCES и nginx 502.
+    # Не вызываем здесь bare `corepack enable` без --install-directory — от не-root упирается в /usr/local/bin (EACCES).
+    # ds-prepare.sh включает corepack в writable каталог (/tmp/.local/bin по умолчанию) перед pnpm в DisignApril.
     run_named_docker "april-hub-shell-ds-prepare" \
       --user "${uid}:${gid}" \
       -e HOME=/tmp \
@@ -199,7 +201,7 @@ run_hub_shell_ds_prepare() {
       -v "${ROOT}:/repo" \
       -w /repo/hub-shell \
       node:20-bookworm-slim \
-      sh -lc "corepack enable && npm ci && npm run ds:prepare"
+      sh -lc "npm ci && npm run ds:prepare"
     return 0
   fi
   log "ошибка: нужны npm или docker для hub-shell ds:prepare"
