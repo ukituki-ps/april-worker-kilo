@@ -33,6 +33,7 @@ EOF
   SKIP_KEYCLOAK_THEME_ENSURE=1 пропустить принудительную проверку login/account theme в realm
   SKIP_OBSERVABILITY_ONBOARD=1 пропустить авто-onboarding стенда в central observability
   SKIP_HEALTHCHECK=1   пропустить health/readiness проверки
+  SKIP_KEYCLOAK_ISSUER_AUTOFIX=1 не править типовую ошибку KEYCLOAK_ISSUER=http://127.0.0.1 при совпадающем KC_HOSTNAME (см. .env.example)
   INGRESS_BASE_URL     базовый URL ingress-check (по умолчанию http://127.0.0.1:${DOCS_HTTP_PORT:-8080})
   DEPLOY_INGRESS_HTTP_HOST заголовок Host для ingress-check (по умолчанию localhost; должен входить в VITE_ALLOWED_HOSTS hub-shell)
   DEPLOY_HEALTH_RETRIES  попыток health/readiness через nginx (по умолчанию 60)
@@ -67,6 +68,26 @@ if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
   usage
   exit 0
 fi
+
+# Старый .env.example задавал issuer 127.0.0.1 при KC_HOSTNAME с публичным HTTPS — JWT отвергались hub-bff (401→login loop).
+fix_stale_keycloak_issuer_env() {
+  [[ -f .env ]] || return 0
+  [[ "${SKIP_KEYCLOAK_ISSUER_AUTOFIX:-}" == "1" ]] && return 0
+  grep -q '^KEYCLOAK_ISSUER=http://127\.0\.0\.1/auth/realms/' .env || return 0
+  local kc_base realm new_issuer bak
+  kc_base="$(grep '^KC_HOSTNAME=' .env | tail -n1 | sed 's/^KC_HOSTNAME=//' | tr -d '\r')" || true
+  [[ -n "$kc_base" ]] || return 0
+  realm="$(grep '^KEYCLOAK_REALM=' .env | tail -n1 | sed 's/^KEYCLOAK_REALM=//' | tr -d '\r')"
+  realm="${realm:-april}"
+  new_issuer="${kc_base%/}/realms/${realm}"
+  bak=".env.bak.keycloak-issuer-$(date -u +%Y%m%dT%H%M%SZ)"
+  log "исправляю KEYCLOAK_ISSUER в .env → ${new_issuer} (было http://127.0.0.1/…; отключение: SKIP_KEYCLOAK_ISSUER_AUTOFIX=1)"
+  awk -v ni="$new_issuer" '
+    /^KEYCLOAK_ISSUER=/ { print "KEYCLOAK_ISSUER=" ni; next }
+    { print }
+  ' .env >"${bak}.new" && mv .env "$bak" && mv "${bak}.new" .env || fail "не удалось обновить KEYCLOAK_ISSUER в .env"
+}
+fix_stale_keycloak_issuer_env
 
 compose_files=(docker compose)
 if [[ -f .env ]]; then
