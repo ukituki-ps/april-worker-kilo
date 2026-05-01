@@ -32,3 +32,8 @@
 
 - При необходимости выровнять `README.md` mandatory gate с фактическим `package.json` (`check:profile-ui-semver`) отдельной задачей.
 - По желанию команды: `hub-shell/.gitignore` или очистка политики для `hub-shell/.vite/deps` вне минимального набора.
+
+## Дополнение: повторная верификация и dist (2026-05-01)
+
+- Повторно выполнены проверки из `TASK.md`: `make openapi-lint`, `cd hub-bff && go test ./...`, `cd hub-shell && npm ci && npm run lint && npm run test && npm run build` — успех.
+- После свежей production-сборки хеши зафиксированных JS-чанков в `hub-shell/dist` отличались от состояния в `develop` сразу после merge PR #129; синхронизация вынесена в коммит на ветке `feature/sync-hub-shell-dist-2026-05-01` (`index-D_paGuwH.js`, `april-profile-ui-Cp1lwvdI.js`, обновлённый `index.html`). Для попадания в основную линию нужен PR в `develop`.
