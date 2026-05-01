@@ -34,7 +34,9 @@ EOF
   SKIP_OBSERVABILITY_ONBOARD=1 пропустить авто-onboarding стенда в central observability
   SKIP_HEALTHCHECK=1   пропустить health/readiness проверки
   INGRESS_BASE_URL     базовый URL ingress-check (по умолчанию http://127.0.0.1:${DOCS_HTTP_PORT:-8080})
-  DEPLOY_INGRESS_RETRIES количество попыток ingress-check (по умолчанию 60)
+  DEPLOY_HEALTH_RETRIES  попыток health/readiness через nginx (по умолчанию 60)
+  DEPLOY_HEALTH_SLEEP_SEC задержка между попытками health (по умолчанию 3)
+  DEPLOY_INGRESS_RETRIES количество попыток ingress-check (по умолчанию 90)
   DEPLOY_INGRESS_SLEEP_SEC задержка между попытками ingress-check (по умолчанию 3)
   SKIP_SMOKE=1         пропустить scripts/smoke-after-deploy.sh
   AUTO_ROLLBACK=0      отключить авто-rollback (по умолчанию включён)
@@ -631,8 +633,8 @@ run_health_checks() {
     return 0
   fi
   local base_url="${HUB_BFF_BASE_URL:-http://127.0.0.1:${DOCS_HTTP_PORT:-8080}}"
-  local retries="${DEPLOY_HEALTH_RETRIES:-30}"
-  local sleep_s="${DEPLOY_HEALTH_SLEEP_SEC:-2}"
+  local retries="${DEPLOY_HEALTH_RETRIES:-60}"
+  local sleep_s="${DEPLOY_HEALTH_SLEEP_SEC:-3}"
   log "health-check ${base_url}/healthz + ${base_url}/readyz"
   for _ in $(seq 1 "$retries"); do
     if curl -fsS "${base_url}/healthz" >/dev/null && curl -fsS "${base_url}/readyz" >/dev/null; then
@@ -654,7 +656,7 @@ run_ingress_checks() {
   fi
 
   local ingress_base="${INGRESS_BASE_URL:-http://127.0.0.1:${DOCS_HTTP_PORT:-8080}}"
-  local retries="${DEPLOY_INGRESS_RETRIES:-60}"
+  local retries="${DEPLOY_INGRESS_RETRIES:-90}"
   local sleep_s="${DEPLOY_INGRESS_SLEEP_SEC:-3}"
   local code=""
 
@@ -773,6 +775,9 @@ main() {
     "hub-bff" \
     "hub-bff" \
     "${state_dir}/hub-bff-git-tree.rev"
+  # После force-recreate hub-bff IP в Docker DNS меняется; reload сбрасывает upstream в nginx
+  # (раньше reload мог выполниться только после hub-shell, до пересоздания BFF → длительные 502).
+  reload_nginx_docs_if_running
   run_observability_onboarding
   run_health_checks
   run_ingress_checks
