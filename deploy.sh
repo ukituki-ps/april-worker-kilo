@@ -184,8 +184,18 @@ run_hub_shell_ds_prepare() {
     return 0
   fi
   if command -v docker >/dev/null 2>&1; then
-    log "hub-shell: npm ci && npm run ds:prepare (docker node:20-bookworm-slim)"
+    local uid="${LOCAL_UID:-}"
+    local gid="${LOCAL_GID:-}"
+    if [[ -z "$uid" || -z "$gid" ]]; then
+      uid="$(id -u)"
+      gid="$(id -g)"
+    fi
+    log "hub-shell: npm ci && npm run ds:prepare (docker node:20-bookworm-slim, user ${uid}:${gid})"
+    # Без --user контейнер пишет в bind-mount от root → hub-shell compose (LOCAL_UID) ломается с EACCES и nginx 502.
     run_named_docker "april-hub-shell-ds-prepare" \
+      --user "${uid}:${gid}" \
+      -e HOME=/tmp \
+      -e npm_config_cache=/tmp/.npm \
       -v "${ROOT}:/repo" \
       -w /repo/hub-shell \
       node:20-bookworm-slim \
@@ -449,7 +459,7 @@ sync_go_service_on_git_tree_change() {
 
 repair_bind_mount_permissions() {
   # hub-shell/hub-bff в compose запускаются от LOCAL_UID/LOCAL_GID (по умолчанию 1000),
-  # но иногда артефакты на bind-mount создаются от root (CI/временные контейнеры) → npm/vite падают с EACCES.
+  # но артефакты на bind-mount часто создаются от root (Docker без --user, CI) → npm/vite/pnpm падают с EACCES.
   if ! command -v docker >/dev/null 2>&1; then
     return 0
   fi
@@ -461,17 +471,16 @@ repair_bind_mount_permissions() {
     gid="$(id -g)"
   fi
 
-  log "проверка владельца bind-mount для hub-shell + DisignApril dist (uid:gid=${uid}:${gid})"
+  log "выравнивание владельца bind-mount (uid:gid=${uid}:${gid}): hub-shell, DisignApril, vendor/april-profile"
   docker run --rm \
     -v "${ROOT}:/workspace" \
     alpine:3.20 \
     sh -c "mkdir -p \
       /workspace/design-system/DisignApril/packages/ui/dist \
       /workspace/design-system/DisignApril/packages/tokens/dist; \
-      chown -R ${uid}:${gid} /workspace/hub-shell >/dev/null 2>&1 || true; \
-      chown -R ${uid}:${gid} \
-        /workspace/design-system/DisignApril/packages/ui/dist \
-        /workspace/design-system/DisignApril/packages/tokens/dist >/dev/null 2>&1 || true"
+      for d in /workspace/hub-shell /workspace/design-system/DisignApril /workspace/vendor/april-profile; do \
+        [ -d \"\${d}\" ] && chown -R ${uid}:${gid} \"\${d}\" >/dev/null 2>&1 || true; \
+      done"
 }
 
 sync_hub_shell_on_design_submodule_gitlink() {
@@ -766,6 +775,7 @@ main() {
   run_submodules
   repair_bind_mount_permissions
   run_hub_shell_ds_prepare
+  repair_bind_mount_permissions
   run_openapi_lint
   run_hook "scripts/db-backup.sh" "SKIP_DB_BACKUP" "db-backup"
   run_hook "scripts/run-migrations.sh" "SKIP_MIGRATIONS" "миграции"
