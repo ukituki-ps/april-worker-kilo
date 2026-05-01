@@ -32,6 +32,10 @@ export default defineConfig(({ mode }) => {
   const hmrClientPortRaw =
     localEnv.VITE_DEV_HMR_CLIENT_PORT?.trim() || rootEnv.VITE_DEV_HMR_CLIENT_PORT?.trim() || "443";
 
+  const hmrDisableRaw =
+    localEnv.VITE_DEV_HMR_DISABLE?.trim() || rootEnv.VITE_DEV_HMR_DISABLE?.trim() || "";
+  const hmrDisabled = ["1", "true", "yes", "on"].includes(hmrDisableRaw.toLowerCase());
+
   return {
     envPrefix: ["VITE_", "SENTRY_"],
     plugins: [react()],
@@ -54,15 +58,19 @@ export default defineConfig(({ mode }) => {
     server: {
       host: "0.0.0.0",
       port: 4173,
-      ...(hmrHost
-        ? {
-            hmr: {
-              protocol: hmrProtocolRaw.toLowerCase() === "ws" ? "ws" : "wss",
-              host: hmrHost,
-              clientPort: Number(hmrClientPortRaw) || 443,
-            },
-          }
-        : {}),
+      // За некорректно настроенным TLS/edge-ingress WebSocket-upgrade даёт HTTP 200 вместо 101 →
+      // клиент Vite уходит в «Polling for restart» и полностью перезагружает страницу по кругу.
+      ...(hmrDisabled
+        ? { hmr: false }
+        : hmrHost
+          ? {
+              hmr: {
+                protocol: hmrProtocolRaw.toLowerCase() === "ws" ? "ws" : "wss",
+                host: hmrHost,
+                clientPort: Number(hmrClientPortRaw) || 443,
+              },
+            }
+          : {}),
       ...(allowedHosts ? { allowedHosts } : {}),
     },
     test: {

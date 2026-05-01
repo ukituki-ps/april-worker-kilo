@@ -114,6 +114,8 @@ services:
       VITE_DEV_HMR_HOST: ${VITE_DEV_HMR_HOST:-}
       VITE_DEV_HMR_PROTOCOL: ${VITE_DEV_HMR_PROTOCOL:-wss}
       VITE_DEV_HMR_CLIENT_PORT: ${VITE_DEV_HMR_CLIENT_PORT:-443}
+      # true: отключить HMR, если внешний прокси не проксирует Upgrade WebSocket на Vite (без этого — reload-loop).
+      VITE_DEV_HMR_DISABLE: ${VITE_DEV_HMR_DISABLE:-}
     volumes:
       - ./:/workspace
     expose:
