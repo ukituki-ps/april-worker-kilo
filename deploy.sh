@@ -34,6 +34,7 @@ EOF
   SKIP_OBSERVABILITY_ONBOARD=1 пропустить авто-onboarding стенда в central observability
   SKIP_HEALTHCHECK=1   пропустить health/readiness проверки
   INGRESS_BASE_URL     базовый URL ingress-check (по умолчанию http://127.0.0.1:${DOCS_HTTP_PORT:-8080})
+  DEPLOY_INGRESS_HTTP_HOST заголовок Host для ingress-check (по умолчанию localhost; должен входить в VITE_ALLOWED_HOSTS hub-shell)
   DEPLOY_HEALTH_RETRIES  попыток health/readiness через nginx (по умолчанию 60)
   DEPLOY_HEALTH_SLEEP_SEC задержка между попытками health (по умолчанию 3)
   DEPLOY_INGRESS_RETRIES количество попыток ingress-check (по умолчанию 90)
@@ -656,13 +657,16 @@ run_ingress_checks() {
   fi
 
   local ingress_base="${INGRESS_BASE_URL:-http://127.0.0.1:${DOCS_HTTP_PORT:-8080}}"
+  # curl на 127.0.0.1 шлёт Host: 127.0.0.1; Vite (hub-shell) фильтрует по allowedHosts — без localhost в списке nginx даёт 502.
+  # Совпадает с healthcheck hub-shell в docker-compose (Host: localhost).
+  local ingress_host="${DEPLOY_INGRESS_HTTP_HOST:-localhost}"
   local retries="${DEPLOY_INGRESS_RETRIES:-90}"
   local sleep_s="${DEPLOY_INGRESS_SLEEP_SEC:-3}"
   local code=""
 
-  log "ingress-check ${ingress_base}/ (ожидается не 5xx, до ${retries} попыток по ${sleep_s}s)"
+  log "ingress-check ${ingress_base}/ Host=${ingress_host} (ожидается не 5xx, до ${retries} попыток по ${sleep_s}s)"
   for attempt in $(seq 1 "$retries"); do
-    code="$(curl -sS -o /tmp/deploy-ingress.out -w "%{http_code}" "${ingress_base}/" || true)"
+    code="$(curl -sS -o /tmp/deploy-ingress.out -w "%{http_code}" -H "Host: ${ingress_host}" "${ingress_base}/" || true)"
     if [[ "$code" =~ ^[1234][0-9][0-9]$ ]]; then
       if [[ "$attempt" -gt 1 ]]; then
         log "ingress-check успешен с попытки ${attempt}: HTTP ${code}"

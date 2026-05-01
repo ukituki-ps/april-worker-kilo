@@ -25,6 +25,8 @@ jobs:
       # Must be a git clone of *this* repo (ukituki-ps/april-worker): github.sha is taken from this workflow's event.
       # Default /opt/april-worker matches deploy.sh; override with repo variable APRIL_DEPLOY_ROOT if the clone lives elsewhere.
       APRIL_DEPLOY_ROOT: ${{ vars.APRIL_DEPLOY_ROOT != '' && vars.APRIL_DEPLOY_ROOT || '/opt/april-worker' }}
+      # Если на стенде VITE_ALLOWED_HOSTS без localhost — задайте в GitHub Vars (напр. имя из allowedHosts).
+      DEPLOY_INGRESS_HTTP_HOST: ${{ vars.APRIL_INGRESS_HTTP_HOST }}
       APRIL_PROFILE_SUBMODULE_URL: git@github.com:ukituki-ps/april-profile.git
       DISIGNAPRIL_SUBMODULE_URL: git@github.com:ukituki-ps/DisignApril.git
     steps:
