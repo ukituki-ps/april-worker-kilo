@@ -10,11 +10,11 @@ sidebar_position: 4
 
 **Каноническая модель для AprilHub (`hub-shell`) на CI, stage и production** после эпика **`049`**: пакеты **`@april/tokens`** и **`@april/ui`** устанавливаются из **приватного npm registry** (GitHub Packages, scope `@april`) по **semver**, зафиксированному в **`hub-shell/package-lock.json`**. Источник истины для runtime в браузере — опубликованный tarball версии, а не локальная сборка `dist` в submodule. Архитектурное решение и политика semver / отката: [ADR «дистрибуция дизайн-системы April через npm»](https://github.com/ukituki-ps/april-worker/blob/develop/docs/architecture/ADR-april-design-system-npm-distribution.md) (в репозитории: `docs/architecture/ADR-april-design-system-npm-distribution.md`).
 
-Переход `package.json` / CI с `file:` на registry выполняется в задаче **`049-03`**; до её merge в репозитории может сохраняться описанная ниже **историческая** схема этапа `013`.
+Переход `package.json` / lock / `ds:prepare` с `file:` на registry для **`hub-shell`** зафиксирован во внешней задаче **`077`** (april-profile-1) / **`053`** (april-worker). Ниже сохранена **историческая** схема этапа `013` для локальных сценариев и обратной совместимости.
 
 ## Целевая интеграция: registry + lockfile (hub-shell)
 
-1. **Registry для scope `@april`:** `https://npm.pkg.github.com` (см. ADR). В репозитории — шаблон **`.npmrc`** без секретов (после **`049-03`**: `hub-shell/.npmrc.example`); в CI и при `docker build` задаётся **`NODE_AUTH_TOKEN`** (PAT или `GITHUB_TOKEN` с **`read:packages`**) так, чтобы `npm ci` мог скачать `@april/*`. Подробности секретов и деплоя: [`docs/DEPLOYMENT_STRATEGY.md`](https://github.com/ukituki-ps/april-worker/blob/develop/docs/DEPLOYMENT_STRATEGY.md) (раздел **«3.1. GitHub Packages»**).
+1. **Registry для scope `@ukituki-ps` / алиасов `@april/*`:** `https://npm.pkg.github.com` (см. ADR). В **`hub-shell/`** закоммичен **`.npmrc`** без секрета: `//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}`; шаблон с тем же содержимым — **`hub-shell/.npmrc.example`**. В CI и при `docker build` задаётся **`NODE_AUTH_TOKEN`** (PAT или `GITHUB_TOKEN` с **`read:packages`**) так, чтобы `npm ci` мог скачать пакеты DS. Подробности секретов и деплоя: [`docs/DEPLOYMENT_STRATEGY.md`](https://github.com/ukituki-ps/april-worker/blob/develop/docs/DEPLOYMENT_STRATEGY.md) (раздел **«3.1. GitHub Packages»**).
 
 2. **Зависимости:** в `hub-shell/package.json` — диапазоны semver (`^x.y.z` или зафиксированные версии по политике команды); **точные версии транзитивного дерева** — в `package-lock.json` после `npm install` / `npm ci`.
 

@@ -200,15 +200,14 @@ jobs:
           APRIL_PROFILE_GH_TOKEN: ${{ steps.app-token-hub-shell.outputs.token }}
         run: ./scripts/ci-init-git-submodules.sh
 
-      - name: Enable Corepack (pnpm for design-system build)
-        run: corepack enable
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "20"
           cache: npm
           cache-dependency-path: hub-shell/package-lock.json
+          registry-url: https://npm.pkg.github.com
+          scope: "@ukituki-ps"
 
       - name: Install Hub Shell dependencies
         working-directory: hub-shell
@@ -280,7 +279,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.GPR_READ_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
           mkdir -p "$HOME/.cache/aprilhub/corepack"
-          hub_install='cp .npmrc.example .npmrc && echo "//npm.pkg.github.com/:_authToken='"$NODE_AUTH_TOKEN"'" >> .npmrc && if [ -f package-lock.json ]; then npm ci; else npm install --no-audit --no-fund; fi && npm run ds:prepare && npm run build'
+          hub_install='if [ -f package-lock.json ]; then npm ci; else npm install --no-audit --no-fund; fi && npm run ds:prepare && npm run build'
           docker run --rm \
             --user "$(id -u):$(id -g)" \
             -e NODE_AUTH_TOKEN \

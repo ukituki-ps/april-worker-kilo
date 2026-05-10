@@ -2,10 +2,19 @@
 set -eu
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PKG_JSON="${SCRIPT_DIR}/../package.json"
 DS_DIR="${SCRIPT_DIR}/../../design-system/DisignApril"
 TOKENS_FALLBACK_FILE="${SCRIPT_DIR}/../src/styles/april-tokens-fallback.css"
 TOKENS_FALLBACK_TARGET="${SCRIPT_DIR}/../node_modules/@april/tokens/css"
 HUB_NODE_MODULES_DIR="${SCRIPT_DIR}/../node_modules/@april"
+
+# Режим GitHub Packages: в package.json нет file: на submodule DisignApril — не собираем монорепо и не затираем dist в node_modules.
+hub_shell_uses_file_design_system() {
+  if [ ! -f "${PKG_JSON}" ]; then
+    return 1
+  fi
+  grep -q 'file:../design-system/DisignApril/packages/\(ui\|tokens\)' "${PKG_JSON}" 2>/dev/null
+}
 
 prepare_tokens_fallback() {
   if [ ! -f "${TOKENS_FALLBACK_FILE}" ]; then
@@ -136,6 +145,12 @@ ensure_ui_runtime_exports() {
 
   echo "[ds:prepare] warning: required exports still missing after rebuild"
 }
+
+if ! hub_shell_uses_file_design_system; then
+  echo "[ds:prepare] @april/* from registry (no file: to design-system), skip DisignApril pnpm build and dist sync"
+  prepare_tokens_fallback
+  exit 0
+fi
 
 if [ ! -d "${DS_DIR}" ]; then
   echo "[ds:prepare] design system directory not found, skip"
