@@ -3,7 +3,7 @@
 - Статус: ✅ выполнено (локальный `hub-shell` gate без GPR-токена не прогонялся — см. §5)
 - Задача: Внешняя **080** — mobile chrome AprilHub, bump `vendor/april-profile`, Playwright mobile smoke
 - Ветка: `feature/054-hub-mobile-chrome-080`
-- Коммиты: **`ffed478`** (tip ветки april-worker); submodule **`vendor/april-profile`** на **`1cb81d2`** (`develop` + `ProfilesApiWidget` + отчёт **080**)
+- Коммиты: ветка **`feature/054-hub-mobile-chrome-080`** (основной коммит с кодом: **`3a1a09c`**; перед PR выполните `git log` для актуального tip); submodule **`vendor/april-profile`** на **`1cb81d2`**
 - PR: не создавался из этой сессии — открыть в `april-worker` и при необходимости отдельный PR в `april-profile` на коммиты `101a802`…`1cb81d2` (или cherry-pick патча `ProfilesApiWidget`)
 
 ## 2) Что сделано
