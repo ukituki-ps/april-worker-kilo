@@ -1,4 +1,5 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState, type JSX } from "react";
+import { useMediaQuery } from "@mantine/hooks";
 import type { ProfileWidgetTelemetryEvent } from "./integrations/april-profile-ui";
 import type { ShellUserContext } from "./types";
 import { keycloak } from "./keycloak";
@@ -7,6 +8,8 @@ import { CompositionErrorBoundary } from "./composition-error-boundary";
 import { useHubHostContext } from "./shell/hub-host-context";
 import { captureRuntimeError } from "./sentry";
 import { SharedState } from "./shared-ux";
+
+const HUB_MOBILE_PRIMARY_NAV_MQ = "(max-width: 47.99em)";
 
 type WidgetProps = {
   context: ShellUserContext;
@@ -124,6 +127,7 @@ export function EntityTypesListHostWidget({ context }: WidgetProps): JSX.Element
 
 export function ProfilesListHostWidget({ context }: WidgetProps): JSX.Element {
   const host = useHubHostContext();
+  const isHubMobileNav = useMediaQuery(HUB_MOBILE_PRIMARY_NAV_MQ, false);
   const accessToken = useProfileWidgetAccessToken();
   const apiBaseUrl = useMemo(
     () => `${window.location.origin}/api/v1/admin/profile/api`,
@@ -178,6 +182,7 @@ export function ProfilesListHostWidget({ context }: WidgetProps): JSX.Element {
             hostContext={widgetHostContext}
             apiBaseUrl={apiBaseUrl}
             accessToken={accessToken}
+            cardListColumnMobileLayout={isHubMobileNav ? "off" : "auto"}
             onObservability={handleObservability}
           />
         </Suspense>

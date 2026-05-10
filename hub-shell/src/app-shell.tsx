@@ -1,8 +1,10 @@
 import type { ComponentType, ReactNode } from "react";
 import { VisuallyHidden } from "@mantine/core";
+import { useMediaQuery } from "@mantine/hooks";
 import {
   ProductHeaderToolbar,
   ProductSidebarNavigation,
+  aprilMobileShellBarContentPaddingBottom,
   type ProductHeaderToolbarLabels,
   type ProductSidebarNavEntry,
 } from "@april/ui";
@@ -10,6 +12,10 @@ import { ProfileAccountMenu, type ProfileAccountMenuProps } from "./shell-header
 import type { ShellNavItem } from "./shell/shell-nav-config";
 import type { SidebarGlyphProps } from "./shell/shell-sidebar-icons";
 import { EntityTypesSidebarIcon, ProfilesSidebarIcon } from "./shell/shell-sidebar-icons";
+import { HubMobilePrimaryDock } from "./shell/HubMobilePrimaryDock";
+
+/** Согласовано с `CardListColumn` / DS §8 mobile (`max-width: 47.99em`). */
+const HUB_MOBILE_PRIMARY_NAV_MQ = "(max-width: 47.99em)";
 
 type Props = {
   navigationItems: ShellNavItem[];
@@ -54,9 +60,11 @@ export function AppShell({
   accountMenu,
   children,
 }: Props) {
+  const isMobilePrimaryNav = useMediaQuery(HUB_MOBILE_PRIMARY_NAV_MQ, false);
   const sidebarItems = buildSidebarItems(navigationItems);
   const firstNavId =
     sidebarItems.find((x): x is Extract<ProductSidebarNavEntry, { type: "link" }> => x.type === "link")?.id ?? "";
+  const effectiveNavId = activeNavId ?? firstNavId;
   const brandSubtitleParts = [statusBadgeLabel.trim(), subtitle.trim()].filter(Boolean);
   const brandSubtitle =
     brandSubtitleParts.length > 0 ? brandSubtitleParts.join(" · ") : undefined;
@@ -74,18 +82,28 @@ export function AppShell({
           labels={HEADER_LABELS_RU}
         />
       </header>
-      <div className="shell-layout shell-layout-fill">
-        <ProductSidebarNavigation
-          items={sidebarItems}
-          activeId={activeNavId ?? firstNavId}
-          labels={{
-            settings: "Настройки",
-            expandSidebar: "Развернуть панель",
-            collapseSidebar: "Свернуть панель",
-          }}
-        />
+      <div
+        className="shell-layout shell-layout-fill"
+        style={
+          isMobilePrimaryNav
+            ? { paddingBottom: aprilMobileShellBarContentPaddingBottom(), boxSizing: "border-box" }
+            : undefined
+        }
+      >
+        {isMobilePrimaryNav ? null : (
+          <ProductSidebarNavigation
+            items={sidebarItems}
+            activeId={effectiveNavId}
+            labels={{
+              settings: "Настройки",
+              expandSidebar: "Развернуть панель",
+              collapseSidebar: "Свернуть панель",
+            }}
+          />
+        )}
         <section className="shell-content">{children}</section>
       </div>
+      {isMobilePrimaryNav ? <HubMobilePrimaryDock items={navigationItems} activeId={effectiveNavId} /> : null}
     </main>
   );
 }
