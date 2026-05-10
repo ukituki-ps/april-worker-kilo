@@ -3,7 +3,7 @@
 - Статус: ✅ выполнено (локальная установка `hub-shell` без PAT с `read:packages` не тянет GPR — см. §5)
 - Задача: Внешняя **077** — `hub-shell`: DS из GitHub Packages, условный `ds:prepare`, lock и CI
 - Ветка: `feature/053-hub-shell-ds-gpr-077` (PR в `develop`, не push в защищённые ветки)
-- Коммиты: `31a5670` (основной), `cc16495` (доп. ссылки в отчёте) на ветке `feature/053-hub-shell-ds-gpr-077`
+- Коммиты: ветка `feature/053-hub-shell-ds-gpr-077`, основной функциональный коммит `31a5670`, tip ветки на момент отчёта — `6b5bac2`
 - PR: открыть с ветки: https://github.com/ukituki-ps/april-worker/compare/develop...feature/053-hub-shell-ds-gpr-077
 
 ## 2) Что сделано
