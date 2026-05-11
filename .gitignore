@@ -12,3 +12,8 @@ structurizr/workspace.json
 .deploy-artifacts/
 .deploy-state/
 .pnpm-store/
+hub-shell/.vite/
+hub-shell/core.*
+hub-shell/dist/assets/
+*.deb
+mermaid-diagram.png
