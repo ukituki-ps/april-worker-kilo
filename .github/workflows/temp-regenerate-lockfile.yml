@@ -1,0 +1,63 @@
+# Временный workflow: регенерация hub-shell package-lock.json (DS ^0.1.11)
+# Запустить через workflow_dispatch, затем удалить этот файл.
+name: Temp - Regenerate hub-shell lockfile
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  packages: read
+
+jobs:
+  regenerate-lockfile:
+    runs-on: [self-hosted, ci, profile]
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          submodules: false
+          clean: true
+          fetch-depth: 1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: https://npm.pkg.github.org
+
+      - name: Regenerate lockfile
+        working-directory: hub-shell
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          rm -f package-lock.json
+          npm install --no-audit --no-fund
+          echo "Lockfile regenerated. Checking resolved DS version:"
+          grep '"@april/ui"' package-lock.json | head -5
+
+      - name: Verify resolved versions
+        working-directory: hub-shell
+        run: |
+          # Убедиться что lockfile содержит 0.1.11 (не 0.1.9)
+          if grep -q '"0.1.9"' package-lock.json; then
+            echo "FAIL: lockfile still references 0.1.9"
+            grep '"0.1.9"' package-lock.json
+            exit 1
+          fi
+          echo "OK: lockfile updated to ^0.1.11"
+
+      - name: Commit and push lockfile
+        working-directory: hub-shell
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add package-lock.json
+          if git diff --cached --quiet; then
+            echo "No changes to lockfile — skip commit"
+          else
+            git commit -m "chore(lockfile): regenerate hub-shell for DS ^0.1.11 (resolved 0.1.9 → 0.1.11)"
+            git push origin HEAD:develop
+          fi
