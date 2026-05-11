@@ -1,0 +1,30 @@
+{
+  "defaultBranch": "develop",
+  "snapshot": true,
+  "permission": {
+    "bash": "ask",
+    "edit": {
+      "hub-shell/src/**": "allow",
+      "hub-bff/**": "allow",
+      "scripts/**": "allow",
+      "tasks/**": "allow",
+      "docs/**": "allow",
+      "infra/**": "allow",
+      "*.md": "allow",
+      "*.tsx": "allow",
+      "*.ts": "allow",
+      "*.go": "allow",
+      "*.css": "allow",
+      "*.yaml": "ask",
+      "*.yml": "ask",
+      "go.mod": "allow",
+      "go.sum": "ask",
+      "*.lock": "deny",
+      "*": "ask"
+    }
+  },
+  "instructions": [
+    "docs/AGENT_ARCHITECTURE_CONTEXT.md",
+    "docs/DEPLOYMENT_STRATEGY.md"
+  ]
+}
