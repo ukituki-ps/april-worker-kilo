@@ -1,0 +1,47 @@
+# ONE-SHOT: regenerate hub-shell package-lock.json for DS ^0.1.11
+# Delete this workflow after successful run.
+name: oneshot-lockfile-regen-0111
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [develop]
+    paths: [.github/workflows/oneshot-lockfile-regen-0111.yml]
+
+permissions:
+  contents: write
+  packages: read
+
+jobs:
+  regenerate:
+    runs-on: [self-hosted, ci, profile]
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          clean: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Regenerate hub-shell lockfile
+        working-directory: hub-shell
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          rm -f package-lock.json
+          npm install --no-audit --no-fund
+          echo "--- Resolved DS versions ---"
+          grep '@april/' package-lock.json | grep version | head -10
+      - name: Commit lockfile
+        working-directory: hub-shell
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add package-lock.json
+          if git diff --cached --quiet; then
+            echo "No lockfile changes — already up to date"
+            exit 0
+          fi
+          git commit -m "chore(lockfile): regenerate hub-shell for DS ^0.1.11 (resolved 0.1.9 → 0.1.11)"
+          git push origin HEAD:lockfile-fix-ds-0111
