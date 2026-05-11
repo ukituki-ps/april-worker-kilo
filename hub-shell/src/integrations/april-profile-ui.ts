@@ -1,4 +1,5 @@
 import type { ComponentType } from "react";
+import type { CardListColumnMobileLayout } from "@april/ui";
 import {
   EntityTypesWidget as ExternalEntityTypesWidget,
   ProfilesWidget as ExternalProfilesWidget,
@@ -41,6 +42,8 @@ export type ProfilesWidgetProps = {
   hostContext: ProfileWidgetHostContext;
   apiBaseUrl: string;
   accessToken?: string;
+  /** См. чеклист интеграции: на узком viewport с глобальным dock Hub — `off`, чтобы не было двух нижних капсул. */
+  cardListColumnMobileLayout?: CardListColumnMobileLayout;
   onAction?: (action: ProfilesListAction) => void;
   onError?: (payload: { message: string; requestId?: string; code?: string }) => void;
   onOpenEntity?: (entityId: string) => void;

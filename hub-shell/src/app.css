@@ -211,6 +211,13 @@
   max-width: min(420px, 92vw);
 }
 
+/* Над глобальным `AprilMobileShellBar` (margin + pill + safe-area), см. `aprilMobileShellBarContentPaddingBottom()` */
+@media (max-width: 47.99em) {
+  .shell-toast-stack {
+    bottom: calc(12px + 52px + env(safe-area-inset-bottom, 0px) + 12px);
+  }
+}
+
 .shell-text-button {
   border: none;
   background: none;

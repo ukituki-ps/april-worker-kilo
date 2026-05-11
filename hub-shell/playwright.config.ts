@@ -34,5 +34,12 @@ export default defineConfig({
       testIgnore: "**/guest.spec.ts",
       use: { ...devices["Desktop Chrome"] },
     },
+    {
+      name: "mobile-chromium",
+      testMatch: "**/profile-widgets-smoke.spec.ts",
+      use: {
+        ...devices["Pixel 5"],
+      },
+    },
   ],
 });
