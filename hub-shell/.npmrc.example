@@ -1,10 +1,10 @@
-# Локально / вне CI: установка пакетов из GitHub Packages (@ukituki-ps/*).
-# cp .npmrc.example .npmrc
+# Локально: скопируйте в .npmrc или экспортируйте NODE_AUTH_TOKEN — см. закоммиченный .npmrc
+# (в репозитории .npmrc использует ${NODE_AUTH_TOKEN}, секрет в git не кладём).
 #
 # Токен: classic PAT с read:packages (и repo — если репо приватное); для org с SSO — authorize.
 # export NODE_AUTH_TOKEN="..."   # не коммитить реальный токен
 #
 # Публикация DS в GPR — только через секрет GPR_PUBLISH_TOKEN в workflow (write:packages).
-#
-# @ukituki-ps:registry=https://npm.pkg.github.com
-# //npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
+
+@ukituki-ps:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
