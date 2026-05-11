@@ -1,0 +1,68 @@
+# ONE-SHOT: regenerate hub-shell/package-lock.json for DS ^0.1.12
+# .npmrc in hub-shell/ already has scope @ukituki-ps → GPR mapping.
+# Do NOT use registry-url in setup-node — it redirects ALL packages to GPR.
+name: oneshot-lockfile-regen-hub-shell-0112
+
+on:
+  pull_request:
+    branches: [develop]
+    paths:
+      - hub-shell/package.json
+
+permissions:
+  contents: write
+  packages: read
+
+jobs:
+  regenerate:
+    runs-on: [self-hosted, ci, profile]
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          clean: true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Regenerate lockfile
+        working-directory: hub-shell
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -ex
+          rm -f package-lock.json
+          # .npmrc already maps @ukituki-ps scope to GPR
+          # ${{ secrets.GITHUB_TOKEN }} has packages:read permission
+          npm install --no-audit --no-fund
+          echo "=== Resolved DS versions ========="
+          grep 'april' package-lock.json | grep version | head -10
+
+      - name: Verify contains 0.1.12
+        working-directory: hub-shell
+        run: |
+          if ! grep -q '0\.1\.12' package-lock.json; then
+            echo "FAIL: no 0.1.12 in lockfile"
+            grep 'april' package-lock.json | grep version | head
+            exit 1
+          fi
+          echo "OK: DS ^0.1.12 resolved"
+
+      - name: Commit lockfile to develop
+        working-directory: hub-shell
+        run: |
+          git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/ukituki-ps/april-worker-kilo.git
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add package-lock.json
+          if git diff --cached --quiet; then
+            echo "No lockfile changes"
+            exit 0
+          fi
+          git commit -m "chore(lockfile): regenerate hub-shell for DS ^0.1.12"
+          git push origin develop
+          echo "== COMMITTED TO develop =="
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
