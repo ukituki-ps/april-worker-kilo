@@ -11,9 +11,9 @@
     "prelint": "npm run ds:prepare",
     "pretest": "npm run ds:prepare",
     "dev": "vite",
-      "build": "npm run ds:check-exports && tsc --noEmit && vite build",
-      "build:analyze": "npm run ds:check-exports && tsc --noEmit && vite build --report",
-      "bundle:report": "du -sh dist"
+    "build": "npm run ds:check-exports && tsc --noEmit && vite build",
+    "build:analyze": "npm run ds:check-exports && tsc --noEmit && vite build --report",
+    "bundle:report": "du -sh dist",
     "lint": "npm run ds:check-exports && tsc --noEmit",
     "test": "vitest run",
     "e2e": "playwright test",
