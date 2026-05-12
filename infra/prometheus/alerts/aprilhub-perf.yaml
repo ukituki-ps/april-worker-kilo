@@ -1,0 +1,63 @@
+groups:
+  - name: aprilhub-performance-alerts
+    rules:
+      - alert: response_time_p95_threshold_bff
+        expr: |
+          histogram_quantile(
+            0.95,
+            sum(rate(hub_bff_http_request_duration_seconds_bucket[5m])) by (le)
+          ) > 0.5
+        for: 5m
+        labels:
+          severity: warning
+          area: performance
+          alert: response_time_p95_threshold_bff
+        annotations:
+          summary: "AprilHub BFF P95 latency exceeds 0.5s"
+          description: |
+            Global P95 request latency is above 500 ms for 5 minutes.
+      - alert: response_time_p99_threshold_bff
+        expr: |
+          histogram_quantile(
+            0.99,
+            sum(rate(hub_bff_http_request_duration_seconds_bucket[5m])) by (le)
+          ) > 1.0
+        for: 2m
+        labels:
+          severity: critical
+          area: performance
+          alert: response_time_p99_threshold_bff
+        annotations:
+          summary: "AprilHub BFF P99 latency exceeds 1s"
+          description: |
+            Global P99 request latency is above 1 s for 2 minutes.
+      - alert: error_rate_threshold_bff
+        expr: |
+          (
+            sum(rate(hub_bff_http_requests_total{status=~"5.."}[5m])) /
+            clamp_min(sum(rate(hub_bff_http_requests_total[5m])), 0.001)
+          ) > 0.01
+        for: 5m
+        labels:
+          severity: warning
+          area: performance
+          alert: error_rate_threshold_bff
+        annotations:
+          summary: "AprilHub BFF error rate exceeds 1%"
+          description: |
+            Error rate is above 1 % for the last 5 minutes.
+      - alert: availability_slo_bff
+        expr: |
+          (
+            sum(rate(hub_bff_http_requests_total{status=~"5.."}[15m])) /
+            clamp_min(sum(rate(hub_bff_http_requests_total[15m])), 0.001)
+          ) > 0.001
+        for: 15m
+        labels:
+          severity: critical
+          area: availability
+          alert: availability_slo_bff
+        annotations:
+          summary: "AprilHub BFF availability below 99.9%"
+          description: |
+            Calculated availability is below the 99.9 % SLO for 15 minutes.
