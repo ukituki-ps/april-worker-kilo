@@ -1,0 +1,66 @@
+# Diagnostic: print npm stderr to CI log
+name: diag-npm-install-0112
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  packages: read
+
+jobs:
+  diag:
+    runs-on: [self-hosted, ci, profile]
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/bump-ds-0112-lockfile
+          fetch-depth: 1
+          clean: true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: NPM install diagnostic
+        working-directory: hub-shell
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          rm -f package-lock.json
+          npm cache clean --force
+          echo "=--START NPM INSTALL--="
+          npm install --no-audit --no-fund > /tmp/npm-stdout.log 2> /tmp/npm-stderr.log && RC=0 || RC=$?
+          echo "=--STDOUT--="
+          cat /tmp/npm-stdout.log
+          echo "=--STDERR (last 200 lines)--="
+          tail -200 /tmp/npm-stderr.log
+          echo "=--RC= ${RC}--="
+          if [ "$RC" != "0" ]; then
+            echo "=--DEBUG LOG (last 100 lines)--="
+            ls -t ~/.npm/_logs/*-debug-*.log 2>/dev/null | head -1 | xargs tail -100
+            exit 1
+          fi
+          echo "=--RESOLVED VERSIONS--="
+          grep 'april' package-lock.json | grep version | head -10
+
+      - name: Commit lockfile to feature branch
+        working-directory: hub-shell
+        if: success()
+        run: |
+          set -ex
+          git remote set-url origin https://x-access-token:${GH_TOKEN}@github.com/ukituki-ps/april-worker-kilo.git
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout feature/bump-ds-0112-lockfile
+          git add package-lock.json
+          if git diff --cached --quiet; then
+            echo "No lockfile changes"
+            exit 0
+          fi
+          git commit -m "chore(lockfile): regenerate hub-shell for DS ^0.1.12"
+          git push origin feature/bump-ds-0112-lockfile
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
