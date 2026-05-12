@@ -115,6 +115,25 @@
 - [x] `051-aprilhub-sidebar-entity-types-widget`: пункт сайдбара «Шаблоны» и host-интеграция виджета `entity-types-widget` из `vendor/april-profile` — [`TASK.md`](./tasks/051-aprilhub-sidebar-entity-types-widget/TASK.md), [`REPORT.md`](./tasks/051-aprilhub-sidebar-entity-types-widget/REPORT.md)
 - [x] `053-aprilhub-execute-external-task-077-april-profile-1`: изучить задачу 077 и документацию в `april-profile-1`, реализовать требования в `april-worker` и оформить двойной отчёт — [`TASK.md`](./tasks/053-aprilhub-execute-external-task-077-april-profile-1/TASK.md), [`REPORT.md`](./tasks/053-aprilhub-execute-external-task-077-april-profile-1/REPORT.md)
 - [x] `054-aprilhub-execute-external-task-080-april-profile-1`: изучить задачу 080 (mobile Hub chrome, ADR-0006) в `april-profile-1`, реализовать в `april-worker`, bump `vendor/april-profile` после **079**, mobile e2e smoke — [`TASK.md`](./tasks/054-aprilhub-execute-external-task-080-april-profile-1/TASK.md), [`REPORT.md`](./tasks/054-aprilhub-execute-external-task-080-april-profile-1/REPORT.md)
+
+## Phase 9: Security Audit + Performance Optimization (ADR-2)
+
+> ADR: [`docs/architecture/ADR-april-phase-9-security-and-performance.md`](./docs/architecture/ADR-april-phase-9-security-and-performance.md)
+
+### Security трек (055–059)
+
+- [ ] `055-security-audit-scoping`: аудит auth/RBAC gaps, OWASP Top-10 mapping для AprilHub — входная задача для 056–059 — [`TASK.md`](./tasks/055-security-audit-scoping/TASK.md)
+- [ ] `056-security-rate-limiting`: rate limiting middleware для Hub BFF endpoints (Redis backend) — зависит от 055 — [`TASK.md`](./tasks/056-security-rate-limiting/TASK.md)
+- [ ] `057-security-csp-headers`: security headers (CSP, HSTS, X-Frame) в Nginx + BFF middleware + CSP violation reporting — зависит от 055 — [`TASK.md`](./tasks/057-security-csp-headers/TASK.md)
+- [ ] `058-security-dependency-scan`: gosec + govulncheck + npm audit в CI pipeline, mitigation policy — нет зависимостей — [`TASK.md`](./tasks/058-security-dependency-scan/TASK.md)
+- [ ] `059-security-penetration-testing`: ручное тестирование auth flows, API security, frontend — зависит от 055, 056, 057 — [`TASK.md`](./tasks/059-security-penetration-testing/TASK.md)
+
+### Performance трек (060–063)
+
+- [ ] `060-perf-k6-production-thresholds`: определение SLA из k6 baseline, Prometheus alerts — нет зависимостей — [`TASK.md`](./tasks/060-perf-k6-production-thresholds/TASK.md)
+- [ ] `061-perf-bff-response-caching`: Redis response cache для read-only BFF endpoints (tenant-aware) — нет зависимостей — [`TASK.md`](./tasks/061-perf-bff-response-caching/TASK.md)
+- [ ] `062-perf-shell-bundle-analysis`: bundle size audit, lazy loading виджетов, code splitting — нет зависимостей — [`TASK.md`](./tasks/062-perf-shell-bundle-analysis/TASK.md)
+- [ ] `063-perf-db-query-optimization`: pg_stat_statements, slow query audit, recommended indexes (cross-repo с AprilProfile) — нет зависимостей — [`TASK.md`](./tasks/063-perf-db-query-optimization/TASK.md)
 - [x] `2026-04-30-micro-profiles-widget-host-fill-height`: закрыт micro-инцидент fixed-height `ProfilesWidget` на `#/app/profile/entities`; подтверждена рабочая цепочка fill-height + восстановлена стабильность dev runtime/containers — [`TASK.md`](./tasks/2026-04-30-micro-profiles-widget-host-fill-height/TASK.md), [`REPORT.md`](./tasks/2026-04-30-micro-profiles-widget-host-fill-height/REPORT.md)
 - [x] `2026-04-30-micro-profiles-widget-sync-aprilprofile`: актуализирован `profiles-widget` после обновления `april-profile` (`vendor/april-profile` -> `ebbc8fc`), прогнан quality gate `hub-shell`, обновлены `dist`-артефакты — [`TASK.md`](./tasks/2026-04-30-micro-profiles-widget-sync-aprilprofile/TASK.md), [`REPORT.md`](./tasks/2026-04-30-micro-profiles-widget-sync-aprilprofile/REPORT.md)
 - [x] `2026-04-30-micro-entity-types-widget-sync-aprilprofile`: актуализирован `entity-types-widget` после обновления `april-profile` (`vendor/april-profile` -> `76ff32a`), прогнан quality gate `hub-shell`, обновлены `dist`-артефакты — [`TASK.md`](./tasks/2026-04-30-micro-entity-types-widget-sync-aprilprofile/TASK.md), [`REPORT.md`](./tasks/2026-04-30-micro-entity-types-widget-sync-aprilprofile/REPORT.md)
@@ -176,3 +195,12 @@
 | `051` | Сайдбар «Шаблоны» + `entity-types-widget` из AprilProfile в `hub-shell` (маршрут, крошки, host-обвязка, тесты) | ✅ Выполнено | [`tasks/051-aprilhub-sidebar-entity-types-widget/TASK.md`](./tasks/051-aprilhub-sidebar-entity-types-widget/TASK.md), [`REPORT.md`](./tasks/051-aprilhub-sidebar-entity-types-widget/REPORT.md) |
 | `053` | Исполнение внешней задачи 077 из `april-profile-1` (анализ docs + реализация + двойной отчёт) | ✅ Выполнено | [`tasks/053-aprilhub-execute-external-task-077-april-profile-1/TASK.md`](./tasks/053-aprilhub-execute-external-task-077-april-profile-1/TASK.md), [`REPORT.md`](./tasks/053-aprilhub-execute-external-task-077-april-profile-1/REPORT.md) |
 | `054` | Исполнение внешней задачи 080 из `april-profile-1` (глобальный mobile chrome Hub, bump `vendor/april-profile`, Playwright mobile) | ✅ Выполнено | [`tasks/054-aprilhub-execute-external-task-080-april-profile-1/TASK.md`](./tasks/054-aprilhub-execute-external-task-080-april-profile-1/TASK.md), [`REPORT.md`](./tasks/054-aprilhub-execute-external-task-080-april-profile-1/REPORT.md) |
+| `055` | Phase 9 Security Audit Scoping — OWASP Top-10 mapping, auth/RBAC gap analysis — вход для 056–059 | 📋 Новая | [`TASK.md`](./tasks/055-security-audit-scoping/TASK.md) |
+| `056` | Phase 9 Rate Limiting — Redis middleware для BFF endpoints | 📋 Новая (зависит от 055) | [`TASK.md`](./tasks/056-security-rate-limiting/TASK.md) |
+| `057` | Phase 9 Security Headers — CSP, HSTS, X-Frame в Nginx + BFF | 📋 Новая (зависит от 055) | [`TASK.md`](./tasks/057-security-csp-headers/TASK.md) |
+| `058` | Phase 9 Dependency Scan — gosec + govulncheck + npm audit в CI | 📋 Новая | [`TASK.md`](./tasks/058-security-dependency-scan/TASK.md) |
+| `059` | Phase 9 Penetration Testing — ручное тестирование auth/API/frontend | 📋 Новая (зависит от 055, 056, 057) | [`TASK.md`](./tasks/059-security-penetration-testing/TASK.md) |
+| `060` | Phase 9 k6 Production Thresholds — SLA definition + Prometheus alerts | 📋 Новая | [`TASK.md`](./tasks/060-perf-k6-production-thresholds/TASK.md) |
+| `061` | Phase 9 BFF Response Caching — Redis tenant-aware cache | 📋 Новая | [`TASK.md`](./tasks/061-perf-bff-response-caching/TASK.md) |
+| `062` | Phase 9 Shell Bundle Analysis — lazy loading, code splitting | 📋 Новая | [`TASK.md`](./tasks/062-perf-shell-bundle-analysis/TASK.md) |
+| `063` | Phase 9 DB Query Optimization — pg_stat_statements, slow queries (cross-repo) | 📋 Новая | [`TASK.md`](./tasks/063-perf-db-query-optimization/TASK.md) |
