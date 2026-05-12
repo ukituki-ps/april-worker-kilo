@@ -195,12 +195,12 @@
 | `051` | Сайдбар «Шаблоны» + `entity-types-widget` из AprilProfile в `hub-shell` (маршрут, крошки, host-обвязка, тесты) | ✅ Выполнено | [`tasks/051-aprilhub-sidebar-entity-types-widget/TASK.md`](./tasks/051-aprilhub-sidebar-entity-types-widget/TASK.md), [`REPORT.md`](./tasks/051-aprilhub-sidebar-entity-types-widget/REPORT.md) |
 | `053` | Исполнение внешней задачи 077 из `april-profile-1` (анализ docs + реализация + двойной отчёт) | ✅ Выполнено | [`tasks/053-aprilhub-execute-external-task-077-april-profile-1/TASK.md`](./tasks/053-aprilhub-execute-external-task-077-april-profile-1/TASK.md), [`REPORT.md`](./tasks/053-aprilhub-execute-external-task-077-april-profile-1/REPORT.md) |
 | `054` | Исполнение внешней задачи 080 из `april-profile-1` (глобальный mobile chrome Hub, bump `vendor/april-profile`, Playwright mobile) | ✅ Выполнено | [`tasks/054-aprilhub-execute-external-task-080-april-profile-1/TASK.md`](./tasks/054-aprilhub-execute-external-task-080-april-profile-1/TASK.md), [`REPORT.md`](./tasks/054-aprilhub-execute-external-task-080-april-profile-1/REPORT.md) |
-| `055` | Phase 9 Security Audit Scoping — OWASP Top-10 mapping, auth/RBAC gap analysis — вход для 056–059 | 📋 Новая | [`TASK.md`](./tasks/055-security-audit-scoping/TASK.md) |
-| `056` | Phase 9 Rate Limiting — Redis middleware для BFF endpoints | 📋 Новая (зависит от 055) | [`TASK.md`](./tasks/056-security-rate-limiting/TASK.md) |
-| `057` | Phase 9 Security Headers — CSP, HSTS, X-Frame в Nginx + BFF | 📋 Новая (зависит от 055) | [`TASK.md`](./tasks/057-security-csp-headers/TASK.md) |
-| `058` | Phase 9 Dependency Scan — gosec + govulncheck + npm audit в CI | 📋 Новая | [`TASK.md`](./tasks/058-security-dependency-scan/TASK.md) |
-| `059` | Phase 9 Penetration Testing — ручное тестирование auth/API/frontend | 📋 Новая (зависит от 055, 056, 057) | [`TASK.md`](./tasks/059-security-penetration-testing/TASK.md) |
-| `060` | Phase 9 k6 Production Thresholds — SLA definition + Prometheus alerts | 📋 Новая | [`TASK.md`](./tasks/060-perf-k6-production-thresholds/TASK.md) |
-| `061` | Phase 9 BFF Response Caching — Redis tenant-aware cache | 📋 Новая | [`TASK.md`](./tasks/061-perf-bff-response-caching/TASK.md) |
-| `062` | Phase 9 Shell Bundle Analysis — lazy loading, code splitting | 📋 Новая | [`TASK.md`](./tasks/062-perf-shell-bundle-analysis/TASK.md) |
-| `063` | Phase 9 DB Query Optimization — pg_stat_statements, slow queries (cross-repo) | 📋 Новая | [`TASK.md`](./tasks/063-perf-db-query-optimization/TASK.md) |
+| `055` | Phase 9 Security Audit Scoping — OWASP Top-10 mapping, auth/RBAC gap analysis — вход для 056–059 | ✅ Выполнено | [`TASK.md`](./tasks/055-security-audit-scoping/TASK.md), [`REPORT.md`](./tasks/055-security-audit-scoping/REPORT.md) |
+| `056` | Phase 9 Rate Limiting — Redis middleware для BFF endpoints | 🔲 В очереди (зависит от 055) | [`TASK.md`](./tasks/056-security-rate-limiting/TASK.md) |
+| `057` | Phase 9 Security Headers — CSP, HSTS, X-Frame в Nginx + BFF | 🔲 В очереди (зависит от 055) | [`TASK.md`](./tasks/057-security-csp-headers/TASK.md) |
+| `058` | Phase 9 Dependency Scan — gosec + govulncheck + npm audit в CI | ✅ Выполнено | [`TASK.md`](./tasks/058-security-dependency-scan/TASK.md), [`REPORT.md`](./tasks/058-security-dependency-scan/REPORT.md) |
+| `059` | Phase 9 Penetration Testing — ручное тестирование auth/API/frontend | 🔲 В очереди (зависит от 055, 056, 057) | [`TASK.md`](./tasks/059-security-penetration-testing/TASK.md) |
+| `060` | Phase 9 k6 Production Thresholds — SLA definition + Prometheus alerts | ✅ Выполнено | [`TASK.md`](./tasks/060-perf-k6-production-thresholds/TASK.md), [`REPORT.md`](./tasks/060-perf-k6-production-thresholds/REPORT.md) |
+| `061` | Phase 9 BFF Response Caching — Redis tenant-aware cache | 🔲 В очереди | [`TASK.md`](./tasks/061-perf-bff-response-caching/TASK.md) |
+| `062` | Phase 9 Shell Bundle Analysis — lazy loading, code splitting | ✅ Выполнено (частично) — bundle scripts + docs, lazy loading pending | [`TASK.md`](./tasks/062-perf-shell-bundle-analysis/TASK.md) |
+| `063` | Phase 9 DB Query Optimization — pg_stat_statements, slow queries (cross-repo) | ✅ Выполнено (анализ + рекомендации) | [`TASK.md`](./tasks/063-perf-db-query-optimization/TASK.md), [`REPORT.md`](./tasks/063-perf-db-query-optimization/REPORT.md) |

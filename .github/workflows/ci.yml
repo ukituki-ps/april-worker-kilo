@@ -6,6 +6,8 @@ on:
     branches: [main, develop]
   push:
     branches: [main, develop]
+  schedule:
+    - cron: '0 6 * * 1'  # Еженедельный security scan: ПН 06:00 UTC
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
@@ -371,3 +373,107 @@ jobs:
         with:
           name: aprilhub-k6-artifacts
           path: artifacts/k6
+
+  security-scan:
+    name: Security dependency scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          clean: true
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: hub-bff/go.mod
+          cache: true
+          cache-dependency-path: hub-bff/go.sum
+
+      - name: Install Go security tools
+        run: |
+          go install github.com/securego/gosec/v2/cmd/gosec@latest
+          go install golang.org/x/vuln/cmd/govulncheck@latest
+
+      - name: Prepare security artifacts directory
+        run: mkdir -p artifacts/security
+
+      # ── Go: govulncheck ──
+      - name: Run govulncheck on hub-bff
+        working-directory: hub-bff
+        run: |
+          echo "=== govulncheck results ==="
+          govulncheck ./... > ../../artifacts/security/govulncheck.log 2>&1 || true
+          cat artifacts/security/govulncheck.log
+
+      # ── Go: gosec ──
+      - name: Run gosec on hub-bff
+        working-directory: hub-bff
+        run: |
+          echo "=== gosec results ==="
+          gosec -severity-critical -severity-high ./... > ../../artifacts/security/gosec.log 2>&1 || true
+          cat artifacts/security/gosec.log
+
+      # ── npm: audit ──
+      - name: Setup Node.js for npm audit
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: hub-shell/package-lock.json
+
+      - name: Install hub-shell dependencies (minimal)
+        working-directory: hub-shell
+        run: npm ci --ignore-scripts
+
+      - name: Run npm audit and generate JSON report
+        working-directory: hub-shell
+        run: |
+          echo "=== npm audit results ==="
+          npm audit --audit-level=critical || true
+          npm audit --json > ../../artifacts/security/npm-audit.json 2>&1 || true
+
+      - name: Upload security scan artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-scan-artifacts
+          path: artifacts/security
+          retention-days: 30
+
+      # ── Финальная проверка: фейлим при Critical/High ──
+      - name: Fail on Critical/High findings
+        run: |
+          FAILED=false
+
+          # govulncheck — фейлим при обнаружении vulnerabilities
+          if grep -qi "vulnerability" artifacts/security/govulncheck.log 2>/dev/null; then
+            echo "🔴 govulncheck found vulnerabilities"
+            FAILED=true
+          fi
+
+          # gosec — фейлим при Critical или High severity
+          if grep -qi "critical\|high" artifacts/security/gosec.log 2>/dev/null; then
+            echo "🔴 gosec found Critical or High issues"
+            FAILED=true
+          fi
+
+          # npm audit — фейлим при Critical
+          if grep -qi '"severity":"critical"' artifacts/security/npm-audit.json 2>/dev/null; then
+            echo "🔴 npm audit found Critical vulnerabilities"
+            FAILED=true
+          fi
+
+          if [ "$FAILED" = true ]; then
+            echo ""
+            echo "============================================"
+            echo "  🔴 SECURITY SCAN FAILED"
+            echo "  Critical или High findings обнаружены!"
+            echo "  См. артефакты security-scan-artifacts."
+            echo "============================================"
+            exit 1
+          else
+            echo "✅ Security scan passed — нет Critical/High findings"
+          fi
