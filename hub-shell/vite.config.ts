@@ -30,7 +30,7 @@ export default defineConfig(({ mode }) => {
   const hmrProtocolRaw =
     localEnv.VITE_DEV_HMR_PROTOCOL?.trim() || rootEnv.VITE_DEV_HMR_PROTOCOL?.trim() || "wss";
   const hmrClientPortRaw =
-    localEnv.VITE_DEV_HMR_CLIENT_PORT?.trim() || rootEnv.VITE_DEV_HMR_CLIENT_PORT?.trim() || "443";
+    localEnv.VITE_DEV_HMR_CLIENT_PORT?.trim() || rootEnv.VITE_DEV_HMR_PROTOCOL?.trim() || "443";
 
   const hmrDisableRaw =
     localEnv.VITE_DEV_HMR_DISABLE?.trim() || rootEnv.VITE_DEV_HMR_DISABLE?.trim() || "";
@@ -78,6 +78,11 @@ export default defineConfig(({ mode }) => {
       setupFiles: "./src/test/setup.ts",
       cache: false,
       exclude: ["tests/e2e/**", "node_modules/**", "dist/**"],
+      server: {
+        deps: {
+          inline: [/\/@april\//, /\/mantine-vaul/],
+        },
+      },
     },
   };
 });
