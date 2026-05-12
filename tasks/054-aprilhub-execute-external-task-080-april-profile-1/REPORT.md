@@ -22,5 +22,5 @@
 
 ## 4) Осталось
 
-- [ ] Push submodule патчей `vendor/april-profile` upstream → `ukituki-ps/april-profile`.
+- [ ] Push submodule патчей `vendor/april-profile` upstream → `ukituki-ps/april-profile-kilo
 - [ ] CI на `develop` с `NODE_AUTH_TOKEN` — подтвердить зелёный `hub-shell` lint/test/build.

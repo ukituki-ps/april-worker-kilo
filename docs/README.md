@@ -32,4 +32,4 @@
 - OpenAPI: [`../openapi/openapi.yaml`](../openapi/openapi.yaml), [`../openapi/aprilhub-bff.yaml`](../openapi/aprilhub-bff.yaml)
 - Frontend host/widget contracts: [`FRONTEND_STRATEGY.md`](./FRONTEND_STRATEGY.md), [`WIDGET_CONTRACTS.md`](./WIDGET_CONTRACTS.md)
 - ADR: [`adr/README.md`](./adr/README.md)
-- Сервис **AprilProfile** (код и продуктовая документация вне этого репозитория): [github.com/ukituki-ps/april-profile](https://github.com/ukituki-ps/april-profile)
+- Сервис **AprilProfile** (код и продуктовая документация вне этого репозитория): [github.com/ukituki-ps/april-profile-kilo

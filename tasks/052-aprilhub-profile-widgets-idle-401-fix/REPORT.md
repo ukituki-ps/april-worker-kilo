@@ -58,7 +58,7 @@ cd hub-shell && npm ci && npm test && npm run build
 - **Задача:** устранение 401 у profile-виджетов после простоя из‑за устаревшего Bearer в React
 - **Ветка:** `fix/052-profile-widgets-idle-401` (рекомендуется создать локально)
 - **Коммиты:** см. `git log`
-- **PR:** https://github.com/ukituki-ps/april-worker/pull/127
+- **PR:** https://github.com/ukituki-ps/april-worker-kilo
 
 ## 2) Что сделано
 

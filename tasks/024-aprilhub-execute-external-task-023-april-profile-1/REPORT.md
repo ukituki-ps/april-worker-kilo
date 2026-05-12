@@ -3,7 +3,7 @@
 - Задача: Исполнение внешней задачи 023 (AprilHub widget host + e2e smoke)
 - Ветка: `develop`
 - Коммиты: см. PR ниже
-- PR (merged): [#40](https://github.com/ukituki-ps/april-worker/pull/40), [#41](https://github.com/ukituki-ps/april-worker/pull/41), [#42](https://github.com/ukituki-ps/april-worker/pull/42), [#43](https://github.com/ukituki-ps/april-worker/pull/43), [#44](https://github.com/ukituki-ps/april-worker/pull/44)
+- PR (merged): [#40](https://github.com/ukituki-ps/april-worker-kilo
 
 ### Статус по acceptance
 - [x] Основная реализация widget host в `hub-shell` выполнена.

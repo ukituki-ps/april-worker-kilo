@@ -4,7 +4,7 @@
 - Задача: Внешняя **077** — `hub-shell`: DS из GitHub Packages, условный `ds:prepare`, lock и CI
 - Ветка: `feature/053-hub-shell-ds-gpr-077` (PR в `develop`, не push в защищённые ветки)
 - Коммиты: ветка `feature/053-hub-shell-ds-gpr-077`; основной коммит с кодом DS/GPR — `31a5670`, далее — док-коммиты отчёта (актуальный tip см. на GitHub)
-- PR: открыть с ветки: https://github.com/ukituki-ps/april-worker/compare/develop...feature/053-hub-shell-ds-gpr-077
+- PR: открыть с ветки: https://github.com/ukituki-ps/april-worker-kilo
 
 ## 2) Что сделано
 

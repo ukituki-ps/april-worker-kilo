@@ -4,7 +4,7 @@
 #   Classic PAT: минимум write:packages + read:packages; для приватного репо — repo.
 #   Организация с SSO: после создания PAT → «Configure SSO» / Authorize для ukituki-ps.
 #   Запись в репозитории:
-#     printf '%s' 'YOUR_PAT' | gh secret set GPR_PUBLISH_TOKEN -R ukituki-ps/april-worker
+#     printf '%s' 'YOUR_PAT' | gh secret set GPR_PUBLISH_TOKEN -R ukituki-ps/april-worker-kilo
 #
 # Почему не GITHUB_TOKEN: у многих org токен Actions не получает write в GPR (write_package), даже при Read and write в репо.
 name: Publish @april DS to GitHub Packages
@@ -64,7 +64,7 @@ jobs:
           p.name = '@ukituki-ps/april-tokens';
           p.repository = {
             type: 'git',
-            url: 'https://github.com/ukituki-ps/april-worker.git',
+            url: 'https://github.com/ukituki-ps/april-worker-kilo.git',
           };
           fs.writeFileSync('package.json', JSON.stringify(p, null, 2) + '\n');
           NODE
@@ -84,7 +84,7 @@ jobs:
           p.dependencies['@ukituki-ps/april-tokens'] = '^0.1.0';
           p.repository = {
             type: 'git',
-            url: 'https://github.com/ukituki-ps/april-worker.git',
+            url: 'https://github.com/ukituki-ps/april-worker-kilo.git',
           };
           fs.writeFileSync('package.json', JSON.stringify(p, null, 2) + '\n');
           NODE

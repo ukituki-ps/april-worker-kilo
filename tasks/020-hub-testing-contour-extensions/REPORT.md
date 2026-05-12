@@ -3,7 +3,7 @@
 - Задача: Hub Testing Contour Extensions (Этап 020)
 - Ветка: `feature/020-hub-testing-contour-extensions`
 - Коммиты: `9b32d44`
-- PR: https://github.com/ukituki-ps/april-worker/pull/23
+- PR: https://github.com/ukituki-ps/april-worker-kilo
 
 ## 2) Что сделано
 - [frontend] Добавлен Playwright smoke-набор (`hub-shell/tests/e2e/smoke.spec.ts`) и конфиг (`hub-shell/playwright.config.ts`), обновлены npm-команды `e2e`/`e2e:install`.
@@ -66,6 +66,6 @@ cd hub-shell && npm run e2e -- --list
 - Nightly jobs добавлены как scheduled/non-blocking; в mandatory P0 слой не переводились.
 
 ## 8) Что осталось
-- [x] Основные deliverables этапа `020` реализованы и переданы в PR: [#23](https://github.com/ukituki-ps/april-worker/pull/23).
+- [x] Основные deliverables этапа `020` реализованы и переданы в PR: [#23](https://github.com/ukituki-ps/april-worker-kilo
 - [ ] Операционный follow-up (локальное окружение): восстановить права/чистое состояние `hub-shell/node_modules`, затем выполнить `cd hub-shell && npm run e2e` и сохранить артефакты прогона.
 - [ ] Операционный follow-up (network/runtime): стабилизировать DNS-доступ к `hub-bff` в `scripts/run-k6-aprilhub-extended.sh` (CI + локаль), затем подтвердить стабильный `pass` extended-профиля.

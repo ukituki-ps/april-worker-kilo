@@ -3,7 +3,7 @@
 - Задача: Исполнение внешней задачи 021 (AprilHub BFF proxy admin routes + OIDC)
 - Ветка: `feature/task-023-external-021-profile-proxy` -> `develop`
 - Коммиты: `84034cb` (feature), `892f464` (merge commit в `develop`)
-- PR: https://github.com/ukituki-ps/april-worker/pull/39 (merged)
+- PR: https://github.com/ukituki-ps/april-worker-kilo
 
 ## 2) Что сделано
 - [backend] Добавлен admin proxy маршрут `GET/POST/PUT/PATCH/DELETE /api/v1/admin/profile/*` в `hub-bff` через reverse proxy до upstream AprilProfile.

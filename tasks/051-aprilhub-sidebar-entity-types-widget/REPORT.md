@@ -6,7 +6,7 @@
 - **Задача:** пункт сайдбара «Шаблоны», маршрут `#/app/profile/entity-types`, host-виджет по образцу «Профили».
 - **Ветка:** `feature/051-aprilhub-sidebar-entity-types-widget` → PR в `april-worker`, merge в `develop`.
 - **Сабмодуль `vendor/april-profile`:** `0b18686` (`develop`), виджет `EntityTypesWidget` из upstream (telemetry kind `entity_types`).
-- **Отдельный PR в `april-profile`:** [#100](https://github.com/ukituki-ps/april-profile/pull/100) закрыт без merge: `develop` уже содержал полноценный виджет; дублирующий коммит конфликтовал.
+- **Отдельный PR в `april-profile`:** [#100](https://github.com/ukituki-ps/april-profile-kilo
 
 ## 2) Что сделано
 

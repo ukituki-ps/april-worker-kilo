@@ -60,7 +60,7 @@
 
 ## 6. План детальный по репозиториям
 
-### 6.1 DisignApril (`ukituki-ps/DisignApril`)
+### 6.1 DisignApril (`ukituki-ps/DisignApril-kilo
 
 - Включить **версии** в `packages/ui/package.json` и `packages/tokens/package.json` (единая политика: начать с `0.1.0` или текущего согласованного).
 - `pnpm build` в CI; артефакт публикации = `dist` + типы + минимальный `package.json` (поле `files`, `exports`, `sideEffects` для CSS).
@@ -68,7 +68,7 @@
 - Secrets: `GITHUB_TOKEN` (packages:write) или отдельный PAT с минимальными правами.
 - Документация в самом DisignApril: `README` / `docs` — как опубликовать, как deprecation/breaking.
 
-### 6.2 AprilHub (`ukituki-ps/april-worker`, этот репозиторий)
+### 6.2 AprilHub (`ukituki-ps/april-worker-kilo
 
 - **ADR:** зафиксировать решение о registry, совместимости с submodule для showcase, политике обновления.
 - **`hub-shell/package.json`:** `"@april/ui": "^x.y.z"`, `"@april/tokens": "^x.y.z"` (диапазоны по согласованию).

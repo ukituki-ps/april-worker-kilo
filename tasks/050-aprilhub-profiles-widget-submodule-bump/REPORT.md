@@ -4,7 +4,7 @@
 - Задача: обновление внешнего `profiles-widget` через submodule `vendor/april-profile`, перезапуск `hub-shell` на dev при bump submodule, совместимость сборки с новым `profile-ui`
 - Ветка: `feature/050-aprilhub-profiles-widget-submodule-bump`
 - Коммиты (ключевые): bump submodule + `deploy.sh` — история ветки до `67a637f`; исправление сборки — **`c734204`** (`fix(hub-shell): bundle @tabler/icons-react for vendored profile-ui`)
-- PR: https://github.com/ukituki-ps/april-worker/pull/102 → base **`develop`**
+- PR: https://github.com/ukituki-ps/april-worker-kilo
 
 ## 2) Что сделано
 

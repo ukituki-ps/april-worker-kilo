@@ -20,7 +20,7 @@ sidebar_position: 3
 | Debian | 13 | целевой хост dev (`docs/AGENT_ARCHITECTURE_CONTEXT.md`) |
 | PostgreSQL | 17 | целевой стек (`docs/AGENT_ARCHITECTURE_CONTEXT.md`) |
 | Docker Compose | v2 | `docs/DEPLOYMENT_STRATEGY.md` |
-| April Design System (`@april/tokens`, `@april/ui`) | semver в `hub-shell/package.json`; **точные версии** — `hub-shell/package-lock.json` (источник после установки из **GitHub Packages**); см. [`DESIGN_SYSTEM.md`](./DESIGN_SYSTEM.md), ADR в репозитории [`docs/architecture/ADR-april-design-system-npm-distribution.md`](https://github.com/ukituki-ps/april-worker/blob/develop/docs/architecture/ADR-april-design-system-npm-distribution.md) | [DisignApril](https://github.com/ukituki-ps/DisignApril) — исходники и публикация пакетов |
+| April Design System (`@april/tokens`, `@april/ui`) | semver в `hub-shell/package.json`; **точные версии** — `hub-shell/package-lock.json` (источник после установки из **GitHub Packages**); см. [`DESIGN_SYSTEM.md`](./DESIGN_SYSTEM.md), ADR в репозитории [`docs/architecture/ADR-april-design-system-npm-distribution.md`](https://github.com/ukituki-ps/april-worker-kilo
 
 ### Backend / frontend приложения
 

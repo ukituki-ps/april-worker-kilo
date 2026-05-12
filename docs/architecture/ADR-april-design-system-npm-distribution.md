@@ -7,7 +7,7 @@
 
 ## Контекст
 
-Пакеты **`@april/tokens`** и **`@april/ui`** поставляются из монорепозитория [DisignApril](https://github.com/ukituki-ps/DisignApril). В AprilHub (`april-worker`) на этапе интеграции `013` потребление реализовано через:
+Пакеты **`@april/tokens`** и **`@april/ui`** поставляются из монорепозитория [DisignApril](https://github.com/ukituki-ps/DisignApril-kilo
 
 - git submodule `design-system/DisignApril`;
 - зависимости **`file:`** в `hub-shell/package.json`;
@@ -48,7 +48,7 @@
 
 5. **Ответственность за релизы дизайн-системы:**
 
-   - **Публикация версий** `@april/tokens` и `@april/ui` в registry: **владельцы репозитория DisignApril** (`ukituki-ps/DisignApril`) — maintainers и согласованный release-процесс (CI, теги/changelog по правилам того репо).
+   - **Публикация версий** `@april/tokens` и `@april/ui` в registry: **владельцы репозитория DisignApril** (`ukituki-ps/DisignApril-kilo
    - **Потребление и своевременный bump** в AprilHub: команда AprilHub / владелец фронтенда `hub-shell` (PR с обновлением `package.json` + lock + прохождение обязательного quality gate из [`README.md`](../../README.md)).
    - **Секреты** read/write для GitHub Packages: хранение и ротация по [`DEPLOYMENT_STRATEGY.md`](../DEPLOYMENT_STRATEGY.md) и внутренним runbook’ам организации; владелец секретов CI — команда инфраструктуры / maintainers репозитория, где выполняется workflow.
 

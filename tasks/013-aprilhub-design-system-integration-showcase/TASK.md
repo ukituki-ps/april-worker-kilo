@@ -3,7 +3,7 @@
 ## Мета
 - **ID / ветка:** `013-aprilhub-design-system-integration-showcase`
 - **Приоритет:** высокий
-- **Связанные документы:** `task_list.md`, `docs/AGENT_ARCHITECTURE_CONTEXT.md`, `docs/DEPLOYMENT_STRATEGY.md`, `docs/TESTING_STRATEGY.md`, [`DisignApril`](https://github.com/ukituki-ps/DisignApril.git)
+- **Связанные документы:** `task_list.md`, `docs/AGENT_ARCHITECTURE_CONTEXT.md`, `docs/DEPLOYMENT_STRATEGY.md`, `docs/TESTING_STRATEGY.md`, [`DisignApril`](https://github.com/ukituki-ps/DisignApril-kilo
 
 ## Цель
 Интегрировать дизайн-систему April из репозитория `DisignApril` в проект `april-worker` и развернуть отдельную витрину (showcase) компонентов/токенов, доступную в dev-контуре.
@@ -14,7 +14,7 @@
 - Для следующих этапов (`014`, `015`) необходима рабочая витрина, чтобы сверять реализацию интерфейсов с эталонными компонентами.
 
 ## Входит в объём
-- Подключить дизайн-систему из `https://github.com/ukituki-ps/DisignApril.git` в проект:
+- Подключить дизайн-систему из `https://github.com/ukituki-ps/DisignApril-kilo
   - определить способ интеграции (package/git dependency/workspace) в рамках текущего репозитория и CI,
   - подключить базовые токены и ключевые UI-компоненты в `hub-shell`.
 - Подготовить и развернуть отдельную витрину дизайн-системы:

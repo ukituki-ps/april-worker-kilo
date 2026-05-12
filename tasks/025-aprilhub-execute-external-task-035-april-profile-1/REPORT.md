@@ -4,7 +4,7 @@
 - Задача: Исполнение внешней задачи 035 (shell IA, HostContext, smoke deep-link)
 - Ветка: `feature/025-aprilhub-shell-ia-035`
 - Коммиты: `488ea51` (основной функционал), `1c221c4`, `18b8bf2`, `6026abc`, `2140435`, `7e169de`, `fa9c125` (актуализация отчёта)
-- PR: [#46](https://github.com/ukituki-ps/april-worker/pull/46), статус: merged в `develop`
+- PR: [#46](https://github.com/ukituki-ps/april-worker-kilo
 
 ### Дублирование отчёта
 

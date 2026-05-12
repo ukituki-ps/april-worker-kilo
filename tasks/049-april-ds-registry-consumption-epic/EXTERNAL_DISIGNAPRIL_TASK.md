@@ -1,5 +1,5 @@
 <!--
-  ИНСТРУКЦИЯ: скопировать содержимое в репозиторий DisignApril (ukituki-ps/DisignApril),
+  ИНСТРУКЦИЯ: скопировать содержимое в репозиторий DisignApril (ukituki-ps/DisignApril-kilo
   например как tasks/049-npm-publish-april-packages/TASK.md
   (номер подпапки выберите по правилам того репозитория).
 -->

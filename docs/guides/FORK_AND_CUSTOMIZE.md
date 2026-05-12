@@ -42,7 +42,7 @@ sidebar_position: 2
 
 ## 6. Фронтенд и дизайн-система April
 
-- [ ] Подключить **`@april/tokens`** и **`@april/ui`** из вашего npm-registry (или локально через сборку [DisignApril](https://github.com/ukituki-ps/DisignApril)) — см. [`DESIGN_SYSTEM.md`](./DESIGN_SYSTEM.md) и при необходимости **`frontend/README.md`** в корне сервиса.
+- [ ] Подключить **`@april/tokens`** и **`@april/ui`** из вашего npm-registry (или локально через сборку [DisignApril](https://github.com/ukituki-ps/DisignApril-kilo
 - [ ] Для приватного scope **`@april/*`**: настроить `.npmrc` / CI credentials по политике организации.
 
 ## 7. После появления кода

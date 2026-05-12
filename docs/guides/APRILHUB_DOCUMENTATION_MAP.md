@@ -15,8 +15,8 @@
    - [`APRILHUB_TEAM_WORKFLOW.md`](./APRILHUB_TEAM_WORKFLOW.md)
    - [`APRILHUB_AGENT_DEVELOPMENT.md`](./APRILHUB_AGENT_DEVELOPMENT.md)
 4. Для frontend/DS интеграции:
-   - [`FRONTEND_STRATEGY`](https://github.com/ukituki-ps/april-worker/blob/develop/docs/FRONTEND_STRATEGY.md)
-   - [`WIDGET_CONTRACTS`](https://github.com/ukituki-ps/april-worker/blob/develop/docs/WIDGET_CONTRACTS.md)
+   - [`FRONTEND_STRATEGY`](https://github.com/ukituki-ps/april-worker-kilo
+   - [`WIDGET_CONTRACTS`](https://github.com/ukituki-ps/april-worker-kilo
    - [`DESIGN_SYSTEM.md`](./DESIGN_SYSTEM.md)
 
 ## Где искать информацию по доменам
@@ -29,9 +29,9 @@
 | Deployment/dev flow | `docs/DEPLOYMENT_STRATEGY.md` |
 | Тестовый контур | `docs/TESTING_STRATEGY.md`, `docs/runbooks/APRILHUB_TESTING_TRIAGE.md` |
 | Observability | [`OBSERVABILITY_INDEX.md`](./OBSERVABILITY_INDEX.md), [`OBSERVABILITY_MULTI_STAND_OPERATING_MODEL.md`](./OBSERVABILITY_MULTI_STAND_OPERATING_MODEL.md) |
-| Incident / error triage (агент) | [`AGENT_ERROR_TRIAGE_PROMPT.md`](https://github.com/ukituki-ps/april-worker/blob/develop/docs/AGENT_ERROR_TRIAGE_PROMPT.md), [`runbooks/APRIL_ERROR_TELEMETRY_TRIAGE.md`](https://github.com/ukituki-ps/april-worker/blob/develop/docs/runbooks/APRIL_ERROR_TELEMETRY_TRIAGE.md) |
+| Incident / error triage (агент) | [`AGENT_ERROR_TRIAGE_PROMPT.md`](https://github.com/ukituki-ps/april-worker-kilo
 | ADR решения | `/adr/` |
-| Сервис **AprilProfile** (профили сущностей, не репозиторий Hub) | Канон: [github.com/ukituki-ps/april-profile](https://github.com/ukituki-ps/april-profile) (`README.md`, `docs/DESIGN_AprilProfile.md`, OpenAPI). Интеграция с Hub BFF и матрица связей — `docs/architecture/INTERSERVICE_LINKS.md`, `docs/architecture/INTEGRATION_CONTRACTS.md` |
+| Сервис **AprilProfile** (профили сущностей, не репозиторий Hub) | Канон: [github.com/ukituki-ps/april-profile-kilo
 
 ## Обязательный минимум для нового участника
 

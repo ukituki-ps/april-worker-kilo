@@ -6,19 +6,19 @@ sidebar_position: 4
 
 Исходный код, витрина компонентов и полные соглашения живут в отдельном репозитории:
 
-**[github.com/ukituki-ps/DisignApril](https://github.com/ukituki-ps/DisignApril)** (монорепозиторий на **pnpm**: пакеты `packages/tokens`, `packages/ui`, приложение-галерея `apps/showcase`).
+**[github.com/ukituki-ps/DisignApril-kilo
 
-**Каноническая модель для AprilHub (`hub-shell`) на CI, stage и production** после эпика **`049`**: пакеты **`@april/tokens`** и **`@april/ui`** устанавливаются из **приватного npm registry** (GitHub Packages, scope `@april`) по **semver**, зафиксированному в **`hub-shell/package-lock.json`**. Источник истины для runtime в браузере — опубликованный tarball версии, а не локальная сборка `dist` в submodule. Архитектурное решение и политика semver / отката: [ADR «дистрибуция дизайн-системы April через npm»](https://github.com/ukituki-ps/april-worker/blob/develop/docs/architecture/ADR-april-design-system-npm-distribution.md) (в репозитории: `docs/architecture/ADR-april-design-system-npm-distribution.md`).
+**Каноническая модель для AprilHub (`hub-shell`) на CI, stage и production** после эпика **`049`**: пакеты **`@april/tokens`** и **`@april/ui`** устанавливаются из **приватного npm registry** (GitHub Packages, scope `@april`) по **semver**, зафиксированному в **`hub-shell/package-lock.json`**. Источник истины для runtime в браузере — опубликованный tarball версии, а не локальная сборка `dist` в submodule. Архитектурное решение и политика semver / отката: [ADR «дистрибуция дизайн-системы April через npm»](https://github.com/ukituki-ps/april-worker-kilo
 
 Переход `package.json` / lock / `ds:prepare` с `file:` на registry для **`hub-shell`** зафиксирован во внешней задаче **`077`** (april-profile-1) / **`053`** (april-worker). Ниже сохранена **историческая** схема этапа `013` для локальных сценариев и обратной совместимости.
 
 ## Целевая интеграция: registry + lockfile (hub-shell)
 
-1. **Registry для scope `@ukituki-ps` / алиасов `@april/*`:** `https://npm.pkg.github.com` (см. ADR). В **`hub-shell/`** закоммичен **`.npmrc`** без секрета: `//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}`; шаблон с тем же содержимым — **`hub-shell/.npmrc.example`**. В CI и при `docker build` задаётся **`NODE_AUTH_TOKEN`** (PAT или `GITHUB_TOKEN` с **`read:packages`**) так, чтобы `npm ci` мог скачать пакеты DS. Подробности секретов и деплоя: [`docs/DEPLOYMENT_STRATEGY.md`](https://github.com/ukituki-ps/april-worker/blob/develop/docs/DEPLOYMENT_STRATEGY.md) (раздел **«3.1. GitHub Packages»**).
+1. **Registry для scope `@ukituki-ps` / алиасов `@april/*`:** `https://npm.pkg.github.com` (см. ADR). В **`hub-shell/`** закоммичен **`.npmrc`** без секрета: `//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}`; шаблон с тем же содержимым — **`hub-shell/.npmrc.example`**. В CI и при `docker build` задаётся **`NODE_AUTH_TOKEN`** (PAT или `GITHUB_TOKEN` с **`read:packages`**) так, чтобы `npm ci` мог скачать пакеты DS. Подробности секретов и деплоя: [`docs/DEPLOYMENT_STRATEGY.md`](https://github.com/ukituki-ps/april-worker-kilo
 
 2. **Зависимости:** в `hub-shell/package.json` — диапазоны semver (`^x.y.z` или зафиксированные версии по политике команды); **точные версии транзитивного дерева** — в `package-lock.json` после `npm install` / `npm ci`.
 
-3. **Bump дизайн-системы:** новая версия публикуется из **DisignApril** → в `april-worker` отдельный PR на обновление `package.json` / `package-lock.json` (и при необходимости образов по SHA) → обязательный quality gate из корневого [`README.md`](https://github.com/ukituki-ps/april-worker/blob/develop/README.md). Submodule **не** заменяет этот шаг для продуктового shell.
+3. **Bump дизайн-системы:** новая версия публикуется из **DisignApril** → в `april-worker` отдельный PR на обновление `package.json` / `package-lock.json` (и при необходимости образов по SHA) → обязательный quality gate из корневого [`README.md`](https://github.com/ukituki-ps/april-worker-kilo
 
 4. **Submodule `design-system/DisignApril` после `049`:** остаётся для **витрины** (`april-showcase`, маршрут `/showcase/`), **локальной разработки** рядом с DS и **подготовки релиза** пакетов в DisignApril; не считается единственным источником runtime для production-сборки `hub-shell`.
 

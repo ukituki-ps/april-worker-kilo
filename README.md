@@ -10,7 +10,7 @@
 2. `make docs-build`, `make openapi-lint`.
 3. `make compose-up` после сборки статики — см. [`docs-site/docs/getting-started.md`](docs-site/docs/getting-started.md).
 
-**Репозиторий:** [github.com/ukituki-ps/april-worker](https://github.com/ukituki-ps/april-worker)
+**Репозиторий:** [github.com/ukituki-ps/april-worker-kilo
 
 **CI:** `.github/workflows/ci.yml` — проверки на PR/push на self-hosted runner `self-hosted, ci, profile` (CI host `192.168.1.29`); деплой на dev — `.github/workflows/dev-deploy.yml` (self-hosted runner `self-hosted, dev, profile`, стенд `dev.profile.april.ukituki.tech` на `192.168.1.42`; см. [`docs/DEPLOYMENT_STRATEGY.md`](docs/DEPLOYMENT_STRATEGY.md)).
 

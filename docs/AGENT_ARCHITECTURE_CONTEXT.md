@@ -5,7 +5,7 @@
 - **Backend**: Go, REST, modular monolith
 - **Workflow Engine**: Temporal (Go SDK, Workflow as Code)
 - **Frontend**: React + TypeScript + Vite
-- **UI Kit**: Mantine; дизайн-система April — пакеты **`@april/tokens`**, **`@april/ui`** (исходники [DisignApril](https://github.com/ukituki-ps/DisignApril); дистрибуция и граница submodule vs npm — [`architecture/ADR-april-design-system-npm-distribution.md`](./architecture/ADR-april-design-system-npm-distribution.md), потребление — [`guides/DESIGN_SYSTEM.md`](./guides/DESIGN_SYSTEM.md))
+- **UI Kit**: Mantine; дизайн-система April — пакеты **`@april/tokens`**, **`@april/ui`** (исходники [DisignApril](https://github.com/ukituki-ps/DisignApril-kilo
 - **Process Editor**: React Flow (`@xyflow/react`)
 - **IAM**: Keycloak (RBAC источник ролей/прав)
 - **DB**: PostgreSQL 17
@@ -18,7 +18,7 @@
 
 **AprilHub как инфраструктурная база экосистемы:** этот репозиторий (AprilHub / april-worker) — **источник правды** для **общей** инфраструктуры, которой пользуются **остальные микросервисы April**: наблюдаемость, onboarding стендов, связанные runbook'и (`infra/observability/`, [`guides/OBSERVABILITY_INDEX.md`](./guides/OBSERVABILITY_INDEX.md)). Они **интегрируются** в контур по документам и артефактам здесь и **не копируют** полный observability-стек в свой репозиторий без отдельного решения.
 
-**AprilProfile** (доменные профили сущностей): реализация, OpenAPI, Docusaurus и дизайн модуля ведутся в репозитории [ukituki-ps/april-profile](https://github.com/ukituki-ps/april-profile) (`DESIGN_AprilProfile.md`, `AGENT_ARCHITECTURE_CONTEXT.md` там). Связи с AprilHub (BFF-агрегация для UI, матрица sync/async) фиксируются **здесь**: [`architecture/INTERSERVICE_LINKS.md`](./architecture/INTERSERVICE_LINKS.md), [`architecture/INTEGRATION_CONTRACTS.md`](./architecture/INTEGRATION_CONTRACTS.md), `structurizr/workspace.dsl`.
+**AprilProfile** (доменные профили сущностей): реализация, OpenAPI, Docusaurus и дизайн модуля ведутся в репозитории [ukituki-ps/april-profile-kilo
 
 Граница: **один репозиторий = один сервис**; внутри репозитория допустим **модульный монолит** (не путать с «микросервисом на каждый модуль»).
 

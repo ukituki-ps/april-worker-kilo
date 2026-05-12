@@ -1,7 +1,7 @@
 [submodule "design-system/DisignApril"]
 	path = design-system/DisignApril
-	url = https://github.com/ukituki-ps/DisignApril.git
+	url = https://github.com/ukituki-ps/DisignApril-kilo.git
 [submodule "vendor/april-profile"]
 	path = vendor/april-profile
-	url = https://github.com/ukituki-ps/april-profile.git
+	url = git@github.com:ukituki-ps/april-profile-kilo.git
 	branch = develop

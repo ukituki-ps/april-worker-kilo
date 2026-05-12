@@ -3,7 +3,7 @@
 - Задача: исполнение внешней задачи 030 из `april-profile-1` с двойным отчётом
 - Ветка: `feature/aprilhub-phase-4a3-instance-history-host-e2e`
 - Коммиты: `ad08248` (реализация), `40d8b85`, `71cf271`, `57f76f0` (актуализации REPORT/ссылки PR после push)
-- PR: черновик сравнения (GitHub): https://github.com/ukituki-ps/april-worker/compare/develop...feature/aprilhub-phase-4a3-instance-history-host-e2e
+- PR: черновик сравнения (GitHub): https://github.com/ukituki-ps/april-worker-kilo
 
 ## 2) Что сделано
 - [frontend] Добавлен host-экран истории экземпляра `InstanceHistoryHostWidget` в `hub-shell` (таймлайн версий, snapshot, diff, read-only режим).

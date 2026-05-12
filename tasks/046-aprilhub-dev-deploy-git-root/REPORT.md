@@ -4,16 +4,16 @@
 - Задача: исправление дефолта пути деплоя GitHub Actions для AprilHub (`april-worker`)
 - Ветка: `fix/046-dev-deploy-git-root`
 - Коммиты: единый коммит на ветке `fix/046-dev-deploy-git-root` (до merge)
-- PR: https://github.com/ukituki-ps/april-worker/pull/92
+- PR: https://github.com/ukituki-ps/april-worker-kilo
 
 ## 2) Инцидент и классификация (CI / Git, не runtime Sentry)
 
-1. **Инцидент:** падение workflow **Deploy to dev** (`.github/workflows/dev-deploy.yml`) на шаге checkout коммита после `push` в `develop` репозитория `ukituki-ps/april-worker`.
+1. **Инцидент:** падение workflow **Deploy to dev** (`.github/workflows/dev-deploy.yml`) на шаге checkout коммита после `push` в `develop` репозитория `ukituki-ps/april-worker-kilo
 2. **Корреляция Sentry → Loki → Prometheus:** не применима; это сбой **инфраструктуры CI/deploy** (git), а не HTTP/UI runtime.
 3. **Наблюдения:** в workflow передаётся `github.sha` из **april-worker**, а дефолтный `APRIL_DEPLOY_ROOT` был `/opt/april-profile` (наследие шаблона AprilProfile). Если на сервере в этом пути клон `april-profile`, объект коммита отсутствует → `git checkout` завершается ошибкой.
 4. **Классификация:** **infra / конфигурация деплоя** (несоответствие клона и репозитория события). Owner: команда AprilHub + администратор runner/сервера.
 5. **Изменения:** см. раздел «Что сделано»; риск: на стендах, где уже выставлена переменная `APRIL_DEPLOY_ROOT`, поведение не меняется; где полагались на дефолт `/opt/april-profile` для **именно** клона april-worker — нужно один раз выставить переменную или перенести клон в `/opt/april-worker`.
-6. **Верификация:** после merge — убедиться, что на dev-хосте каталог из `APRIL_DEPLOY_ROOT` — клон `ukituki-ps/april-worker` и `git fetch && git checkout <sha из Actions>` проходит для свежего push в `develop`.
+6. **Верификация:** после merge — убедиться, что на dev-хосте каталог из `APRIL_DEPLOY_ROOT` — клон `ukituki-ps/april-worker-kilo
 
 ## 3) Что сделано
 

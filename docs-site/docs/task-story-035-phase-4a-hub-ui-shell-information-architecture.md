@@ -26,7 +26,7 @@ sidebar_position: 22
 
 ## HostContext и встраивание виджетов
 
-Минимальный контракт по-прежнему описан в [WIDGET_CONTRACTS](https://github.com/ukituki-ps/april-worker/blob/develop/docs/WIDGET_CONTRACTS.md). В shell добавлены провайдер **`HubHostContextProvider`** (навигация + срез маршрута поверх tenant/auth/telemetry) и **`ShellToastProvider`** для унифицированных уведомлений об успехе/ошибке. Подключение нового виджета: см. **§8** в том же документе.
+Минимальный контракт по-прежнему описан в [WIDGET_CONTRACTS](https://github.com/ukituki-ps/april-worker-kilo
 
 ## Проверки
 

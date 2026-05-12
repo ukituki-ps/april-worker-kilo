@@ -3,7 +3,7 @@
 - Статус: ✅ выполнено (локальная интеграция и сборка; смок на dev-ingress ожидается при поднятом upstream без 502)
 - Задача: AprilHub Shell — parity с `@april/ui` (Header / Sidebar), full-height layout, favicon Icon Only `#12B886`, выравнивание Keycloak favicon
 - Ветка: `fix/047-aprilhub-shell-ds-parity`
-- Коммиты: см. историю деплоя PR #97; подмодуль [`design-system/DisignApril`](../../design-system/DisignApril) — `5e03e27` на `main` (после того как этот коммит запушен в `ukituki-ps/DisignApril`, иначе CI не сможет его скачать).
+- Коммиты: см. историю деплоя PR #97; подмодуль [`design-system/DisignApril`](../../design-system/DisignApril) — `5e03e27` на `main` (после того как этот коммит запушен в `ukituki-ps/DisignApril-kilo
 - PR: не создавался
 
 ## 2) Что сделано
@@ -58,7 +58,7 @@ npm run lint && npm run test && npm run build       # cwd: hub-shell
 
 ## 7) Риски и ограничения
 
-- Подмодуль `design-system/DisignApril`: перед merge в april-worker коммиты дизайн-системы должны быть запушены в `ukituki-ps/DisignApril`; иначе указатель в родителе указывает на SHA, которого нет на GitHub (`upload-pack: not our ref`).
+- Подмодуль `design-system/DisignApril`: перед merge в april-worker коммиты дизайн-системы должны быть запушены в `ukituki-ps/DisignApril-kilo
 - В `hub-shell` не добавлен пакет `lucide-react` из‑за конфликта прав на дерево `node_modules/playwright` (каталог от root из Docker); иконки навигации реализованы локальным глифом, совместимым по месту под `NavLink`/иконку.
 - Полное E2E и smoke против реального ingress нужно повторить на стенде, где `nginx` успешно проксирует `hub-shell` (без 502).
 
