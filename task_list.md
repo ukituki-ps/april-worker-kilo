@@ -127,7 +127,7 @@
 - [x] `056-security-rate-limiting`: rate limiting middleware для Hub BFF endpoints (Redis backend, sliding window) — зависит от 055 — [`TASK.md`](./tasks/056-security-rate-limiting/TASK.md), [`REPORT.md`](./tasks/056-security-rate-limiting/REPORT.md)
 - [x] `057-security-csp-headers`: security headers (CSP, HSTS, X-Frame) в Nginx + BFF CSP violation reporting endpoint — зависит от 055 — [`TASK.md`](./tasks/057-security-csp-headers/TASK.md), [`REPORT.md`](./tasks/057-security-csp-headers/REPORT.md)
 - [x] `058-security-dependency-scan`: gosec + govulncheck + npm audit в CI pipeline, mitigation policy — нет зависимостей — [`TASK.md`](./tasks/058-security-dependency-scan/TASK.md), [`REPORT.md`](./tasks/058-security-dependency-scan/REPORT.md)
-- [ ] `059-security-penetration-testing`: ручное тестирование auth flows, API security, frontend — зависит от 055, 056, 057 — [`TASK.md`](./tasks/059-security-penetration-testing/TASK.md)
+- [x] `059-security-penetration-testing`: ручное тестирование auth flows, API security, frontend — зависит от 055, 056, 057 — [`TASK.md`](./tasks/059-security-penetration-testing/TASK.md), [`REPORT.md`](./tasks/059-security-penetration-testing/REPORT.md), [`SECURITY_AUDIT.md`](./tasks/059-security-penetration-testing/SECURITY_AUDIT.md)
 
 ### Performance трек (060–063)
 
@@ -201,7 +201,7 @@
 | `056` | Phase 9 Rate Limiting — Redis middleware для BFF endpoints | ✅ Выполнено | [`TASK.md`](./tasks/056-security-rate-limiting/TASK.md), [`REPORT.md`](./tasks/056-security-rate-limiting/REPORT.md) |
 | `057` | Phase 9 Security Headers — CSP, HSTS, X-Frame в Nginx + BFF | ✅ Выполнено | [`TASK.md`](./tasks/057-security-csp-headers/TASK.md), [`REPORT.md`](./tasks/057-security-csp-headers/REPORT.md) |
 | `058` | Phase 9 Dependency Scan — gosec + govulncheck + npm audit в CI | ✅ Выполнено | [`TASK.md`](./tasks/058-security-dependency-scan/TASK.md), [`REPORT.md`](./tasks/058-security-dependency-scan/REPORT.md) |
-| `059` | Phase 9 Penetration Testing — ручное тестирование auth/API/frontend | 🔲 В очереди (зависит от 055, 056, 057) | [`TASK.md`](./tasks/059-security-penetration-testing/TASK.md) |
+| `059` | Phase 9 Penetration Testing — ручное тестирование auth/API/frontend | ✅ Выполнено | [`TASK.md`](./tasks/059-security-penetration-testing/TASK.md), [`REPORT.md`](./tasks/059-security-penetration-testing/REPORT.md), [`SECURITY_AUDIT.md`](./tasks/059-security-penetration-testing/SECURITY_AUDIT.md) |
 | `060` | Phase 9 k6 Production Thresholds — SLA definition + Prometheus alerts | ✅ Выполнено | [`TASK.md`](./tasks/060-perf-k6-production-thresholds/TASK.md), [`REPORT.md`](./tasks/060-perf-k6-production-thresholds/REPORT.md) |
 | `061` | Phase 9 BFF Response Caching — Redis tenant-aware cache | ✅ Выполнено | [`TASK.md`](./tasks/061-perf-bff-response-caching/TASK.md), [`REPORT.md`](./tasks/061-perf-bff-response-caching/REPORT.md) |
 | `062` | Phase 9 Shell Bundle Analysis — lazy loading, code splitting | ✅ Выполнено | [`TASK.md`](./tasks/062-perf-shell-bundle-analysis/TASK.md), [`REPORT.md`](./tasks/062-perf-shell-bundle-analysis/REPORT.md) |
