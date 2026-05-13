@@ -67,6 +67,7 @@
 
 ## Текущий фокус
 
+- [x] `004-production-cicd-infrastructure`: Dockerfiles (hub-bff + hub-shell), docker-compose.prod.yml overlay, deploy.sh MODE=production, dev-deploy.yml two-job pipeline (build-and-push images to ghcr.io → deploy with images.env) — [`tasks/004-production-cicd-infrastructure/REPORT.md`](./tasks/004-production-cicd-infrastructure/REPORT.md)
 - [x] `001-aprilhub-bootstrap`: каркас `hub-bff`/`hub-shell` + dev Keycloak + health/readiness + env templates
 - [x] `002-aprilhub-auth-rbac`: OIDC flow в `hub-shell`, `/me` + role guards в `hub-bff`
 - [x] `003-aprilhub-shell-design-system`: UX/layout для guest, Keycloak transitions и authorized shell по дизайн-системе
