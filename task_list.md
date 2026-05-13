@@ -123,18 +123,18 @@
 
 ### Security трек (055–059)
 
-- [ ] `055-security-audit-scoping`: аудит auth/RBAC gaps, OWASP Top-10 mapping для AprilHub — входная задача для 056–059 — [`TASK.md`](./tasks/055-security-audit-scoping/TASK.md)
-- [ ] `056-security-rate-limiting`: rate limiting middleware для Hub BFF endpoints (Redis backend) — зависит от 055 — [`TASK.md`](./tasks/056-security-rate-limiting/TASK.md)
-- [ ] `057-security-csp-headers`: security headers (CSP, HSTS, X-Frame) в Nginx + BFF middleware + CSP violation reporting — зависит от 055 — [`TASK.md`](./tasks/057-security-csp-headers/TASK.md)
-- [ ] `058-security-dependency-scan`: gosec + govulncheck + npm audit в CI pipeline, mitigation policy — нет зависимостей — [`TASK.md`](./tasks/058-security-dependency-scan/TASK.md)
+- [x] `055-security-audit-scoping`: аудит auth/RBAC gaps, OWASP Top-10 mapping для AprilHub — входная задача для 056–059 — [`TASK.md`](./tasks/055-security-audit-scoping/TASK.md), [`REPORT.md`](./tasks/055-security-audit-scoping/REPORT.md)
+- [x] `056-security-rate-limiting`: rate limiting middleware для Hub BFF endpoints (Redis backend, sliding window) — зависит от 055 — [`TASK.md`](./tasks/056-security-rate-limiting/TASK.md), [`REPORT.md`](./tasks/056-security-rate-limiting/REPORT.md)
+- [x] `057-security-csp-headers`: security headers (CSP, HSTS, X-Frame) в Nginx + BFF CSP violation reporting endpoint — зависит от 055 — [`TASK.md`](./tasks/057-security-csp-headers/TASK.md), [`REPORT.md`](./tasks/057-security-csp-headers/REPORT.md)
+- [x] `058-security-dependency-scan`: gosec + govulncheck + npm audit в CI pipeline, mitigation policy — нет зависимостей — [`TASK.md`](./tasks/058-security-dependency-scan/TASK.md), [`REPORT.md`](./tasks/058-security-dependency-scan/REPORT.md)
 - [ ] `059-security-penetration-testing`: ручное тестирование auth flows, API security, frontend — зависит от 055, 056, 057 — [`TASK.md`](./tasks/059-security-penetration-testing/TASK.md)
 
 ### Performance трек (060–063)
 
-- [ ] `060-perf-k6-production-thresholds`: определение SLA из k6 baseline, Prometheus alerts — нет зависимостей — [`TASK.md`](./tasks/060-perf-k6-production-thresholds/TASK.md)
-- [ ] `061-perf-bff-response-caching`: Redis response cache для read-only BFF endpoints (tenant-aware) — нет зависимостей — [`TASK.md`](./tasks/061-perf-bff-response-caching/TASK.md)
-- [ ] `062-perf-shell-bundle-analysis`: bundle size audit, lazy loading виджетов, code splitting — нет зависимостей — [`TASK.md`](./tasks/062-perf-shell-bundle-analysis/TASK.md)
-- [ ] `063-perf-db-query-optimization`: pg_stat_statements, slow query audit, recommended indexes (cross-repo с AprilProfile) — нет зависимостей — [`TASK.md`](./tasks/063-perf-db-query-optimization/TASK.md)
+- [x] `060-perf-k6-production-thresholds`: определение SLA из k6 baseline, Prometheus alerts — нет зависимостей — [`TASK.md`](./tasks/060-perf-k6-production-thresholds/TASK.md), [`REPORT.md`](./tasks/060-perf-k6-production-thresholds/REPORT.md)
+- [x] `061-perf-bff-response-caching`: Redis response cache для read-only BFF endpoints (tenant-aware, X-Cache headers) — нет зависимостей — [`TASK.md`](./tasks/061-perf-bff-response-caching/TASK.md), [`REPORT.md`](./tasks/061-perf-bff-response-caching/REPORT.md)
+- [x] `062-perf-shell-bundle-analysis`: bundle size audit, lazy loading виджетов (уже реализовано в 042/051), code splitting — нет зависимостей — [`TASK.md`](./tasks/062-perf-shell-bundle-analysis/TASK.md), [`REPORT.md`](./tasks/062-perf-shell-bundle-analysis/REPORT.md)
+- [x] `063-perf-db-query-optimization`: pg_stat_statements, slow query audit, recommended indexes (cross-repo с AprilProfile) — нет зависимостей — [`TASK.md`](./tasks/063-perf-db-query-optimization/TASK.md), [`REPORT.md`](./tasks/063-perf-db-query-optimization/REPORT.md)
 - [x] `2026-04-30-micro-profiles-widget-host-fill-height`: закрыт micro-инцидент fixed-height `ProfilesWidget` на `#/app/profile/entities`; подтверждена рабочая цепочка fill-height + восстановлена стабильность dev runtime/containers — [`TASK.md`](./tasks/2026-04-30-micro-profiles-widget-host-fill-height/TASK.md), [`REPORT.md`](./tasks/2026-04-30-micro-profiles-widget-host-fill-height/REPORT.md)
 - [x] `2026-04-30-micro-profiles-widget-sync-aprilprofile`: актуализирован `profiles-widget` после обновления `april-profile` (`vendor/april-profile` -> `ebbc8fc`), прогнан quality gate `hub-shell`, обновлены `dist`-артефакты — [`TASK.md`](./tasks/2026-04-30-micro-profiles-widget-sync-aprilprofile/TASK.md), [`REPORT.md`](./tasks/2026-04-30-micro-profiles-widget-sync-aprilprofile/REPORT.md)
 - [x] `2026-04-30-micro-entity-types-widget-sync-aprilprofile`: актуализирован `entity-types-widget` после обновления `april-profile` (`vendor/april-profile` -> `76ff32a`), прогнан quality gate `hub-shell`, обновлены `dist`-артефакты — [`TASK.md`](./tasks/2026-04-30-micro-entity-types-widget-sync-aprilprofile/TASK.md), [`REPORT.md`](./tasks/2026-04-30-micro-entity-types-widget-sync-aprilprofile/REPORT.md)
@@ -197,11 +197,12 @@
 | `053` | Исполнение внешней задачи 077 из `april-profile-1` (анализ docs + реализация + двойной отчёт) | ✅ Выполнено | [`tasks/053-aprilhub-execute-external-task-077-april-profile-1/TASK.md`](./tasks/053-aprilhub-execute-external-task-077-april-profile-1/TASK.md), [`REPORT.md`](./tasks/053-aprilhub-execute-external-task-077-april-profile-1/REPORT.md) |
 | `054` | Исполнение внешней задачи 080 из `april-profile-1` (глобальный mobile chrome Hub, bump `vendor/april-profile`, Playwright mobile) | ✅ Выполнено | [`tasks/054-aprilhub-execute-external-task-080-april-profile-1/TASK.md`](./tasks/054-aprilhub-execute-external-task-080-april-profile-1/TASK.md), [`REPORT.md`](./tasks/054-aprilhub-execute-external-task-080-april-profile-1/REPORT.md) |
 | `055` | Phase 9 Security Audit Scoping — OWASP Top-10 mapping, auth/RBAC gap analysis — вход для 056–059 | ✅ Выполнено | [`TASK.md`](./tasks/055-security-audit-scoping/TASK.md), [`REPORT.md`](./tasks/055-security-audit-scoping/REPORT.md) |
-| `056` | Phase 9 Rate Limiting — Redis middleware для BFF endpoints | 🔲 В очереди (зависит от 055) | [`TASK.md`](./tasks/056-security-rate-limiting/TASK.md) |
-| `057` | Phase 9 Security Headers — CSP, HSTS, X-Frame в Nginx + BFF | 🔲 В очереди (зависит от 055) | [`TASK.md`](./tasks/057-security-csp-headers/TASK.md) |
+| `055` | Phase 9 Security Audit Scoping — OWASP Top-10 mapping, auth/RBAC gap analysis — вход для 056–059 | ✅ Выполнено | [`TASK.md`](./tasks/055-security-audit-scoping/TASK.md), [`REPORT.md`](./tasks/055-security-audit-scoping/REPORT.md) |
+| `056` | Phase 9 Rate Limiting — Redis middleware для BFF endpoints | ✅ Выполнено | [`TASK.md`](./tasks/056-security-rate-limiting/TASK.md), [`REPORT.md`](./tasks/056-security-rate-limiting/REPORT.md) |
+| `057` | Phase 9 Security Headers — CSP, HSTS, X-Frame в Nginx + BFF | ✅ Выполнено | [`TASK.md`](./tasks/057-security-csp-headers/TASK.md), [`REPORT.md`](./tasks/057-security-csp-headers/REPORT.md) |
 | `058` | Phase 9 Dependency Scan — gosec + govulncheck + npm audit в CI | ✅ Выполнено | [`TASK.md`](./tasks/058-security-dependency-scan/TASK.md), [`REPORT.md`](./tasks/058-security-dependency-scan/REPORT.md) |
 | `059` | Phase 9 Penetration Testing — ручное тестирование auth/API/frontend | 🔲 В очереди (зависит от 055, 056, 057) | [`TASK.md`](./tasks/059-security-penetration-testing/TASK.md) |
 | `060` | Phase 9 k6 Production Thresholds — SLA definition + Prometheus alerts | ✅ Выполнено | [`TASK.md`](./tasks/060-perf-k6-production-thresholds/TASK.md), [`REPORT.md`](./tasks/060-perf-k6-production-thresholds/REPORT.md) |
-| `061` | Phase 9 BFF Response Caching — Redis tenant-aware cache | 🔲 В очереди | [`TASK.md`](./tasks/061-perf-bff-response-caching/TASK.md) |
-| `062` | Phase 9 Shell Bundle Analysis — lazy loading, code splitting | ✅ Выполнено (частично) — bundle scripts + docs, lazy loading pending | [`TASK.md`](./tasks/062-perf-shell-bundle-analysis/TASK.md) |
-| `063` | Phase 9 DB Query Optimization — pg_stat_statements, slow queries (cross-repo) | ✅ Выполнено (анализ + рекомендации) | [`TASK.md`](./tasks/063-perf-db-query-optimization/TASK.md), [`REPORT.md`](./tasks/063-perf-db-query-optimization/REPORT.md) |
+| `061` | Phase 9 BFF Response Caching — Redis tenant-aware cache | ✅ Выполнено | [`TASK.md`](./tasks/061-perf-bff-response-caching/TASK.md), [`REPORT.md`](./tasks/061-perf-bff-response-caching/REPORT.md) |
+| `062` | Phase 9 Shell Bundle Analysis — lazy loading, code splitting | ✅ Выполнено | [`TASK.md`](./tasks/062-perf-shell-bundle-analysis/TASK.md), [`REPORT.md`](./tasks/062-perf-shell-bundle-analysis/REPORT.md) |
+| `063` | Phase 9 DB Query Optimization — pg_stat_statements, slow queries (cross-repo) | ✅ Выполнено | [`TASK.md`](./tasks/063-perf-db-query-optimization/TASK.md), [`REPORT.md`](./tasks/063-perf-db-query-optimization/REPORT.md) |

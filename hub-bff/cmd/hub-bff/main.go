@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 	"log/slog"
 	"net/http"
@@ -12,7 +13,9 @@ import (
 	"github.com/ukituki-ps/april-worker/hub-bff/internal/auth"
 	"github.com/ukituki-ps/april-worker/hub-bff/internal/config"
 	httpapi "github.com/ukituki-ps/april-worker/hub-bff/internal/http"
+	"github.com/ukituki-ps/april-worker/hub-bff/internal/middleware"
 	"github.com/ukituki-ps/april-worker/hub-bff/internal/observability"
+	"github.com/ukituki-ps/april-worker/hub-bff/internal/redis"
 )
 
 func main() {
@@ -25,6 +28,12 @@ func main() {
 
 	registry := prometheus.NewRegistry()
 	observability.SetRecorder(observability.NewPrometheusRecorder(registry))
+
+	redisClient, err := redis.New(context.Background(), cfg.RedisHost, cfg.RedisPort)
+	if err != nil {
+		log.Fatalf("connect redis: %v", err)
+	}
+	defer redisClient.Close()
 
 	authMiddleware, err := auth.NewMiddleware(cfg.KeycloakIssuer, cfg.KeycloakAud, cfg.KeycloakJWKS)
 	if err != nil {
@@ -78,10 +87,27 @@ func main() {
 		"/api/v1/admin/profile/",
 		authMiddleware.Validate(auth.RequireAnyRole("admin")(profileAdminProxy)),
 	)
+	// CSP violation report endpoint — public, no auth required (browsers send reports unauthenticated)
+	mux.HandleFunc("/api/v1/csp-report", httpapi.CSReport)
+
+	// Cache middleware for read-only endpoints (inside auth to be user-aware)
+	cacheCfg := &middleware.CacheConfig{
+		TTLs:        middleware.DefaultTTLs(),
+		RedisClient: redisClient,
+		Enabled:     true,
+	}
+	rlCfg := &middleware.RateLimiterConfig{
+		Tiers:       middleware.DefaultTiers(),
+		RedisClient: redisClient,
+	}
+	handler := rlCfg.Middleware(
+		cacheCfg.Middleware(
+			httpapi.CORS(cfg.CORSOrigins, httpapi.Metadata(httpapi.AccessLog(mux))),
+		),
+	)
 
 	addr := ":" + cfg.Port
 	log.Printf("hub-bff listening on %s", addr)
-	handler := httpapi.CORS(cfg.CORSOrigins, httpapi.Metadata(httpapi.AccessLog(mux)))
 	if err := http.ListenAndServe(addr, handler); err != nil {
 		log.Fatalf("server stopped: %v", err)
 	}

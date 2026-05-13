@@ -15,16 +15,28 @@ type Recorder interface {
 	ObserveDegraded(service, reason string)
 	ObserveAuthError(path, reason string, status int)
 	ObserveTimeoutBudgetExceeded(service, path string)
+	// ObserveRateLimited records a rate-limited request.
+	ObserveRateLimited(endpoint, reason string)
+	// ObserveCSPViolation records a CSP violation report.
+	ObserveCSPViolation(uri, disposition string)
+	// ObserveCacheHit/CACHE_MISS records cache events for read-only endpoints.
+	ObserveCacheHit(path string)
+	ObserveCacheMiss(path string)
 }
 
 type noopRecorder struct{}
 
-func (noopRecorder) ObserveRequest(string, string, int, time.Duration)            {}
-func (noopRecorder) ObserveDownstream(string, string, string, int, time.Duration) {}
-func (noopRecorder) ObserveDownstreamRetry(string, string)                        {}
-func (noopRecorder) ObserveDegraded(string, string)                               {}
-func (noopRecorder) ObserveAuthError(string, string, int)                         {}
-func (noopRecorder) ObserveTimeoutBudgetExceeded(string, string)                  {}
+func (noopRecorder) ObserveRequest(string, string, int, time.Duration)  {}
+func (noopRecorder) ObserveDownstream(string, string, string, int, time.Duration) {
+}
+func (noopRecorder) ObserveDownstreamRetry(string, string)                   {}
+func (noopRecorder) ObserveDegraded(string, string)                         {}
+func (noopRecorder) ObserveAuthError(string, string, int)                   {}
+func (noopRecorder) ObserveTimeoutBudgetExceeded(string, string)            {}
+func (noopRecorder) ObserveRateLimited(string, string)                      {}
+func (noopRecorder) ObserveCSPViolation(string, string)                     {}
+func (noopRecorder) ObserveCacheHit(string)                                 {}
+func (noopRecorder) ObserveCacheMiss(string)                                {}
 
 var (
 	recorderMu sync.RWMutex
@@ -71,6 +83,10 @@ func ObserveTimeoutBudgetExceeded(service, path string) {
 	getRecorder().ObserveTimeoutBudgetExceeded(service, path)
 }
 
+func ObserveRateLimited(endpoint, reason string) {
+	getRecorder().ObserveRateLimited(endpoint, reason)
+}
+
 type PrometheusRecorder struct {
 	requestTotal       *prometheus.CounterVec
 	requestDuration    *prometheus.HistogramVec
@@ -80,6 +96,10 @@ type PrometheusRecorder struct {
 	degradedTotal      *prometheus.CounterVec
 	authErrorTotal     *prometheus.CounterVec
 	timeoutBudgetTotal *prometheus.CounterVec
+	rateLimitedTotal   *prometheus.CounterVec
+	cspViolationsTotal *prometheus.CounterVec
+	cacheHitTotal      *prometheus.CounterVec
+	cacheMissTotal     *prometheus.CounterVec
 }
 
 func NewPrometheusRecorder(reg prometheus.Registerer) *PrometheusRecorder {
@@ -126,6 +146,26 @@ func NewPrometheusRecorder(reg prometheus.Registerer) *PrometheusRecorder {
 			Name:      "downstream_timeout_budget_exceeded_total",
 			Help:      "Total number of downstream timeout budget exceed events.",
 		}, []string{"service", "path"}),
+		rateLimitedTotal: prometheus.NewCounterVec(prometheus.CounterOpts{
+			Namespace: "hub_bff",
+			Name:      "rate_limited_requests_total",
+			Help:      "Total number of rate-limited requests.",
+		}, []string{"endpoint", "reason"}),
+		cspViolationsTotal: prometheus.NewCounterVec(prometheus.CounterOpts{
+			Namespace: "hub_bff",
+			Name:      "csp_violations_total",
+			Help:      "Total number of CSP violation reports.",
+		}, []string{"uri", "disposition"}),
+		cacheHitTotal: prometheus.NewCounterVec(prometheus.CounterOpts{
+			Namespace: "hub_bff",
+			Name:      "cache_hit_total",
+			Help:      "Total number of cache hits for BFF responses.",
+		}, []string{"path"}),
+		cacheMissTotal: prometheus.NewCounterVec(prometheus.CounterOpts{
+			Namespace: "hub_bff",
+			Name:      "cache_miss_total",
+			Help:      "Total number of cache misses for BFF responses.",
+		}, []string{"path"}),
 	}
 
 	reg.MustRegister(
@@ -137,6 +177,10 @@ func NewPrometheusRecorder(reg prometheus.Registerer) *PrometheusRecorder {
 		r.degradedTotal,
 		r.authErrorTotal,
 		r.timeoutBudgetTotal,
+		r.rateLimitedTotal,
+		r.cspViolationsTotal,
+		r.cacheHitTotal,
+		r.cacheMissTotal,
 	)
 
 	return r
@@ -180,6 +224,37 @@ func (r *PrometheusRecorder) ObserveAuthError(path, reason string, status int) {
 
 func (r *PrometheusRecorder) ObserveTimeoutBudgetExceeded(service, path string) {
 	r.timeoutBudgetTotal.WithLabelValues(service, path).Inc()
+}
+
+func (r *PrometheusRecorder) ObserveRateLimited(endpoint, reason string) {
+	r.rateLimitedTotal.WithLabelValues(endpoint, reason).Inc()
+}
+
+func (r *PrometheusRecorder) ObserveCSPViolation(uri, disposition string) {
+	r.cspViolationsTotal.WithLabelValues(uri, disposition).Inc()
+}
+
+func (r *PrometheusRecorder) ObserveCacheHit(path string) {
+	r.cacheHitTotal.WithLabelValues(path).Inc()
+}
+
+func (r *PrometheusRecorder) ObserveCacheMiss(path string) {
+	r.cacheMissTotal.WithLabelValues(path).Inc()
+}
+
+// ObserveCSPViolation — пакетная функция для записи CSP violation события.
+func ObserveCSPViolation(uri, disposition string) {
+	getRecorder().ObserveCSPViolation(uri, disposition)
+}
+
+// ObserveCacheHit — пакетная функция для записи cache HIT события.
+func ObserveCacheHit(path string) {
+	getRecorder().ObserveCacheHit(path)
+}
+
+// ObserveCacheMiss — пакетная функция для записи cache MISS события.
+func ObserveCacheMiss(path string) {
+	getRecorder().ObserveCacheMiss(path)
 }
 
 func prometheusLabelInt(value int) string {

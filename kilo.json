@@ -26,5 +26,10 @@
   "instructions": [
     "docs/AGENT_ARCHITECTURE_CONTEXT.md",
     "docs/DEPLOYMENT_STRATEGY.md"
-  ]
+  ],
+  "logging": {
+    "enabled": true,
+    "level": "debug",
+    "path": "./logs/kilo.log"
+  }
 }
