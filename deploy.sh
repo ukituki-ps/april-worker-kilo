@@ -403,8 +403,13 @@ run_compose() {
   nginx_hash_after="$(calc_sha256 "$nginx_conf" || true)"
   if [[ -n "$nginx_hash_after" ]]; then
     if [[ "$nginx_hash_after" != "$nginx_hash_before" || ! -f "$nginx_hash_file" || "$(cat "$nginx_hash_file" 2>/dev/null || true)" != "$nginx_hash_after" ]]; then
-      log "обнаружено изменение infra/nginx/default.conf — force-recreate nginx-docs"
-      "${compose_files[@]}" up -d --force-recreate nginx-docs
+      # В production mode nginx-сервис — nginx-aprilhub, в dev — nginx-docs.
+      local nginx_service="nginx-docs"
+      if [[ "$MODE" == "production" ]]; then
+        nginx_service="nginx-aprilhub"
+      fi
+      log "обнаружено изменение infra/nginx/default.conf — force-recreate ${nginx_service}"
+      "${compose_files[@]}" up -d --force-recreate "$nginx_service" || log "предупреждение: force-recreate ${nginx_service} не выполнен (сервис может отсутствовать в текущем compose profile)"
       printf '%s\n' "$nginx_hash_after" >"$nginx_hash_file"
     fi
   fi
