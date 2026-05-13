@@ -63,7 +63,8 @@ func TestTimeToSec(t *testing.T) {
 
 func TestBuildCacheKey(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/api/v1/aggregation/dashboard", nil)
-	expected := cachePrefix + "/api/v1/aggregation/dashboard:anon:none"
+	// Format: aprilhub:bff:cache:{tenantID}:{path}:{userID}:{query}
+	expected := cachePrefix + "anon:/api/v1/aggregation/dashboard:anon:none"
 	key := buildCacheKey(req)
 	if key != expected {
 		t.Errorf("expected key %s, got %s", expected, key)
@@ -72,7 +73,7 @@ func TestBuildCacheKey(t *testing.T) {
 
 func TestBuildCacheKey_with_query(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/api/v1/me?page=1", nil)
-	expected := cachePrefix + "/api/v1/me:anon:page=1"
+	expected := cachePrefix + "anon:/api/v1/me:anon:page=1"
 	key := buildCacheKey(req)
 	if key != expected {
 		t.Errorf("expected key %s, got %s", expected, key)

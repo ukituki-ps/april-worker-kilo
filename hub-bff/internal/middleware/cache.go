@@ -102,18 +102,20 @@ func (cfg *CacheConfig) Middleware(next http.Handler) http.Handler {
 	})
 }
 
-// buildCacheKey creates a user-isolated cache key.
-// Format: aprilhub:bff:cache:{endpoint}:{user-or-anon}:{query-hash}
+// buildCacheKey creates a tenant-scoped, user-isolated cache key.
+// Format: aprilhub:bff:cache:{tenantID}:{endpoint}:{user-or-anon}:{query-hash}
 func buildCacheKey(r *http.Request) string {
 	userID := "anon"
+	tenantID := "anon"
 	if claims, ok := auth.ClaimsFromContext(r.Context()); ok {
 		userID = claims.Subject
+		tenantID = claims.TenantID
 	}
 	queryHash := r.URL.RawQuery
 	if queryHash == "" {
 		queryHash = "none"
 	}
-	return cachePrefix + r.URL.Path + ":" + userID + ":" + queryHash
+	return cachePrefix + tenantID + ":" + r.URL.Path + ":" + userID + ":" + queryHash
 }
 
 // cacheHit checks Redis for a cached response. Returns (hit, body).
@@ -168,10 +170,13 @@ func (rw *captureResponseWriter) Write(b []byte) (int, error) {
 }
 
 // InvalidateEndpoint clears all cache entries matching a path pattern.
+// New key format: aprilhub:bff:cache:{tenantID}:{endpoint}:{user}:{query}
 func (cfg *CacheConfig) InvalidateEndpoint(pattern string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
-	prefix := cachePrefix + pattern + ":"
+	// Match: aprilhub:bff:cache:*:pattern:*:*
+	// The wildcard * covers any tenantID before the pattern
+	prefix := cachePrefix + "*" + pattern + ":"
 	// Use SCAN-like pattern via Lua to delete keys
 	script := `
 for i, key in ipairs(redis.call('KEYS', ARGV[1])) do

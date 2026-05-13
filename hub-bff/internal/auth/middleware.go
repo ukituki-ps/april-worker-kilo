@@ -21,6 +21,7 @@ type realmAccess struct {
 
 type Claims struct {
 	AZP               string      `json:"azp"`
+	TenantID          string      `json:"tenant_id"`
 	PreferredUsername string      `json:"preferred_username"`
 	Email             string      `json:"email"`
 	GivenName         string      `json:"given_name"`
@@ -136,6 +137,14 @@ func (m *Middleware) Validate(next http.Handler) http.Handler {
 		}
 
 		ctx := context.WithValue(r.Context(), claimsContextKey, claims)
+
+		slog.Debug("hub-bff auth",
+			"event", "auth_success",
+			"path", r.URL.Path,
+			"user", claims.Subject,
+			"tenant_id", claims.TenantID,
+		)
+
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

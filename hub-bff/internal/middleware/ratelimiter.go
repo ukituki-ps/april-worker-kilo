@@ -77,13 +77,15 @@ func (cfg *RateLimiterConfig) Middleware(next http.Handler) http.Handler {
 		}
 
 		identifier := r.RemoteAddr
+		tenantID := "anon"
 		if tier.Sensitive {
 			if claims, ok := auth.ClaimsFromContext(r.Context()); ok {
 				identifier = claims.Subject
+				tenantID = claims.TenantID
 			}
 		}
 
-		key := fmt.Sprintf("%s%s:%s", rlPrefix, tier.Matches, identifier)
+		key := fmt.Sprintf("%s%s:%s:%s", rlPrefix, tier.Matches, tenantID, identifier)
 		nowSec := time.Now().Unix()
 
 		allowed, remaining, limit, retryAfter := cfg.allowWithEval(r.Context(), key, tier.Limit, tier.WindowSeconds, nowSec)
