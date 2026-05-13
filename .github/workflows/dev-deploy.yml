@@ -1,5 +1,9 @@
-# Автодеплой на dev: merge PR в develop → push → этот workflow на self-hosted runner.
+# Автодеплой на dev: merge PR в develop → push → build+push образов в ghcr → deploy на self-hosted runner.
 # См. docs/DEPLOYMENT_STRATEGY.md
+#
+# Pipeline:
+#   1. build-and-push — CI-раннер собирает hub-shell + hub-bff, пушит в ghcr.io с тегом git SHA
+#   2. deploy — dev-раннер обновляет images.env и запускает deploy.sh
 
 name: Deploy to dev
 
@@ -15,12 +19,108 @@ concurrency:
 
 permissions:
   contents: read
+  packages: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+  GOMODCACHE: /var/cache/aprilhub/go/pkg/mod
+  GOCACHE: /var/cache/aprilhub/go/build
+  npm_config_cache: /var/cache/aprilhub/npm
+
+# ─── Передаваемые между job значения ───
+# build-and-push записывает outputs, deploy считывает их для обновления images.env.
+# ─────────────────────────────────────────────────────────────────────────────
 
 jobs:
+  # ══════════════════════════════════════════════════════════════════════
+  # Job 1: сборка образов и push в ghcr.io
+  # ══════════════════════════════════════════════════════════════════════
+  build-and-push:
+    name: Build and push images to ghcr
+    runs-on: [self-hosted, ci, profile]
+    timeout-minutes: 60
+    outputs:
+      hub_shell_tag: ${{ steps.meta.outputs.hub-shell-tag }}
+      hub_bff_tag: ${{ steps.meta.outputs.hub-bff-tag }}
+
+    steps:
+      # ── Checkout ──
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+          clean: true
+
+      # ── Cache dirs ──
+      - name: Ensure local cache directories
+        run: |
+          if mkdir -p "$GOMODCACHE" "$GOCACHE" "$npm_config_cache" 2>/dev/null; then
+            echo "Using system cache paths under /var/cache/aprilhub"
+          else
+            FALLBACK_ROOT="$HOME/.cache/aprilhub"
+            mkdir -p "$FALLBACK_ROOT/go/pkg/mod" "$FALLBACK_ROOT/go/build" "$FALLBACK_ROOT/npm"
+            {
+              echo "GOMODCACHE=$FALLBACK_ROOT/go/pkg/mod"
+              echo "GOCACHE=$FALLBACK_ROOT/go/build"
+              echo "npm_config_cache=$FALLBACK_ROOT/npm"
+            } >> "$GITHUB_ENV"
+            echo "System cache not writable; switched to $FALLBACK_ROOT"
+          fi
+
+      # ── Setup Go (нужен для build hub-bff через docker build — не требуется, но кэш полезен) ──
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: hub-bff/go.mod
+          cache: false
+
+      # ── Docker login ──
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_PAT }}
+
+      # ── Build hub-bff ──
+      # hub-bff/Dockerfile — multi-stage, static binary (CGO_ENABLED=0).
+      - name: Build and push hub-bff
+        uses: docker/build-push-action@v6
+        with:
+          context: ./hub-bff
+          file: ./hub-bff/Dockerfile
+          push: true
+          tags: ghcr.io/ukituki-ps/april-hub-bff:${{ github.sha }}
+
+      # ── Build hub-shell ──
+      # hub-shell/Dockerfile требует NODE_AUTH_TOKEN для npm ci (GPR registry @ukituki-ps/*)
+      # и submodule vendor/april-profile + design-system/DisignApril (уже загружены checkout'ом).
+      - name: Build and push hub-shell
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./hub-shell/Dockerfile
+          push: true
+          tags: ghcr.io/ukituki-ps/april-hub-shell:${{ github.sha }}
+          build-args: |
+            NODE_AUTH_TOKEN=${{ secrets.GPR_READ_TOKEN || secrets.GITHUB_TOKEN }}
+
+      # ── Outputs для deploy job ──
+      - name: Set image tags as outputs
+        id: meta
+        run: |
+          echo "hub-shell-tag=ghcr.io/ukituki-ps/april-hub-shell:${{ github.sha }}" >> "$GITHUB_OUTPUT"
+          echo "hub-bff-tag=ghcr.io/ukituki-ps/april-hub-bff:${{ github.sha }}" >> "$GITHUB_OUTPUT"
+
+  # ══════════════════════════════════════════════════════════════════════
+  # Job 2: deploy на dev-сервере
+  # ══════════════════════════════════════════════════════════════════════
   deploy:
-    name: Sync repo and run deploy.sh
+    name: Sync repo, update images, and deploy
     runs-on: [self-hosted, dev, profile]
     timeout-minutes: 60
+    needs: [build-and-push]
     env:
       # Must be a git clone of *this* repo (ukituki-ps/april-worker-kilo): github.sha is taken from this workflow's event.
       # Default /opt/april-worker matches deploy.sh; override with repo variable APRIL_DEPLOY_ROOT if the clone lives elsewhere.
@@ -29,11 +129,16 @@ jobs:
       DEPLOY_INGRESS_HTTP_HOST: ${{ vars.APRIL_INGRESS_HTTP_HOST }}
       APRIL_PROFILE_SUBMODULE_URL: git@github.com:ukituki-ps/april-profile-kilo.git
       DISIGNAPRIL_SUBMODULE_URL: git@github.com:ukituki-ps/DisignApril-kilo.git
+      # Новые теги образов переданы из build-and-push job
+      NEW_HUB_BFF_IMAGE: ${{ needs.build-and-push.outputs.hub_bff_tag }}
+      NEW_HUB_SHELL_IMAGE: ${{ needs.build-and-push.outputs.hub_shell_tag }}
+
     steps:
-      - name: Checkout ref and deploy
+      - name: Checkout ref, update images.env and deploy
         env:
           APRIL_PROFILE_DEPLOY_KEY: ${{ secrets.APRIL_PROFILE_DEPLOY_KEY }}
           DISIGNAPRIL_DEPLOY_KEY: ${{ secrets.DISIGNAPRIL_DEPLOY_KEY }}
+          MODE: production
         run: |
           set -euo pipefail
           ROOT="${APRIL_DEPLOY_ROOT}"
@@ -44,6 +149,8 @@ jobs:
           test -x ./deploy.sh
           test -n "${APRIL_PROFILE_DEPLOY_KEY}"
           test -n "${DISIGNAPRIL_DEPLOY_KEY}"
+
+          # ── SSH-ключи для submodule fetch ──
           APRIL_PROFILE_KEY_FILE="$(mktemp)"
           DISIGNAPRIL_KEY_FILE="$(mktemp)"
           trap 'rm -f "${APRIL_PROFILE_KEY_FILE}" "${DISIGNAPRIL_KEY_FILE}"; if [ -n "${SSH_AGENT_PID:-}" ]; then ssh-agent -k >/dev/null 2>&1 || true; fi' EXIT
@@ -54,9 +161,8 @@ jobs:
           ssh-add "${APRIL_PROFILE_KEY_FILE}"
           ssh-add "${DISIGNAPRIL_KEY_FILE}"
           DEPLOY_KEY_SSH="ssh -o StrictHostKeyChecking=accept-new"
-          # git checkout тянет новые gitlink субмодулей; URL из .gitmodules — HTTPS без токена → "could not read Username".
-          # Для субмодулей нужен APRIL_PROFILE_DEPLOY_KEY, но тот же GIT_SSH_COMMAND ломает `git fetch origin`,
-          # если origin — SSH на этот репозиторий: deploy-key только для april-profile → "Repository not found".
+
+          # ── Git sync ──
           git config submodule.vendor/april-profile.url "${APRIL_PROFILE_SUBMODULE_URL}"
           git config submodule.design-system/DisignApril.url "${DISIGNAPRIL_SUBMODULE_URL}"
           git reset --hard
@@ -65,6 +171,30 @@ jobs:
           git fetch origin
           export GIT_SSH_COMMAND="${DEPLOY_KEY_SSH}"
           git checkout "${{ github.sha }}"
+
+          # ── Обновление images.env с новыми SHA-тегами ──
+          # images.env — server-local файл, не коммитится в git.
+          # Записываем/обновляем HUB_BFF_IMAGE и HUB_SHELL_IMAGE, остальные строки не трогаем.
+          IMAGE_ENV="${ROOT}/images.env"
+          if [[ -f "$IMAGE_ENV" ]]; then
+            # Обновляем существующие ключи
+            sed -i "s|^HUB_BFF_IMAGE=.*|HUB_BFF_IMAGE=${NEW_HUB_BFF_IMAGE}|" "$IMAGE_ENV"
+            sed -i "s|^HUB_SHELL_IMAGE=.*|HUB_SHELL_IMAGE=${NEW_HUB_SHELL_IMAGE}|" "$IMAGE_ENV"
+          else
+            # images.env отсутствует — создаём
+            printf 'HUB_BFF_IMAGE=%s\nHUB_SHELL_IMAGE=%s\n' \
+              "${NEW_HUB_BFF_IMAGE}" "${NEW_HUB_SHELL_IMAGE}" > "$IMAGE_ENV"
+          fi
+          echo "images.env обновлён:"
+          grep -E 'HUB_(BFF|SHELL)_IMAGE=' "$IMAGE_ENV" || true
+
+          # ── Docker pull новых образов ──
+          # Login в ghcr чтобы docker compose pull мог скачать образы.
+          echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          docker pull "${NEW_HUB_BFF_IMAGE}" || true
+          docker pull "${NEW_HUB_SHELL_IMAGE}" || true
+
+          # ── Deploy ──
           SKIP_GIT_PULL=1 DEPLOY_ARTIFACTS_DIR="${ROOT}/.deploy-artifacts" ./deploy.sh
 
       - name: Upload deploy artifacts

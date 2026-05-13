@@ -45,6 +45,7 @@ EOF
   REQUIRE_IMAGES_ENV=0 не требовать images.env (по умолчанию REQUIRE_IMAGES_ENV=1)
   DEPLOY_ARTIFACTS_DIR каталог артефактов (по умолчанию .deploy-artifacts)
   HUB_BFF_BASE_URL     базовый URL для health/readiness (по умолчанию http://127.0.0.1:${DOCS_HTTP_PORT:-8080})
+  MODE=production       включить docker-compose.prod.yml overlay (ghcr.io образы, без bind-mount/dev-шагов)
   OBS_AUTO_ONBOARD=1   включить авто-регистрацию стенда в central observability
   OBS_CENTRAL_HOST     host/IP центрального observability (обязательно для OBS_AUTO_ONBOARD=1)
   OBS_CENTRAL_USER     SSH-пользователь центрального observability (по умолчанию текущий)
@@ -90,11 +91,25 @@ fix_stale_keycloak_issuer_env() {
 fix_stale_keycloak_issuer_env
 
 compose_files=(docker compose)
+# MODE=production включает docker-compose.prod.yml (ghcr.io образы, без bind-mount).
+# В production-mode пропускаются dev-only шаги: ds:prepare, submodule sync, lock-based recreate.
+MODE="${MODE:-dev}"
+if [[ "$MODE" == "production" && -f docker-compose.prod.yml ]]; then
+  compose_files+=(-f docker-compose.yml -f docker-compose.prod.yml)
+  log "production mode: включён overlay docker-compose.prod.yml (ghcr.io образы)"
+else
+  compose_files+=(-f docker-compose.yml)
+fi
 if [[ -f .env ]]; then
   compose_files+=(--env-file .env)
 fi
 if [[ -f images.env ]]; then
   compose_files+=(--env-file images.env)
+  log "images.env найден — образы приложений берутся из него"
+else
+  if [[ "$MODE" == "production" ]]; then
+    fail "production mode требует images.env (HUB_BFF_IMAGE, HUB_SHELL_IMAGE), файл не найден"
+  fi
 fi
 
 timestamp="$(date -u +"%Y%m%dT%H%M%SZ")"
@@ -575,16 +590,21 @@ sync_frontend_dependencies() {
     "${state_dir}/hub-shell-vendor-april-profile.rev"
 }
 
+reload_nginx_if_running() {
+  local nginx_name="$1"
+  if ! is_service_running "$nginx_name"; then
+    return 0
+  fi
+  log "${nginx_name}: nginx -s reload (обновление upstream после compose)"
+  if ! "${compose_files[@]}" exec -T "$nginx_name" nginx -s reload; then
+    log "предупреждение: nginx -s reload для ${nginx_name} не выполнен, продолжаем"
+  fi
+}
+
 reload_nginx_docs_if_running() {
   # После force-recreate hub-shell у nginx может остаться кратковременный 502 на `/`
   # (см. resolver в infra/nginx/default.conf). Reload сбрасывает upstream state.
-  if ! is_service_running "nginx-docs"; then
-    return 0
-  fi
-  log "nginx-docs: nginx -s reload (обновление upstream после compose)"
-  if ! "${compose_files[@]}" exec -T nginx-docs nginx -s reload; then
-    log "предупреждение: nginx -s reload не выполнен, продолжаем"
-  fi
+  reload_nginx_if_running "nginx-docs"
 }
 
 sync_keycloak_on_theme_or_realm_change() {
@@ -791,30 +811,40 @@ on_error() {
 
 main() {
   trap 'on_error $?' ERR
-  log "каталог: $ROOT"
+  log "каталог: $ROOT, mode: $MODE"
   preflight
   persist_images_state
   run_git_pull
-  run_submodules
-  repair_bind_mount_permissions
-  run_hub_shell_ds_prepare
-  repair_bind_mount_permissions
+
+  # В production mode пропускаются dev-only шаги (build в bind-mount, ds:prepare, lock-based recreate).
+  if [[ "$MODE" == "production" ]]; then
+    log "production mode: пропуск submodules/sync/repair (pre-built ghcr.io образы)"
+  else
+    run_submodules
+    repair_bind_mount_permissions
+    run_hub_shell_ds_prepare
+    repair_bind_mount_permissions
+    sync_keycloak_on_theme_or_realm_change
+  fi
+
   run_openapi_lint
   run_hook "scripts/db-backup.sh" "SKIP_DB_BACKUP" "db-backup"
   run_hook "scripts/run-migrations.sh" "SKIP_MIGRATIONS" "миграции"
   run_docs_build
   run_compose
-  sync_keycloak_on_theme_or_realm_change
-  ensure_keycloak_realm_theme
-  sync_frontend_dependencies
-  reload_nginx_docs_if_running
-  sync_go_service_on_git_tree_change \
-    "hub-bff" \
-    "hub-bff" \
-    "${state_dir}/hub-bff-git-tree.rev"
-  # После force-recreate hub-bff IP в Docker DNS меняется; reload сбрасывает upstream в nginx
-  # (раньше reload мог выполниться только после hub-shell, до пересоздания BFF → длительные 502).
-  reload_nginx_docs_if_running
+  if [[ "$MODE" != "production" ]]; then
+    sync_frontend_dependencies
+    sync_go_service_on_git_tree_change \
+      "hub-bff" \
+      "hub-bff" \
+      "${state_dir}/hub-bff-git-tree.rev"
+  fi
+  # После force-recreate IP в Docker DNS меняется; reload сбрасывает upstream в nginx.
+  if [[ "$MODE" == "production" ]]; then
+    reload_nginx_if_running "nginx-aprilhub"
+  else
+    reload_nginx_docs_if_running
+  fi
   run_observability_onboarding
   run_health_checks
   run_ingress_checks

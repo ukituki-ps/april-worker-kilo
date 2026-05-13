@@ -1,0 +1,66 @@
+# Git
+.git/
+
+# Secrets
+.env
+images.env
+
+# Node
+node_modules/
+hub-shell/node_modules/
+design-system/DisignApril/node_modules/
+design-system/DisignApril/packages/*/node_modules/
+vendor/april-profile/frontend/node_modules/
+vendor/april-profile/frontend/packages/*/node_modules/
+
+# Build output
+hub-shell/dist/assets/
+hub-shell/.vite/
+hub-shell/test-results/
+hub-shell/playwright-report/
+docs-site/build/
+docs-site/.docusaurus/
+
+# Docs
+docs-site/static/openapi/*.yaml
+
+# Structurizr
+structurizr/workspace.json
+
+# Deploy state
+.deploy-artifacts/
+.deploy-state/
+
+# Core dumps / DEB
+hub-shell/core.*
+*.deb
+
+# PNPM store
+.pnpm-store/
+
+# Logs
+*.log
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Kilo config
+.kilo/
+.kilocode/
+.opencode/
+
+# Misc
+Dockerfile
+.dockerignore
+
+# CI/CD
+.github/
+scripts/
+tasks/
+
+# Go build cache (уже кэшируется в Docker, но не нужен в контексте)
+vendor/april-profile/backend/

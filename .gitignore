@@ -17,3 +17,7 @@ hub-shell/core.*
 hub-shell/dist/assets/
 *.deb
 mermaid-diagram.png
+
+# Agent reports (не коммитить)
+tasks/REPORT.md
+hub-bff/Dockerfile.report.md

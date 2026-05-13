@@ -1,0 +1,66 @@
+# Production overlay для AprilHub (docker-compose.prod.yml)
+#
+# Переопределяет hub-bff и hub-shell: используется ghcr.io образы из images.env,
+# убираются bind-mount'ы и dev-команды. Остальные сервисы наследуются из
+# базового docker-compose.yml.
+#
+# docker compose -f docker-compose.yml -f docker-compose.prod.yml --profile aprilhub up -d
+
+services:
+  # ============================================================
+  # nginx-aprilhub: production reverse proxy (порт 80 → hub-shell, /api/ → hub-bff, /auth/ → keycloak)
+  # Заменяет nginx-docs для профиля aprilhub; nginx-docs продолжает работать для docs-профиля.
+  # ============================================================
+  nginx-aprilhub:
+    image: nginx:1.27-alpine
+    profiles: ["aprilhub"]
+    ports:
+      - "${APRILHUB_HTTP_PORT:-8080}:80"
+    volumes:
+      - ./infra/nginx/aprilhub.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      hub-shell:
+        condition: service_started
+      hub-bff:
+        condition: service_started
+    restart: unless-stopped
+
+  # ============================================================
+  # hub-bff: pre-built static Go binary (alpine runtime)
+  # ENTRYPOINT уже задан в Dockerfile: ["/app/hub-bff"]
+  # ============================================================
+  hub-bff:
+    image: ${HUB_BFF_IMAGE}
+    profiles: ["aprilhub"]
+    environment:
+      HUB_BFF_PORT: ${HUB_BFF_PORT:-8081}
+      KEYCLOAK_URL: ${KEYCLOAK_URL:-http://keycloak:8080/auth}
+      KEYCLOAK_REALM: ${KEYCLOAK_REALM:-april}
+      KEYCLOAK_ISSUER: ${KEYCLOAK_ISSUER:-https://dev.april.ukituki.tech/auth/realms/april}
+      KEYCLOAK_AUDIENCE: ${KEYCLOAK_AUDIENCE:-aprilhub-shell}
+      KEYCLOAK_JWKS_URL: ${KEYCLOAK_JWKS_URL:-http://keycloak:8080/auth/realms/april/protocol/openid-connect/certs}
+      APRIL_PROFILE_ADMIN_URL: ${APRIL_PROFILE_ADMIN_URL:-}
+      APRIL_PROFIL_URL: ${APRIL_PROFIL_URL:-}
+      APRIL_WORKFLOW_URL: ${APRIL_WORKFLOW_URL:-}
+      APRIL_NFLOW_URL: ${APRIL_NFLOW_URL:-}
+      APRIL_ORGFLOW_URL: ${APRIL_ORGFLOW_URL:-}
+      APRIL_REPORT_URL: ${APRIL_REPORT_URL:-}
+    expose:
+      - "${HUB_BFF_PORT:-8081}"
+    depends_on:
+      - keycloak
+    restart: unless-stopped
+
+  # ============================================================
+  # hub-shell: pre-built Vite preview runtime (node:20-alpine)
+  # CMD уже задан в Dockerfile: npm run preview -- --host 0.0.0.0
+  # VITE_* переменные baking'аются на этапе CI-сборки вместе с dist/.
+  # ============================================================
+  hub-shell:
+    image: ${HUB_SHELL_IMAGE}
+    profiles: ["aprilhub"]
+    expose:
+      - "${HUB_SHELL_PORT:-4173}"
+    depends_on:
+      - hub-bff
+    restart: unless-stopped
