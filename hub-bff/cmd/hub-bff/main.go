@@ -29,7 +29,7 @@ func main() {
 	registry := prometheus.NewRegistry()
 	observability.SetRecorder(observability.NewPrometheusRecorder(registry))
 
-	redisClient, err := redis.New(context.Background(), cfg.RedisHost, cfg.RedisPort)
+	redisClient, err := redis.New(context.Background(), cfg.RedisHost, cfg.RedisPort, cfg.RedisPassword)
 	if err != nil {
 		log.Fatalf("connect redis: %v", err)
 	}
@@ -56,39 +56,53 @@ func main() {
 	}
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("/healthz", httpapi.Healthz)
-	mux.HandleFunc("/readyz", httpapi.Readyz)
-	mux.Handle("/metrics", promhttp.HandlerFor(registry, promhttp.HandlerOpts{}))
+	mux.Handle("/healthz", httpapi.AllowedMethods([]string{"GET"})(http.HandlerFunc(httpapi.Healthz)))
+	mux.Handle("/readyz", httpapi.AllowedMethods([]string{"GET"})(http.HandlerFunc(httpapi.Readyz)))
+	mux.Handle("/metrics", httpapi.AllowedMethods([]string{"GET"})(promhttp.HandlerFor(registry, promhttp.HandlerOpts{})))
 	mux.Handle(
 		"/api/v1/overview",
-		authMiddleware.Validate(auth.RequireAnyRole("user", "admin")(http.HandlerFunc(handlers.Overview))),
+		httpapi.AllowedMethods([]string{"GET"})(
+			authMiddleware.Validate(auth.RequireAnyRole("user", "admin")(http.HandlerFunc(handlers.Overview))),
+		),
 	)
 	mux.Handle(
 		"/api/v1/aggregation/dashboard",
-		authMiddleware.Validate(auth.RequireAnyRole("user", "admin")(http.HandlerFunc(handlers.Dashboard))),
+		httpapi.AllowedMethods([]string{"GET"})(
+			authMiddleware.Validate(auth.RequireAnyRole("user", "admin")(http.HandlerFunc(handlers.Dashboard))),
+		),
 	)
 	mux.Handle(
 		"/api/v1/aggregation/home",
-		authMiddleware.Validate(auth.RequireAnyRole("user", "admin")(http.HandlerFunc(handlers.Home))),
+		httpapi.AllowedMethods([]string{"GET"})(
+			authMiddleware.Validate(auth.RequireAnyRole("user", "admin")(http.HandlerFunc(handlers.Home))),
+		),
 	)
 	mux.Handle(
 		"/api/v1/aggregation/summary",
-		authMiddleware.Validate(auth.RequireAnyRole("user", "admin")(http.HandlerFunc(handlers.Summary))),
+		httpapi.AllowedMethods([]string{"GET"})(
+			authMiddleware.Validate(auth.RequireAnyRole("user", "admin")(http.HandlerFunc(handlers.Summary))),
+		),
 	)
 	mux.Handle(
 		"/api/v1/me",
-		authMiddleware.Validate(auth.RequireAnyRole("user", "admin")(http.HandlerFunc(httpapi.Me))),
+		httpapi.AllowedMethods([]string{"GET"})(
+			authMiddleware.Validate(auth.RequireAnyRole("user", "admin")(http.HandlerFunc(httpapi.Me))),
+		),
 	)
 	mux.Handle(
 		"/api/v1/admin/ping",
-		authMiddleware.Validate(auth.RequireAnyRole("admin")(http.HandlerFunc(httpapi.AdminPing))),
+		httpapi.AllowedMethods([]string{"GET"})(
+			authMiddleware.Validate(auth.RequireAnyRole("admin")(http.HandlerFunc(httpapi.AdminPing))),
+		),
 	)
 	mux.Handle(
 		"/api/v1/admin/profile/",
-		authMiddleware.Validate(auth.RequireAnyRole("admin")(profileAdminProxy)),
+		httpapi.AllowedMethods([]string{"GET", "PUT", "PATCH", "DELETE"})(
+			authMiddleware.Validate(auth.RequireAnyRole("admin")(profileAdminProxy)),
+		),
 	)
 	// CSP violation report endpoint — public, no auth required (browsers send reports unauthenticated)
-	mux.HandleFunc("/api/v1/csp-report", httpapi.CSReport)
+	mux.Handle("/api/v1/csp-report", httpapi.AllowedMethods([]string{"POST"})(http.HandlerFunc(httpapi.CSReport)))
 
 	// Cache middleware for read-only endpoints (inside auth to be user-aware)
 	cacheCfg := &middleware.CacheConfig{

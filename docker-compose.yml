@@ -59,6 +59,7 @@ services:
       APRIL_NFLOW_URL: ${APRIL_NFLOW_URL:-}
       APRIL_ORGFLOW_URL: ${APRIL_ORGFLOW_URL:-}
       APRIL_REPORT_URL: ${APRIL_REPORT_URL:-}
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
     volumes:
       - ./:/workspace
     expose:

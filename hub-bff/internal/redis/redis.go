@@ -3,6 +3,7 @@ package redis
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"time"
 
 	"github.com/redis/go-redis/v9"
@@ -14,11 +15,11 @@ type Client struct {
 }
 
 // New creates and verifies a Redis connection.
-func New(ctx context.Context, host string, port string) (*Client, error) {
+func New(ctx context.Context, host string, port string, password string) (*Client, error) {
 	addr := fmt.Sprintf("%s:%s", host, port)
 	rc := redis.NewClient(&redis.Options{
 		Addr:         addr,
-		Password:     "",
+		Password:     password,
 		DB:           0,
 		DialTimeout:  3 * time.Second,
 		ReadTimeout:  3 * time.Second,
@@ -27,6 +28,12 @@ func New(ctx context.Context, host string, port string) (*Client, error) {
 
 	if err := rc.Ping(ctx).Err(); err != nil {
 		return nil, fmt.Errorf("redis ping %s: %w", addr, err)
+	}
+
+	if password != "" {
+		slog.Info("Redis connecting with password authentication", "host", addr)
+	} else {
+		slog.Warn("Redis connecting without password authentication", "host", addr)
 	}
 
 	return &Client{redis: rc}, nil

@@ -25,8 +25,9 @@ type Config struct {
 	ProfileAdminURL   string
 	ReportURL         string
 	// Redis connection for distributed rate limiting.
-	RedisHost string
-	RedisPort string
+	RedisHost     string
+	RedisPort     string
+	RedisPassword string
 }
 
 func Load() (Config, error) {
@@ -48,6 +49,7 @@ func Load() (Config, error) {
 		ReportURL:         os.Getenv("APRIL_REPORT_URL"),
 		RedisHost:         getEnv("REDIS_HOST", "localhost"),
 		RedisPort:         getEnv("REDIS_PORT", "6379"),
+		RedisPassword:     getEnv("REDIS_PASSWORD", ""),
 	}
 	if cfg.KeycloakURL == "" || cfg.KeycloakRealm == "" {
 		return Config{}, fmt.Errorf("KEYCLOAK_URL and KEYCLOAK_REALM are required")
