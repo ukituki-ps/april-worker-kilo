@@ -1,6 +1,8 @@
 package middleware
 
 import (
+	"net/http"
+	"net/http/httptest"
 	"testing"
 	"time"
 )
@@ -9,8 +11,8 @@ func TestResolveTTL(t *testing.T) {
 	ttls := DefaultTTLs()
 
 	tests := []struct {
-		path    string
-		want    time.Duration
+		path     string
+		want     time.Duration
 		wantZero bool
 	}{
 		{"/api/v1/aggregation/dashboard", 60 * time.Second, false},
@@ -60,9 +62,18 @@ func TestTimeToSec(t *testing.T) {
 }
 
 func TestBuildCacheKey(t *testing.T) {
-	r := mockRequest("/api/v1/aggregation/dashboard", nil)
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/aggregation/dashboard", nil)
 	expected := cachePrefix + "/api/v1/aggregation/dashboard:anon:none"
-	key := buildCacheKey(r)
+	key := buildCacheKey(req)
+	if key != expected {
+		t.Errorf("expected key %s, got %s", expected, key)
+	}
+}
+
+func TestBuildCacheKey_with_query(t *testing.T) {
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/me?page=1", nil)
+	expected := cachePrefix + "/api/v1/me:anon:page=1"
+	key := buildCacheKey(req)
 	if key != expected {
 		t.Errorf("expected key %s, got %s", expected, key)
 	}
@@ -71,15 +82,18 @@ func TestBuildCacheKey(t *testing.T) {
 func TestCacheMiddleware_disabled(t *testing.T) {
 	cfg := &CacheConfig{TTLs: DefaultTTLs(), Enabled: false}
 	called := false
-	next := &mockHandler{handler: func(w any, r any) { called = true }}
-	_ = cfg.Middleware(next.httpHandler())
-	// When disabled, middleware should just pass through
-	// We can't easily test without http calls, but verify it doesn't panic
-}
-
-// Mock helpers for tests
-func mockRequest(path string, query map[string]string) interface{} {
-	_ = path
-	_ = query
-	return nil
+	next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		called = true
+	})
+	mw := cfg.Middleware(next)
+	if mw == nil {
+		t.Fatal("middleware should not be nil")
+	}
+	// Disabled middleware passes through to next handler
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/me", nil)
+	mw.ServeHTTP(w, req)
+	if !called {
+		t.Error("next handler should have been called when cache is disabled")
+	}
 }
