@@ -14,7 +14,7 @@ LOCAL_UID="${LOCAL_UID:-$(id -u)}"
 LOCAL_GID="${LOCAL_GID:-$(id -g)}"
 export DOCS_HTTP_PORT KC_HOSTNAME KEYCLOAK_ISSUER LOCAL_UID LOCAL_GID
 
-ingress_base="http://localhost:${DOCS_HTTP_PORT}"
+ingress_base="http://192.168.1.42:${DOCS_HTTP_PORT}"
 started_compose=0
 
 compose() {
@@ -115,11 +115,10 @@ from pathlib import Path
 html = Path("/tmp/keycloak-login.html").read_text(errors="ignore")
 
 # Keycloak may rewrite stylesheet URLs, so check both exact file and themed resource pattern.
-has_exact_css = "aprilhub-login.css" in html
 has_theme_css_pattern = bool(
     re.search(r"/auth/resources/[^\"']+/login/aprilhub/[^\"']+\.css", html)
 )
-assert has_exact_css or has_theme_css_pattern, "expected aprilhub login theme css reference in Keycloak login page HTML"
+assert has_theme_css_pattern, "expected aprilhub login theme css reference in Keycloak login page HTML"
 
 # Keep this check tolerant to Keycloak wording changes: we need at least one Russian UI fragment.
 ru_candidates = ["Войти", "Вход", "Пароль", "Имя пользователя"]
