@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
-	"time"
 
 	"github.com/ukituki-ps/april-worker/hub-bff/internal/aggregation"
 	"github.com/ukituki-ps/april-worker/hub-bff/internal/auth"
@@ -26,16 +25,6 @@ func NewHandlers(aggregationSvc AggregationService) *Handlers {
 	}
 }
 
-func Healthz(w http.ResponseWriter, _ *http.Request) {
-	writeJSON(w, http.StatusOK, map[string]string{"status": "ok"})
-}
-
-func Readyz(w http.ResponseWriter, _ *http.Request) {
-	writeJSON(w, http.StatusOK, map[string]string{
-		"status":    "ready",
-		"timestamp": time.Now().UTC().Format(time.RFC3339),
-	})
-}
 
 func (h *Handlers) Dashboard(w http.ResponseWriter, r *http.Request) {
 	md := MetadataFromContext(r.Context())

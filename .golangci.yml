@@ -1,0 +1,19 @@
+run:
+  timeout: 5m
+  modules-download-mode: readonly
+
+linters:
+  disable-all: true
+  enable:
+    - gofmt
+    - govet
+    - errcheck
+    - unused
+    - gocritic
+    - gosimple
+    - staticcheck
+    - gosec
+
+issues:
+  exclude-dirs:
+    - vendor

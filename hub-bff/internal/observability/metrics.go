@@ -26,17 +26,17 @@ type Recorder interface {
 
 type noopRecorder struct{}
 
-func (noopRecorder) ObserveRequest(string, string, int, time.Duration)  {}
+func (noopRecorder) ObserveRequest(string, string, int, time.Duration) {}
 func (noopRecorder) ObserveDownstream(string, string, string, int, time.Duration) {
 }
-func (noopRecorder) ObserveDownstreamRetry(string, string)                   {}
-func (noopRecorder) ObserveDegraded(string, string)                         {}
-func (noopRecorder) ObserveAuthError(string, string, int)                   {}
-func (noopRecorder) ObserveTimeoutBudgetExceeded(string, string)            {}
-func (noopRecorder) ObserveRateLimited(string, string)                      {}
-func (noopRecorder) ObserveCSPViolation(string, string)                     {}
-func (noopRecorder) ObserveCacheHit(string)                                 {}
-func (noopRecorder) ObserveCacheMiss(string)                                {}
+func (noopRecorder) ObserveDownstreamRetry(string, string)       {}
+func (noopRecorder) ObserveDegraded(string, string)              {}
+func (noopRecorder) ObserveAuthError(string, string, int)        {}
+func (noopRecorder) ObserveTimeoutBudgetExceeded(string, string) {}
+func (noopRecorder) ObserveRateLimited(string, string)           {}
+func (noopRecorder) ObserveCSPViolation(string, string)          {}
+func (noopRecorder) ObserveCacheHit(string)                      {}
+func (noopRecorder) ObserveCacheMiss(string)                     {}
 
 var (
 	recorderMu sync.RWMutex

@@ -15,17 +15,17 @@ type CSPReportBody struct {
 }
 
 type CSPReport struct {
-	URI                         string   `json:"document-uri"`
-	BlockedURL                  string   `json:"blocked-uri"`
-	ViolatedDirective           string   `json:"violated-directive"`
-	Disposition                 string   `json:"disposition"`
-	StatusCode                  int      `json:"status-code"`
-	OriginalPolicy              string   `json:"original-policy"`
-	Referrer                    string   `json:"referrer"`
-	SrcElement                  string   `json:"source-file"`
-	LineNum                     int      `json:"line-number"`
-	EffectiveIntent             string   `json:"effective-intent"`
-	Sample                      string   `json:"sample"`
+	URI               string `json:"document-uri"`
+	BlockedURL        string `json:"blocked-uri"`
+	ViolatedDirective string `json:"violated-directive"`
+	Disposition       string `json:"disposition"`
+	StatusCode        int    `json:"status-code"`
+	OriginalPolicy    string `json:"original-policy"`
+	Referrer          string `json:"referrer"`
+	SrcElement        string `json:"source-file"`
+	LineNum           int    `json:"line-number"`
+	EffectiveIntent   string `json:"effective-intent"`
+	Sample            string `json:"sample"`
 }
 
 // CSReport handles POST /api/v1/csp-report — CSP violation report endpoint.
@@ -45,18 +45,18 @@ func CSReport(w http.ResponseWriter, r *http.Request) {
 
 	md := MetadataFromContext(r.Context())
 	slog.Warn("hub-bff csp violation received",
-		"event",            "csp_violation",
-		"documentUri",      report.CSPReport.URI,
-		"blockedUri",       report.CSPReport.BlockedURL,
+		"event", "csp_violation",
+		"documentUri", report.CSPReport.URI,
+		"blockedUri", report.CSPReport.BlockedURL,
 		"violatedDirective", report.CSPReport.ViolatedDirective,
-		"disposition",      report.CSPReport.Disposition,
-		"referrer",         report.CSPReport.Referrer,
-		"sourceFile",       report.CSPReport.SrcElement,
-		"lineNumber",       report.CSPReport.LineNum,
-		"sample",           report.CSPReport.Sample,
-		"correlationId",    md.CorrelationID,
-		"requestId",        md.RequestID,
-		"sourceService",    "hub-bff",
+		"disposition", report.CSPReport.Disposition,
+		"referrer", report.CSPReport.Referrer,
+		"sourceFile", report.CSPReport.SrcElement,
+		"lineNumber", report.CSPReport.LineNum,
+		"sample", report.CSPReport.Sample,
+		"correlationId", md.CorrelationID,
+		"requestId", md.RequestID,
+		"sourceService", "hub-bff",
 	)
 
 	observability.ObserveCSPViolation(report.CSPReport.URI, report.CSPReport.Disposition)

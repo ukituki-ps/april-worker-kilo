@@ -49,6 +49,12 @@ services:
       - "${HUB_BFF_PORT:-8081}"
     depends_on:
       - keycloak
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -T2 -O /dev/null http://127.0.0.1:${HUB_BFF_PORT:-8081}/healthz || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     restart: unless-stopped
 
   # ============================================================

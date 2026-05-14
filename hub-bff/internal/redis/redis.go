@@ -58,3 +58,8 @@ func (c *Client) Close() error {
 func (c *Client) Pipeline() redis.Pipeliner {
 	return c.redis.Pipeline()
 }
+
+// Ping checks Redis connectivity.
+func (c *Client) Ping(ctx context.Context) error {
+	return c.redis.Ping(ctx).Err()
+}

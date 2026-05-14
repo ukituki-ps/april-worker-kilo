@@ -33,12 +33,13 @@ func main() {
 	if err != nil {
 		log.Fatalf("connect redis: %v", err)
 	}
-	defer redisClient.Close()
 
 	authMiddleware, err := auth.NewMiddleware(cfg.KeycloakIssuer, cfg.KeycloakAud, cfg.KeycloakJWKS)
 	if err != nil {
+		redisClient.Close()
 		log.Fatalf("init auth middleware: %v", err)
 	}
+	defer redisClient.Close()
 	aggregationRuntime := aggregation.NewRuntime(&http.Client{}, aggregation.Options{
 		Timeout: cfg.DownstreamTimeout,
 		Retries: cfg.DownstreamRetries,
@@ -50,14 +51,16 @@ func main() {
 		"report":   cfg.ReportURL,
 	})
 	handlers := httpapi.NewHandlers(aggregationRuntime)
+	health := httpapi.NewHealth(redisClient)
 	profileAdminProxy, err := httpapi.NewProfileAdminProxy(cfg.ProfileAdminURL)
 	if err != nil {
 		log.Fatalf("init profile admin proxy: %v", err)
 	}
 
 	mux := http.NewServeMux()
-	mux.Handle("/healthz", httpapi.AllowedMethods([]string{"GET"})(http.HandlerFunc(httpapi.Healthz)))
-	mux.Handle("/readyz", httpapi.AllowedMethods([]string{"GET"})(http.HandlerFunc(httpapi.Readyz)))
+	mux.Handle("/healthz", httpapi.AllowedMethods([]string{"GET"})(http.HandlerFunc(health.Healthz)))
+	mux.Handle("/livez", httpapi.AllowedMethods([]string{"GET"})(http.HandlerFunc(health.Livez)))
+	mux.Handle("/readyz", httpapi.AllowedMethods([]string{"GET"})(http.HandlerFunc(health.Readyz)))
 	mux.Handle("/metrics", httpapi.AllowedMethods([]string{"GET"})(promhttp.HandlerFor(registry, promhttp.HandlerOpts{})))
 	mux.Handle(
 		"/api/v1/overview",
@@ -121,8 +124,15 @@ func main() {
 	)
 
 	addr := ":" + cfg.Port
+	srv := &http.Server{
+		Addr:         addr,
+		Handler:      handler,
+		ReadTimeout:  15 * time.Second,
+		WriteTimeout: 15 * time.Second,
+		IdleTimeout:  60 * time.Second,
+	}
 	log.Printf("hub-bff listening on %s", addr)
-	if err := http.ListenAndServe(addr, handler); err != nil {
+	if err := srv.ListenAndServe(); err != nil {
 		log.Fatalf("server stopped: %v", err)
 	}
 }
