@@ -39,10 +39,10 @@ func (h *Health) Readyz(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusServiceUnavailable)
 		_ = json.NewEncoder(w).Encode(map[string]any{
-			"status":      "not_ready",
-			"timestamp":   time.Now().UTC().Format(time.RFC3339),
-			"failure":     "redis_unavailable",
-			"error":      err.Error(),
+			"status":    "not_ready",
+			"timestamp": time.Now().UTC().Format(time.RFC3339),
+			"failure":   "redis_unavailable",
+			"error":     err.Error(),
 		})
 		return
 	}

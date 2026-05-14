@@ -25,7 +25,6 @@ func NewHandlers(aggregationSvc AggregationService) *Handlers {
 	}
 }
 
-
 func (h *Handlers) Dashboard(w http.ResponseWriter, r *http.Request) {
 	md := MetadataFromContext(r.Context())
 	writeJSON(w, http.StatusOK, h.aggregation.Dashboard(r.Context(), md))
