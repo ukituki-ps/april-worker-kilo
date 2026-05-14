@@ -93,13 +93,13 @@ func (cfg *RateLimiterConfig) Middleware(next http.Handler) http.Handler {
 		if !allowed {
 			md := httpapi.MetadataFromContext(r.Context())
 			slog.Warn("hub-bff rate limit exceeded",
-				"event",         "rate_limited",
-				"path",          r.URL.Path,
-				"method",        r.Method,
-				"limit",         limit,
-				"retryAfter",    retryAfter,
+				"event", "rate_limited",
+				"path", r.URL.Path,
+				"method", r.Method,
+				"limit", limit,
+				"retryAfter", retryAfter,
 				"correlationId", md.CorrelationID,
-				"requestId",     md.RequestID,
+				"requestId", md.RequestID,
 				"sourceService", "hub-bff",
 			)
 			observability.ObserveRateLimited(r.URL.Path, "rate_limit_exceeded")

@@ -40,8 +40,20 @@ func main() {
 		redisClient.Close()
 		log.Fatalf("init auth middleware: %v", err)
 	}
-	defer redisClient.Close()
-	aggregationRuntime := aggregation.NewRuntime(&http.Client{}, aggregation.Options{
+
+	if err := run(cfg, redisClient, authMiddleware, registry); err != nil {
+		redisClient.Close()
+		log.Fatalf("server: %v", err)
+	}
+}
+
+func run(cfg config.Config, rc *redis.Client, am *auth.Middleware, reg *prometheus.Registry) error {
+	pap, err := httpapi.NewProfileAdminProxy(cfg.ProfileAdminURL)
+	if err != nil {
+		return err
+	}
+
+	agg := aggregation.NewRuntime(&http.Client{}, aggregation.Options{
 		Timeout: cfg.DownstreamTimeout,
 		Retries: cfg.DownstreamRetries,
 	}, map[string]string{
@@ -51,72 +63,66 @@ func main() {
 		"profil":   cfg.ProfilURL,
 		"report":   cfg.ReportURL,
 	})
-	handlers := httpapi.NewHandlers(aggregationRuntime)
-	health := httpapi.NewHealth(redisClient)
-	profileAdminProxy, err := httpapi.NewProfileAdminProxy(cfg.ProfileAdminURL)
-	if err != nil {
-		log.Fatalf("init profile admin proxy: %v", err)
-	}
+	handlers := httpapi.NewHandlers(agg)
+	health := httpapi.NewHealth(rc)
 
 	mux := http.NewServeMux()
 	mux.Handle("/healthz", httpapi.AllowedMethods([]string{"GET"})(http.HandlerFunc(health.Healthz)))
 	mux.Handle("/livez", httpapi.AllowedMethods([]string{"GET"})(http.HandlerFunc(health.Livez)))
 	mux.Handle("/readyz", httpapi.AllowedMethods([]string{"GET"})(http.HandlerFunc(health.Readyz)))
-	mux.Handle("/metrics", httpapi.AllowedMethods([]string{"GET"})(promhttp.HandlerFor(registry, promhttp.HandlerOpts{})))
+	mux.Handle("/metrics", httpapi.AllowedMethods([]string{"GET"})(promhttp.HandlerFor(reg, promhttp.HandlerOpts{})))
 	mux.Handle(
 		"/api/v1/overview",
 		httpapi.AllowedMethods([]string{"GET"})(
-			authMiddleware.Validate(auth.RequireAnyRole("user", "admin")(http.HandlerFunc(handlers.Overview))),
+			am.Validate(auth.RequireAnyRole("user", "admin")(http.HandlerFunc(handlers.Overview))),
 		),
 	)
 	mux.Handle(
 		"/api/v1/aggregation/dashboard",
 		httpapi.AllowedMethods([]string{"GET"})(
-			authMiddleware.Validate(auth.RequireAnyRole("user", "admin")(http.HandlerFunc(handlers.Dashboard))),
+			am.Validate(auth.RequireAnyRole("user", "admin")(http.HandlerFunc(handlers.Dashboard))),
 		),
 	)
 	mux.Handle(
 		"/api/v1/aggregation/home",
 		httpapi.AllowedMethods([]string{"GET"})(
-			authMiddleware.Validate(auth.RequireAnyRole("user", "admin")(http.HandlerFunc(handlers.Home))),
+			am.Validate(auth.RequireAnyRole("user", "admin")(http.HandlerFunc(handlers.Home))),
 		),
 	)
 	mux.Handle(
 		"/api/v1/aggregation/summary",
 		httpapi.AllowedMethods([]string{"GET"})(
-			authMiddleware.Validate(auth.RequireAnyRole("user", "admin")(http.HandlerFunc(handlers.Summary))),
+			am.Validate(auth.RequireAnyRole("user", "admin")(http.HandlerFunc(handlers.Summary))),
 		),
 	)
 	mux.Handle(
 		"/api/v1/me",
 		httpapi.AllowedMethods([]string{"GET"})(
-			authMiddleware.Validate(auth.RequireAnyRole("user", "admin")(http.HandlerFunc(httpapi.Me))),
+			am.Validate(auth.RequireAnyRole("user", "admin")(http.HandlerFunc(httpapi.Me))),
 		),
 	)
 	mux.Handle(
 		"/api/v1/admin/ping",
 		httpapi.AllowedMethods([]string{"GET"})(
-			authMiddleware.Validate(auth.RequireAnyRole("admin")(http.HandlerFunc(httpapi.AdminPing))),
+			am.Validate(auth.RequireAnyRole("admin")(http.HandlerFunc(httpapi.AdminPing))),
 		),
 	)
 	mux.Handle(
 		"/api/v1/admin/profile/",
 		httpapi.AllowedMethods([]string{"GET", "PUT", "PATCH", "DELETE"})(
-			authMiddleware.Validate(auth.RequireAnyRole("admin")(profileAdminProxy)),
+			am.Validate(auth.RequireAnyRole("admin")(pap)),
 		),
 	)
-	// CSP violation report endpoint — public, no auth required (browsers send reports unauthenticated)
 	mux.Handle("/api/v1/csp-report", httpapi.AllowedMethods([]string{"POST"})(http.HandlerFunc(httpapi.CSReport)))
 
-	// Cache middleware for read-only endpoints (inside auth to be user-aware)
 	cacheCfg := &middleware.CacheConfig{
 		TTLs:        middleware.DefaultTTLs(),
-		RedisClient: redisClient,
+		RedisClient: rc,
 		Enabled:     true,
 	}
 	rlCfg := &middleware.RateLimiterConfig{
 		Tiers:       middleware.DefaultTiers(),
-		RedisClient: redisClient,
+		RedisClient: rc,
 	}
 	handler := rlCfg.Middleware(
 		cacheCfg.Middleware(
@@ -133,7 +139,5 @@ func main() {
 		IdleTimeout:  60 * time.Second,
 	}
 	log.Printf("hub-bff listening on %s", addr)
-	if err := srv.ListenAndServe(); err != nil {
-		log.Fatalf("server stopped: %v", err)
-	}
+	return srv.ListenAndServe()
 }

@@ -161,9 +161,9 @@ func TestCountingRateLimiterDifferentKeys(t *testing.T) {
 
 func TestParseTierValue(t *testing.T) {
 	tests := []struct {
-		input     string
-		wantReq   int
-		wantWin   int
+		input   string
+		wantReq int
+		wantWin int
 	}{
 		{"60:60", 60, 60},
 		{"100:30", 100, 30},

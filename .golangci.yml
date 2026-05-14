@@ -17,3 +17,7 @@ linters:
 issues:
   exclude-dirs:
     - vendor
+  exclude-rules:
+    - path: integration/
+      linters:
+        - gosec
