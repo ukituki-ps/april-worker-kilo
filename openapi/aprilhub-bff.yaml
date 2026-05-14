@@ -341,6 +341,41 @@ paths:
                 $ref: "#/components/schemas/Error"
         "502":
           description: Upstream unavailable
+  /api/v1/csp-report:
+    post:
+      summary: CSP violation report endpoint
+      description: |
+        Receives Content Security Policy violation reports from browsers.
+        This endpoint is public and does not require authentication.
+      operationId: postCSPReport
+      tags: [Security]
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CSPReportBody"
+      responses:
+        "202":
+          description: Report accepted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CSPReportResponse"
+        "400":
+          description: Invalid report body
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "405":
+          description: Method not allowed
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: method not allowed
 components:
   securitySchemes:
     bearerAuth:
@@ -457,6 +492,44 @@ components:
           example: downstream_unavailable
         message:
           type: string
+    CSPReportBody:
+      type: object
+      required: [csp-report]
+      properties:
+        csp-report:
+          $ref: "#/components/schemas/CSPReport"
+    CSPReport:
+      type: object
+      properties:
+        document-uri:
+          type: string
+        blocked-uri:
+          type: string
+        violated-directive:
+          type: string
+        disposition:
+          type: string
+          enum: [enforce, report-only]
+        status-code:
+          type: integer
+        original-policy:
+          type: string
+        referrer:
+          type: string
+        source-file:
+          type: string
+        line-number:
+          type: integer
+        effective-intent:
+          type: string
+        sample:
+          type: string
+    CSPReportResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: ok
     Metadata:
       type: object
       required: [correlationId, requestId, sourceService]
