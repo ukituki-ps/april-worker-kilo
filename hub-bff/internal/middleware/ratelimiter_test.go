@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 )
 
@@ -19,6 +20,7 @@ func TestResolveTier(t *testing.T) {
 		{"/api/v1/admin/ping", false, "/api/v1/admin"},
 		{"/api/v1/aggregation/dashboard", false, "/api/v1/aggregation"},
 		{"/api/v1/overview", false, "/api/v1/overview"},
+		{"/api/v1/csp-report", false, "/api/v1/csp-report"},
 		{"/healthz", true, ""},
 		{"/readyz", true, ""},
 		{"/metrics", true, ""},
@@ -154,5 +156,86 @@ func TestCountingRateLimiterDifferentKeys(t *testing.T) {
 	allowed, _, _, _ = limiter.Allow(ctx, "key2")
 	if !allowed {
 		t.Error("key2 первый вызов: expected allowed")
+	}
+}
+
+func TestParseTierValue(t *testing.T) {
+	tests := []struct {
+		input     string
+		wantReq   int
+		wantWin   int
+	}{
+		{"60:60", 60, 60},
+		{"100:30", 100, 30},
+		{" 20 : 120 ", 20, 120},
+		{"abc:60", 0, 0},
+		{"60:abc", 0, 0},
+		{"60", 0, 0},
+		{"", 0, 0},
+		{":", 0, 0},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.input, func(t *testing.T) {
+			gotReq, gotWin := parseTierValue(tc.input)
+			if gotReq != tc.wantReq || gotWin != tc.wantWin {
+				t.Errorf("parseTierValue(%q) = (%d, %d), want (%d, %d)", tc.input, gotReq, gotWin, tc.wantReq, tc.wantWin)
+			}
+		})
+	}
+}
+
+func TestDefaultTiersEnvOverride(t *testing.T) {
+	_ = os.Unsetenv("RATE_LIMIT_TIER_GENERAL")
+	_ = os.Unsetenv("RATE_LIMIT_TIER_SENSITIVE")
+
+	t.Setenv("RATE_LIMIT_TIER_GENERAL", "200:30")
+	t.Setenv("RATE_LIMIT_TIER_SENSITIVE", "5:120")
+
+	tiers := DefaultTiers()
+	if len(tiers) == 0 {
+		t.Fatal("expected non-empty tiers")
+	}
+
+	generalTier := ResolveTier("/api/v1/aggregation", tiers)
+	if generalTier == nil {
+		t.Fatal("expected general tier for /api/v1/aggregation")
+	}
+	if generalTier.Limit != 200 {
+		t.Errorf("general tier limit: expected 200, got %d", generalTier.Limit)
+	}
+	if generalTier.WindowSeconds != 30 {
+		t.Errorf("general tier window: expected 30, got %d", generalTier.WindowSeconds)
+	}
+
+	sensitiveTier := ResolveTier("/api/v1/me", tiers)
+	if sensitiveTier == nil {
+		t.Fatal("expected sensitive tier for /api/v1/me")
+	}
+	if sensitiveTier.Limit != 5 {
+		t.Errorf("sensitive tier limit: expected 5, got %d", sensitiveTier.Limit)
+	}
+	if sensitiveTier.WindowSeconds != 120 {
+		t.Errorf("sensitive tier window: expected 120, got %d", sensitiveTier.WindowSeconds)
+	}
+}
+
+func TestDefaultTiersCSPReport(t *testing.T) {
+	_ = os.Unsetenv("RATE_LIMIT_TIER_GENERAL")
+	_ = os.Unsetenv("RATE_LIMIT_TIER_SENSITIVE")
+
+	tiers := DefaultTiers()
+	cspTier := ResolveTier("/api/v1/csp-report", tiers)
+	if cspTier == nil {
+		t.Fatal("expected tier for /api/v1/csp-report")
+	}
+	if cspTier.Limit != 30 {
+		t.Errorf("csp-report limit: expected 30, got %d", cspTier.Limit)
+	}
+	if cspTier.WindowSeconds != 60 {
+		t.Errorf("csp-report window: expected 60, got %d", cspTier.WindowSeconds)
+	}
+	if cspTier.Sensitive {
+		t.Error("csp-report should not be sensitive")
 	}
 }

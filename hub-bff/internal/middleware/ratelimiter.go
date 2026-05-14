@@ -139,16 +139,6 @@ func (cfg *RateLimiterConfig) allowWithEval(ctx context.Context, key string, lim
 	return true, remaining, limit, 0
 }
 
-// DefaultTiers returns the default rate limit tiers for AprilHub BFF.
-func DefaultTiers() []Tier {
-	return []Tier{
-		{Matches: "/api/v1/me", Sensitive: true, Limit: 10, WindowSeconds: 60},
-		{Matches: "/api/v1/admin", Sensitive: true, Limit: 10, WindowSeconds: 60},
-		{Matches: "/api/v1/aggregation", Sensitive: false, Limit: 100, WindowSeconds: 60},
-		{Matches: "/api/v1/overview", Sensitive: false, Limit: 100, WindowSeconds: 60},
-	}
-}
-
 // ResolveTier finds the best matching tier for the request path.
 // Returns nil for paths without a rate limit (e.g. /healthz, /readyz, /metrics).
 func ResolveTier(path string, tiers []Tier) *Tier {
